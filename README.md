@@ -11,37 +11,54 @@ python -m pip install --upgrade pip
 pip install -e .
 ```
 
-## OTO-aware deep timbre analysis
+## Main analysis command: one JSON per selected pitch layer
 
-Analyse one entire pitch-layer folder. The analyser will discover the nearest `oto.ini` automatically and attach each matching alias and timing window to the sample's JSON analysis.
-
-```powershell
-eugene-timbre analyze-deep-bank "C:\Users\photo\OneDrive\Документы\UtauV\Data\Singers\EugeneRE\5. G4" --output "C:\Users\photo\OneDrive\Документы\UtauV\Data\Singers\EugeneRE\G4_deep_analysis"
-```
-
-For B2, change the input to `6. B2` and use a separate output folder. The output path must not be the input folder.
-
-Analyse the entire voicebank root, with each subfolder's nearest `oto.ini`:
+This keeps the same input/output style as the earlier analyser. It now performs deep harmonic, spectral-envelope and OTO-timing analysis, automatically discovering the nearest `oto.ini`.
 
 ```powershell
-eugene-timbre analyze-deep-bank "C:\Users\photo\OneDrive\Документы\UtauV\Data\Singers\EugeneRE" --output "C:\Users\photo\OneDrive\Документы\UtauV\Data\Singers\EugeneRE_deep"
+eugene-timbre analyze "C:\Users\photo\OneDrive\Документы\UtauV\Data\Singers\EugeneRE\5. G4" -o "G4_analysis.json"
 ```
 
-Optional flags:
+For B2, change the input folder to `6. B2` and output file to `B2_analysis.json`. Use a destination outside the input folder when you want to keep the voicebank directory unchanged.
 
-- `--groups B2 F3 G4` — analyse only selected groups.
-- `--oto-file "D:\\path\\oto.ini"` — use one explicit OTO file.
-- `--no-oto` — run the deep waveform analysis without OTO alignment.
-
-For one sample:
+Analyse the entire voicebank root in one JSON:
 
 ```powershell
-eugene-timbre analyze-deep-sample "D:\Voicebanks\EugeneRE\6. B2\a_a_i.wav" --output "D:\AudioAnalysis\a_a_i_deep.json"
+eugene-timbre analyze "C:\Users\photo\OneDrive\Документы\UtauV\Data\Singers\EugeneRE" -o "EugeneRE_deep_analysis.json"
 ```
 
-Add `--alias "a あ_B2"` to select a single exact alias.
+Useful options:
 
-The analyser reports F0 trajectories, harmonic amplitudes, harmonic/residual energy, inharmonicity, cepstral spectral envelopes, frame-level variation, and OTO-aligned source/fixed/stretchable regions. It preserves all original OTO timing values and never modifies the voicebank. See [docs/deep-analysis.md](docs/deep-analysis.md) and [docs/oto-timing-analysis.md](docs/oto-timing-analysis.md).
+- `--oto-file "D:\\path\\oto.ini"` — use one explicit OTO file instead of auto-discovery.
+- `--no-oto` — disable OTO alignment.
+- `--f0-min 65 --f0-max 850` — adjust the fundamental-frequency search range.
+- `--frame-ms 85 --hop-ms 20` — adjust analysis window and hop.
+
+## Alternative: separate report files by group
+
+```powershell
+eugene-timbre analyze-deep-bank "C:\Users\photo\OneDrive\Документы\UtauV\Data\Singers\EugeneRE" --output "C:\AudioAnalysis\EugeneRE_deep"
+```
+
+This writes a manifest plus separate JSON files for B2, F3, G4 and other folders. Add `--groups B2 F3 G4` to select only those groups.
+
+## Analyse one WAV
+
+```powershell
+eugene-timbre analyze-deep-sample "D:\Voicebanks\EugeneRE\6. B2\a_a_i.wav" -o "D:\AudioAnalysis\a_a_i_deep.json"
+```
+
+Add `--alias "a あ_B2"` to select one exact alias.
+
+## Earlier broad analysis only
+
+The original whole-file energy summary is still available as:
+
+```powershell
+eugene-timbre analyze-basic "D:\Voicebanks\EugeneRE\6. B2" -o "B2_basic_analysis.json"
+```
+
+The deep analyser measures F0 trajectories, harmonic amplitudes, harmonic/residual energy, inharmonicity, cepstral spectral envelopes, frame-level variation and OTO-aligned source/fixed/stretchable regions. It preserves all original OTO timing values and never modifies the voicebank. See [docs/deep-analysis.md](docs/deep-analysis.md) and [docs/oto-timing-analysis.md](docs/oto-timing-analysis.md).
 
 ## Experimental tonal processing
 

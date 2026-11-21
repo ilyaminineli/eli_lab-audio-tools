@@ -1,27 +1,37 @@
 # OTO-aware timbre analysis
 
-The deep bank analyser reads `oto.ini` files as read-only timing metadata. It does not alter aliases or timing values.
+The deep analyser reads `oto.ini` files as read-only timing metadata. It does not alter aliases or timing values.
 
-## Run against one pitch-layer folder
+## Run with the same one-file output style as the earlier analyser
 
-The selected folder can be a pitch layer such as `5. G4`. The analyser automatically finds the nearest `oto.ini` in that folder or its parent folders.
+Choose the pitch-layer directory as the input and a JSON file as the output:
 
 ```powershell
-eugene-timbre analyze-deep-bank "C:\Users\photo\OneDrive\Документы\UtauV\Data\Singers\EugeneRE\5. G4" --output "C:\Users\photo\OneDrive\Документы\UtauV\Data\Singers\EugeneRE\G4_deep_analysis"
+eugene-timbre analyze "C:\Users\photo\OneDrive\Документы\UtauV\Data\Singers\EugeneRE\5. G4" -o "G4_analysis.json"
 ```
 
-For B2, use the same command with `6. B2` as the input folder and a separate B2 output directory.
+For B2, change the input to `6. B2` and output file to `B2_analysis.json`. The command automatically discovers `oto.ini` in the selected folder, or the nearest parent folder. It writes one JSON document containing the manifest, group summaries, per-file metrics and all OTO alias matches.
 
-Use an explicit OTO file when necessary:
+Analyse the entire voicebank root in one JSON:
 
 ```powershell
-eugene-timbre analyze-deep-bank "D:\Voicebanks\EugeneRE\6. B2" --oto-file "D:\Voicebanks\EugeneRE\6. B2\oto.ini" --output "D:\AudioAnalysis\B2_deep"
+eugene-timbre analyze "C:\Users\photo\OneDrive\Документы\UtauV\Data\Singers\EugeneRE" -o "EugeneRE_deep_analysis.json"
 ```
 
-To analyse one WAV and all of its OTO aliases:
+The CLI also supports `--oto-file "D:\\path\\oto.ini"` to specify one OTO file explicitly, and `--no-oto` to disable OTO alignment.
+
+## Alternative: separate reports by folder
 
 ```powershell
-eugene-timbre analyze-deep-sample "D:\Voicebanks\EugeneRE\6. B2\a_a_i.wav" --output "D:\AudioAnalysis\a_a_i_deep.json"
+eugene-timbre analyze-deep-bank "D:\Voicebanks\EugeneRE" --output "D:\AudioAnalysis\EugeneRE_deep"
+```
+
+This creates `bank_deep_analysis.json` plus one JSON file for each discovered group.
+
+## Analyse one sample
+
+```powershell
+eugene-timbre analyze-deep-sample "D:\Voicebanks\EugeneRE\6. B2\a_a_i.wav" -o "D:\AudioAnalysis\a_a_i_deep.json"
 ```
 
 Add `--alias "a あ_B2"` to restrict the single-sample report to one exact alias.
@@ -49,12 +59,11 @@ The negative-cutoff coordinate follows OpenUtau's OTO display implementation. Th
 
 For each alias, the report includes OTO line number, decoded alias, original timing values, calculated markers, warnings, and separate analysis of the source, fixed and stretchable regions. Regions shorter than 60 ms receive a basic spectral summary where possible but are skipped for F0/harmonic-envelope analysis, because they are too short for a reliable voiced-frame analysis.
 
-## Output
+## Output structure
 
-- `bank_deep_analysis.json`: bank manifest, OTO file list, parse errors, unmatched aliases and group summaries.
-- `b2_deep_analysis.json`, `f3_deep_analysis.json`, `g4_deep_analysis.json`: per-sample analysis with a list of OTO alias entries for each WAV.
-
-A WAV may have multiple OTO aliases. The analyser therefore keeps all matching entries rather than assuming one WAV equals one alias.
+- One-file output: top-level `manifest` and `groups` objects, with one group report containing per-WAV records and OTO alias entries.
+- Separate-report output: `bank_deep_analysis.json` plus `b2_deep_analysis.json`, `f3_deep_analysis.json`, `g4_deep_analysis.json`, and reports for other folders.
+- Each WAV can have multiple OTO aliases. The analyser keeps all matching entries rather than assuming one WAV equals one alias.
 
 The OTO parser supports UTF-8 and CP932/Shift-JIS, preserving Japanese aliases in JSON. It only reads `oto.ini`; it does not rewrite it.
 
