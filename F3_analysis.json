@@ -1,0 +1,2422 @@
+{
+  "files": [
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\- a.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 100044
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 100044,
+        "channels": 1,
+        "duration_seconds": 2.2685714285714287,
+        "peak_dbfs": 0.857421875,
+        "rms_dbfs": -11.461215297265472,
+        "crest_factor_db": 10.125106482591285,
+        "spectral_centroid_hz": 524.2938062202516,
+        "spectral_flatness": 9.513406613712925e-05,
+        "relative_band_energy": {
+          "20_150_hz": 1.8481967122648907e-05,
+          "150_500_hz": 0.3797990242427189,
+          "500_2000_hz": 0.6125404905963656,
+          "2000_5000_hz": 0.007418965444770928,
+          "5000_10000_hz": 0.0002072492478060422,
+          "10000_nyquist_hz": 9.41008681951968e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\- e.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 100113
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 100113,
+        "channels": 1,
+        "duration_seconds": 2.270136054421769,
+        "peak_dbfs": 0.872344970703125,
+        "rms_dbfs": -9.757136138455447,
+        "crest_factor_db": 8.570901370266917,
+        "spectral_centroid_hz": 495.35027384536977,
+        "spectral_flatness": 8.921542933242536e-05,
+        "relative_band_energy": {
+          "20_150_hz": 8.67497562158199e-06,
+          "150_500_hz": 0.7102101930911512,
+          "500_2000_hz": 0.27537533327188474,
+          "2000_5000_hz": 0.014000100340174952,
+          "5000_10000_hz": 0.00037756168660897703,
+          "10000_nyquist_hz": 1.1560095170793454e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\- i.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 99646
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 99646,
+        "channels": 1,
+        "duration_seconds": 2.259546485260771,
+        "peak_dbfs": 0.656097412109375,
+        "rms_dbfs": -11.717341587483961,
+        "crest_factor_db": 8.056708082339302,
+        "spectral_centroid_hz": 364.6806185477948,
+        "spectral_flatness": 7.43058343121111e-05,
+        "relative_band_energy": {
+          "20_150_hz": 1.6312914711578822e-05,
+          "150_500_hz": 0.9868697312387105,
+          "500_2000_hz": 0.009187427538128005,
+          "2000_5000_hz": 0.0037435796932428086,
+          "5000_10000_hz": 0.00015483532964849026,
+          "10000_nyquist_hz": 1.1474275945587131e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\- o.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 99820
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 99820,
+        "channels": 1,
+        "duration_seconds": 2.2634920634920634,
+        "peak_dbfs": 0.745269775390625,
+        "rms_dbfs": -10.98264979662635,
+        "crest_factor_db": 8.42891996986312,
+        "spectral_centroid_hz": 408.05718684562135,
+        "spectral_flatness": 1.2066578125062414e-05,
+        "relative_band_energy": {
+          "20_150_hz": 1.0648315091418887e-05,
+          "150_500_hz": 0.8328418033105711,
+          "500_2000_hz": 0.1669566842954107,
+          "2000_5000_hz": 0.00016872790981853992,
+          "5000_10000_hz": 5.142272740844233e-06,
+          "10000_nyquist_hz": 1.1927615999739369e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\- u.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 99147
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 99147,
+        "channels": 1,
+        "duration_seconds": 2.2482312925170067,
+        "peak_dbfs": 0.72430419921875,
+        "rms_dbfs": -10.048155801230427,
+        "crest_factor_db": 7.246575862617237,
+        "spectral_centroid_hz": 377.958817176856,
+        "spectral_flatness": 1.1335555756019934e-05,
+        "relative_band_energy": {
+          "20_150_hz": 2.5533136896752392e-05,
+          "150_500_hz": 0.9801150467402078,
+          "500_2000_hz": 0.01963902136935129,
+          "2000_5000_hz": 0.0002026145223420213,
+          "5000_10000_hz": 5.933733581865081e-06,
+          "10000_nyquist_hz": 1.6207523557662447e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\a_a_i.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 141872
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 141872,
+        "channels": 1,
+        "duration_seconds": 3.2170521541950112,
+        "peak_dbfs": 0.48736572265625,
+        "rms_dbfs": -15.38566027220902,
+        "crest_factor_db": 9.14275989578432,
+        "spectral_centroid_hz": 442.339415588107,
+        "spectral_flatness": 4.9307543102603275e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00028511308661393974,
+          "150_500_hz": 0.7189186697312316,
+          "500_2000_hz": 0.27546008277299155,
+          "2000_5000_hz": 0.005093512612590626,
+          "5000_10000_hz": 0.00022686633173925113,
+          "10000_nyquist_hz": 4.229938467694498e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\a_e_a.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142782
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142782,
+        "channels": 1,
+        "duration_seconds": 3.237687074829932,
+        "peak_dbfs": 0.585540771484375,
+        "rms_dbfs": -14.551292267270657,
+        "crest_factor_db": 9.902435079151402,
+        "spectral_centroid_hz": 522.8986147089652,
+        "spectral_flatness": 5.484456937922406e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00029024406723376396,
+          "150_500_hz": 0.4627754168685735,
+          "500_2000_hz": 0.5290922619308306,
+          "2000_5000_hz": 0.0074825185937232135,
+          "5000_10000_hz": 0.00034180972607192025,
+          "10000_nyquist_hz": 5.9314629352195024e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\a_n_a.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142568
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142568,
+        "channels": 1,
+        "duration_seconds": 3.232834467120181,
+        "peak_dbfs": 0.506988525390625,
+        "rms_dbfs": -16.513902945559355,
+        "crest_factor_db": 10.613865547771361,
+        "spectral_centroid_hz": 469.0384795694528,
+        "spectral_flatness": 3.0403554823234658e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00045783360559005336,
+          "150_500_hz": 0.528371839258726,
+          "500_2000_hz": 0.4672397037385859,
+          "2000_5000_hz": 0.003835743011128217,
+          "5000_10000_hz": 7.309839682205273e-05,
+          "10000_nyquist_hz": 2.5782660908596893e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\a_o_a.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142627
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142627,
+        "channels": 1,
+        "duration_seconds": 3.234172335600907,
+        "peak_dbfs": 0.557159423828125,
+        "rms_dbfs": -14.20098702878138,
+        "crest_factor_db": 9.120576640775955,
+        "spectral_centroid_hz": 463.36835997158903,
+        "spectral_flatness": 1.9151240231188092e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00029336550932870716,
+          "150_500_hz": 0.620807641391743,
+          "500_2000_hz": 0.3771000505927859,
+          "2000_5000_hz": 0.0017378050120412795,
+          "5000_10000_hz": 4.9282232017842825e-05,
+          "10000_nyquist_hz": 1.717031559104439e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\a_tsu.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142212
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142212,
+        "channels": 1,
+        "duration_seconds": 3.224761904761905,
+        "peak_dbfs": 0.450286865234375,
+        "rms_dbfs": -15.875647313778096,
+        "crest_factor_db": 8.945432891303302,
+        "spectral_centroid_hz": 419.617801506224,
+        "spectral_flatness": 0.00012729012981129036,
+        "relative_band_energy": {
+          "20_150_hz": 0.00036753035757002136,
+          "150_500_hz": 0.7631779753037804,
+          "500_2000_hz": 0.23389535736826922,
+          "2000_5000_hz": 0.0022149851143665276,
+          "5000_10000_hz": 0.0002901973609777719,
+          "10000_nyquist_hz": 4.293055358117741e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\a_u_a.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142753
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142753,
+        "channels": 1,
+        "duration_seconds": 3.23702947845805,
+        "peak_dbfs": 0.544525146484375,
+        "rms_dbfs": -14.311619561438507,
+        "crest_factor_db": 9.031978371914635,
+        "spectral_centroid_hz": 452.06026954135524,
+        "spectral_flatness": 1.9751311389197645e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0002521510414198913,
+          "150_500_hz": 0.66431390865084,
+          "500_2000_hz": 0.3335835692604502,
+          "2000_5000_hz": 0.0017788113862966305,
+          "5000_10000_hz": 5.720520419499422e-05,
+          "10000_nyquist_hz": 1.7697913456388115e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\ba_bi_bu.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 143750
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 143750,
+        "channels": 1,
+        "duration_seconds": 3.259637188208617,
+        "peak_dbfs": 0.53204345703125,
+        "rms_dbfs": -15.147415875738687,
+        "crest_factor_db": 9.666358009537259,
+        "spectral_centroid_hz": 405.73393552653664,
+        "spectral_flatness": 4.4380291326841e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0004326119519887997,
+          "150_500_hz": 0.849993221759694,
+          "500_2000_hz": 0.1473828010184689,
+          "2000_5000_hz": 0.002061761031255895,
+          "5000_10000_hz": 0.00010652193367532143,
+          "10000_nyquist_hz": 4.134117106841435e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\bu_be_bo.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 143938
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 143938,
+        "channels": 1,
+        "duration_seconds": 3.26390022675737,
+        "peak_dbfs": 0.568817138671875,
+        "rms_dbfs": -13.869064605185685,
+        "crest_factor_db": 8.968518072646877,
+        "spectral_centroid_hz": 416.42748241069535,
+        "spectral_flatness": 2.5935177162127465e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0003864988841216871,
+          "150_500_hz": 0.8169491771620799,
+          "500_2000_hz": 0.1808965779340155,
+          "2000_5000_hz": 0.0016986813246015458,
+          "5000_10000_hz": 5.304732304592789e-05,
+          "10000_nyquist_hz": 2.780759172810671e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\bya_byu_byo.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 143934
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 143934,
+        "channels": 1,
+        "duration_seconds": 3.263809523809524,
+        "peak_dbfs": 0.51104736328125,
+        "rms_dbfs": -14.75016778578066,
+        "crest_factor_db": 8.919390824031794,
+        "spectral_centroid_hz": 419.28653055761265,
+        "spectral_flatness": 3.852016144032304e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0003337572237079207,
+          "150_500_hz": 0.7934833879208687,
+          "500_2000_hz": 0.20341488300746938,
+          "2000_5000_hz": 0.0026636667813609537,
+          "5000_10000_hz": 8.186229144721941e-05,
+          "10000_nyquist_hz": 3.0189066985074494e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\cha_chi_chu.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 147899
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 147899,
+        "channels": 1,
+        "duration_seconds": 3.353718820861678,
+        "peak_dbfs": 0.506378173828125,
+        "rms_dbfs": -15.473350675571409,
+        "crest_factor_db": 9.56285024015361,
+        "spectral_centroid_hz": 434.0561925615455,
+        "spectral_flatness": 0.00023846467561591152,
+        "relative_band_energy": {
+          "20_150_hz": 0.0002948401983637848,
+          "150_500_hz": 0.8205234257194209,
+          "500_2000_hz": 0.17065091752009484,
+          "2000_5000_hz": 0.007205674823010531,
+          "5000_10000_hz": 0.0012737385691027068,
+          "10000_nyquist_hz": 4.013205218180395e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\chu_che_cho.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 147812
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 147812,
+        "channels": 1,
+        "duration_seconds": 3.351746031746032,
+        "peak_dbfs": 0.569976806640625,
+        "rms_dbfs": -14.302907656382843,
+        "crest_factor_db": 9.420051332887777,
+        "spectral_centroid_hz": 440.63992862096063,
+        "spectral_flatness": 0.0001799594314540527,
+        "relative_band_energy": {
+          "20_150_hz": 0.00023176379319709376,
+          "150_500_hz": 0.7856867323809291,
+          "500_2000_hz": 0.2071491414724899,
+          "2000_5000_hz": 0.005904986268664806,
+          "5000_10000_hz": 0.0009890314055170514,
+          "10000_nyquist_hz": 2.9590208526560287e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\da_di_du.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 144520
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 144520,
+        "channels": 1,
+        "duration_seconds": 3.277097505668934,
+        "peak_dbfs": 0.5010986328125,
+        "rms_dbfs": -15.024668123093367,
+        "crest_factor_db": 9.023132479567447,
+        "spectral_centroid_hz": 408.3983917601605,
+        "spectral_flatness": 5.532319280714737e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0004058335093162094,
+          "150_500_hz": 0.8392612827817744,
+          "500_2000_hz": 0.15760469964639962,
+          "2000_5000_hz": 0.002570733375567576,
+          "5000_10000_hz": 0.00013321150666336366,
+          "10000_nyquist_hz": 5.657010344734506e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\du_de_do.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 144296
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 144296,
+        "channels": 1,
+        "duration_seconds": 3.272018140589569,
+        "peak_dbfs": 0.552886962890625,
+        "rms_dbfs": -13.424551123816062,
+        "crest_factor_db": 8.277278111181293,
+        "spectral_centroid_hz": 432.82469314045443,
+        "spectral_flatness": 3.743164506301606e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.000254006454527749,
+          "150_500_hz": 0.7476485645153431,
+          "500_2000_hz": 0.24952642198987476,
+          "2000_5000_hz": 0.0024643321469882914,
+          "5000_10000_hz": 9.448226386752417e-05,
+          "10000_nyquist_hz": 4.170667794486248e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\e_e_u.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 141511
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 141511,
+        "channels": 1,
+        "duration_seconds": 3.208866213151927,
+        "peak_dbfs": 0.603363037109375,
+        "rms_dbfs": -12.473494422701755,
+        "crest_factor_db": 8.085068445641843,
+        "spectral_centroid_hz": 480.137089465848,
+        "spectral_flatness": 3.611728101075267e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0001541005211869083,
+          "150_500_hz": 0.5910543965239131,
+          "500_2000_hz": 0.4043189678458693,
+          "2000_5000_hz": 0.004206333620085658,
+          "5000_10000_hz": 0.0002502185538926215,
+          "10000_nyquist_hz": 4.593053588955668e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\e_n_e.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 143474
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 143474,
+        "channels": 1,
+        "duration_seconds": 3.2533786848072563,
+        "peak_dbfs": 0.5626220703125,
+        "rms_dbfs": -14.037287351224457,
+        "crest_factor_db": 9.041622641079753,
+        "spectral_centroid_hz": 497.1896227897064,
+        "spectral_flatness": 4.65005316195171e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00025639238501596923,
+          "150_500_hz": 0.46138908733617084,
+          "500_2000_hz": 0.5317296084876894,
+          "2000_5000_hz": 0.006372866827527255,
+          "5000_10000_hz": 0.00023701500604581528,
+          "10000_nyquist_hz": 5.26118830892137e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\e_o_e.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142701
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142701,
+        "channels": 1,
+        "duration_seconds": 3.2358503401360545,
+        "peak_dbfs": 0.5802001953125,
+        "rms_dbfs": -12.355485622607516,
+        "crest_factor_db": 7.627043035867575,
+        "spectral_centroid_hz": 494.32740971498345,
+        "spectral_flatness": 2.9403692547212323e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00015007949902911703,
+          "150_500_hz": 0.49683854125427923,
+          "500_2000_hz": 0.49993807091618525,
+          "2000_5000_hz": 0.0029427303731976353,
+          "5000_10000_hz": 0.00012020957876710191,
+          "10000_nyquist_hz": 2.9246602366910737e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\e_tsu.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142923
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142923,
+        "channels": 1,
+        "duration_seconds": 3.2408843537414964,
+        "peak_dbfs": 0.50933837890625,
+        "rms_dbfs": -14.520463873607934,
+        "crest_factor_db": 8.660591907998509,
+        "spectral_centroid_hz": 435.5615614315311,
+        "spectral_flatness": 0.00011627912573222424,
+        "relative_band_energy": {
+          "20_150_hz": 0.0002223176333840659,
+          "150_500_hz": 0.7509281439220531,
+          "500_2000_hz": 0.24344216047111608,
+          "2000_5000_hz": 0.004947845353806113,
+          "5000_10000_hz": 0.00041426191790965467,
+          "10000_nyquist_hz": 3.2986109575810874e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\fa_fi_fu.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 141932
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 141932,
+        "channels": 1,
+        "duration_seconds": 3.2184126984126986,
+        "peak_dbfs": 0.493438720703125,
+        "rms_dbfs": -15.298951473668549,
+        "crest_factor_db": 9.163615995222527,
+        "spectral_centroid_hz": 406.1862585428648,
+        "spectral_flatness": 0.0001275392089098035,
+        "relative_band_energy": {
+          "20_150_hz": 0.0002896721452435097,
+          "150_500_hz": 0.8522453593083316,
+          "500_2000_hz": 0.144968233418457,
+          "2000_5000_hz": 0.00228115824778252,
+          "5000_10000_hz": 0.0001554866308756807,
+          "10000_nyquist_hz": 4.936555847342107e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\fu_fe_fo.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 141991
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 141991,
+        "channels": 1,
+        "duration_seconds": 3.219750566893424,
+        "peak_dbfs": 0.503662109375,
+        "rms_dbfs": -14.022237783682405,
+        "crest_factor_db": 8.06502338378995,
+        "spectral_centroid_hz": 422.4810587110748,
+        "spectral_flatness": 8.183493863161932e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0003181245722501223,
+          "150_500_hz": 0.8038128366562439,
+          "500_2000_hz": 0.19356200744774096,
+          "2000_5000_hz": 0.002151483400784019,
+          "5000_10000_hz": 0.00010184939002479753,
+          "10000_nyquist_hz": 4.187326825212466e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\fu_ha_ha.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142029
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142029,
+        "channels": 1,
+        "duration_seconds": 3.2206122448979593,
+        "peak_dbfs": 0.576171875,
+        "rms_dbfs": -14.754230035167506,
+        "crest_factor_db": 9.96527113521415,
+        "spectral_centroid_hz": 449.91314044896507,
+        "spectral_flatness": 4.0325595696191665e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0004801718085561976,
+          "150_500_hz": 0.6589760394048061,
+          "500_2000_hz": 0.33738732348885414,
+          "2000_5000_hz": 0.0029897559278504217,
+          "5000_10000_hz": 0.00014468448794159613,
+          "10000_nyquist_hz": 3.1281741866642277e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\ga_gi_gu.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 144421
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 144421,
+        "channels": 1,
+        "duration_seconds": 3.2748526077097506,
+        "peak_dbfs": 0.562347412109375,
+        "rms_dbfs": -14.782104029754699,
+        "crest_factor_db": 9.782198047424018,
+        "spectral_centroid_hz": 415.4730995688589,
+        "spectral_flatness": 6.496513744460706e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0003282318075520252,
+          "150_500_hz": 0.8144619919504098,
+          "500_2000_hz": 0.18227175082500707,
+          "2000_5000_hz": 0.0027689551809004283,
+          "5000_10000_hz": 0.00014547818045650314,
+          "10000_nyquist_hz": 8.31017335608879e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\gu_ge_go.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 143183
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 143183,
+        "channels": 1,
+        "duration_seconds": 3.246780045351474,
+        "peak_dbfs": 0.591217041015625,
+        "rms_dbfs": -13.206222989704637,
+        "crest_factor_db": 8.641161859834872,
+        "spectral_centroid_hz": 432.5518838414831,
+        "spectral_flatness": 3.7153430844480184e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00021061317121518232,
+          "150_500_hz": 0.7573698678905175,
+          "500_2000_hz": 0.23971987077101017,
+          "2000_5000_hz": 0.0025835460070626126,
+          "5000_10000_hz": 9.337581311279206e-05,
+          "10000_nyquist_hz": 4.656226304171956e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\gya_gyu_gyo.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 144641
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 144641,
+        "channels": 1,
+        "duration_seconds": 3.27984126984127,
+        "peak_dbfs": 0.557098388671875,
+        "rms_dbfs": -14.231472281148838,
+        "crest_factor_db": 9.150110327669402,
+        "spectral_centroid_hz": 427.7389135907648,
+        "spectral_flatness": 7.661486515024448e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0002726582221479045,
+          "150_500_hz": 0.7811201840022711,
+          "500_2000_hz": 0.2157380197563441,
+          "2000_5000_hz": 0.0026370781226837214,
+          "5000_10000_hz": 0.00021220886538361893,
+          "10000_nyquist_hz": 1.0913974052506774e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\he_hyu_hyo.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 143409
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 143409,
+        "channels": 1,
+        "duration_seconds": 3.251904761904762,
+        "peak_dbfs": 0.524749755859375,
+        "rms_dbfs": -14.374689952152924,
+        "crest_factor_db": 8.77373485611921,
+        "spectral_centroid_hz": 428.20242495004453,
+        "spectral_flatness": 0.00016753444622225684,
+        "relative_band_energy": {
+          "20_150_hz": 0.00036186269290864947,
+          "150_500_hz": 0.8224796050436829,
+          "500_2000_hz": 0.16990791264719549,
+          "2000_5000_hz": 0.006427144825411666,
+          "5000_10000_hz": 0.0007601571031695451,
+          "10000_nyquist_hz": 4.812592833397245e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\hi_he_ho.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 143967
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 143967,
+        "channels": 1,
+        "duration_seconds": 3.264557823129252,
+        "peak_dbfs": 0.5225830078125,
+        "rms_dbfs": -14.555606252691199,
+        "crest_factor_db": 8.918711936742277,
+        "spectral_centroid_hz": 436.9695935720902,
+        "spectral_flatness": 6.208409790233252e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00032454901115333025,
+          "150_500_hz": 0.7335489557702324,
+          "500_2000_hz": 0.2615985719116553,
+          "2000_5000_hz": 0.004316198965389388,
+          "5000_10000_hz": 0.00018955018053876482,
+          "10000_nyquist_hz": 6.614591995661139e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\hya_hi_hyu.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 145299
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 145299,
+        "channels": 1,
+        "duration_seconds": 3.294761904761905,
+        "peak_dbfs": 0.541900634765625,
+        "rms_dbfs": -15.651438576148234,
+        "crest_factor_db": 10.329831770784196,
+        "spectral_centroid_hz": 416.54924345212703,
+        "spectral_flatness": 0.00017708905281397873,
+        "relative_band_energy": {
+          "20_150_hz": 0.00038891450343663626,
+          "150_500_hz": 0.8725003100270327,
+          "500_2000_hz": 0.12180177590293556,
+          "2000_5000_hz": 0.004648905191338675,
+          "5000_10000_hz": 0.0006117281317876502,
+          "10000_nyquist_hz": 3.2463053265447944e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\i_e_i.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142362
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142362,
+        "channels": 1,
+        "duration_seconds": 3.2281632653061223,
+        "peak_dbfs": 0.57208251953125,
+        "rms_dbfs": -13.611617024334704,
+        "crest_factor_db": 8.760790578945286,
+        "spectral_centroid_hz": 440.6254063458448,
+        "spectral_flatness": 4.926484374818714e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00017664714259298784,
+          "150_500_hz": 0.7523700444287253,
+          "500_2000_hz": 0.24149188583204065,
+          "2000_5000_hz": 0.005662930185408275,
+          "5000_10000_hz": 0.0002775972753623655,
+          "10000_nyquist_hz": 6.931539431557571e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\i_i_a.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 143356
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 143356,
+        "channels": 1,
+        "duration_seconds": 3.250702947845805,
+        "peak_dbfs": 0.54180908203125,
+        "rms_dbfs": -14.45158787856127,
+        "crest_factor_db": 9.128513490252445,
+        "spectral_centroid_hz": 419.52239263825066,
+        "spectral_flatness": 4.131414311918736e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00022301701576105717,
+          "150_500_hz": 0.7964928550500804,
+          "500_2000_hz": 0.19951791487310597,
+          "2000_5000_hz": 0.0036115317406402877,
+          "5000_10000_hz": 0.0001294658678297003,
+          "10000_nyquist_hz": 5.050261229716469e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\i_n_i.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142609
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142609,
+        "channels": 1,
+        "duration_seconds": 3.2337641723356008,
+        "peak_dbfs": 0.478363037109375,
+        "rms_dbfs": -15.253760758550165,
+        "crest_factor_db": 8.848913049410887,
+        "spectral_centroid_hz": 358.2635099592492,
+        "spectral_flatness": 4.204886883503932e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00025863968335066166,
+          "150_500_hz": 0.9530126141370379,
+          "500_2000_hz": 0.04252985062833762,
+          "2000_5000_hz": 0.004025884492574668,
+          "5000_10000_hz": 0.0001405356411479009,
+          "10000_nyquist_hz": 4.976940087301447e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\i_o_i.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 138000
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 138000,
+        "channels": 1,
+        "duration_seconds": 3.129251700680272,
+        "peak_dbfs": 0.539276123046875,
+        "rms_dbfs": -13.239740611145038,
+        "crest_factor_db": 7.875964449560021,
+        "spectral_centroid_hz": 385.5153879869628,
+        "spectral_flatness": 2.944980500800378e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00017878986792838587,
+          "150_500_hz": 0.9413336275691833,
+          "500_2000_hz": 0.05551309717593877,
+          "2000_5000_hz": 0.002851247762677022,
+          "5000_10000_hz": 9.960504114549807e-05,
+          "10000_nyquist_hz": 3.7184740244581867e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\i_sa_su.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142027
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142027,
+        "channels": 1,
+        "duration_seconds": 3.2205668934240363,
+        "peak_dbfs": 0.498779296875,
+        "rms_dbfs": -15.266419053825867,
+        "crest_factor_db": 9.224587427119332,
+        "spectral_centroid_hz": 424.2000783598511,
+        "spectral_flatness": 0.00033222822336767186,
+        "relative_band_energy": {
+          "20_150_hz": 0.00034317338189295373,
+          "150_500_hz": 0.8269891234353928,
+          "500_2000_hz": 0.16785255220932166,
+          "2000_5000_hz": 0.0028599272861135564,
+          "5000_10000_hz": 0.0017797044262273058,
+          "10000_nyquist_hz": 0.00016101563207966842
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\i_tsu.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142397
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142397,
+        "channels": 1,
+        "duration_seconds": 3.228956916099773,
+        "peak_dbfs": 0.464691162109375,
+        "rms_dbfs": -15.450776270170172,
+        "crest_factor_db": 8.794064525702806,
+        "spectral_centroid_hz": 371.920960752454,
+        "spectral_flatness": 0.00010612432123093893,
+        "relative_band_energy": {
+          "20_150_hz": 0.00020419713547756036,
+          "150_500_hz": 0.976525101729894,
+          "500_2000_hz": 0.021564690846582902,
+          "2000_5000_hz": 0.0013791087921620462,
+          "5000_10000_hz": 0.0002750324285624646,
+          "10000_nyquist_hz": 3.8216537747176196e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\i_u_i.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 143160
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 143160,
+        "channels": 1,
+        "duration_seconds": 3.2462585034013607,
+        "peak_dbfs": 0.52081298828125,
+        "rms_dbfs": -13.256389041342402,
+        "crest_factor_db": 7.590025168080443,
+        "spectral_centroid_hz": 375.5885953864792,
+        "spectral_flatness": 2.7521521897642015e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00013869597385571315,
+          "150_500_hz": 0.9898019593803143,
+          "500_2000_hz": 0.007024549029881943,
+          "2000_5000_hz": 0.0029043618091231693,
+          "5000_10000_hz": 0.00011149212317560356,
+          "10000_nyquist_hz": 3.226195292657155e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\i_ya_yu.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 141878
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 141878,
+        "channels": 1,
+        "duration_seconds": 3.21718820861678,
+        "peak_dbfs": 0.486602783203125,
+        "rms_dbfs": -14.641006022510199,
+        "crest_factor_db": 8.3844977948954,
+        "spectral_centroid_hz": 404.00390872123484,
+        "spectral_flatness": 4.227725559443394e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00025182064822086944,
+          "150_500_hz": 0.8364536356884371,
+          "500_2000_hz": 0.16026735951636426,
+          "2000_5000_hz": 0.002865904747916677,
+          "5000_10000_hz": 0.00014453218601203618,
+          "10000_nyquist_hz": 4.512098201153626e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\i_za_zu.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 144497
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 144497,
+        "channels": 1,
+        "duration_seconds": 3.276575963718821,
+        "peak_dbfs": 0.707977294921875,
+        "rms_dbfs": -11.9866940556544,
+        "crest_factor_db": 8.987080654414271,
+        "spectral_centroid_hz": 416.51951480150666,
+        "spectral_flatness": 0.00020627447544609569,
+        "relative_band_energy": {
+          "20_150_hz": 0.0003642089498538272,
+          "150_500_hz": 0.8179809440985487,
+          "500_2000_hz": 0.17842857362845257,
+          "2000_5000_hz": 0.0026348124756182456,
+          "5000_10000_hz": 0.00045711950796836043,
+          "10000_nyquist_hz": 0.00012433177734445496
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\ja_ji_ju.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 147737
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 147737,
+        "channels": 1,
+        "duration_seconds": 3.350045351473923,
+        "peak_dbfs": 0.493133544921875,
+        "rms_dbfs": -15.39802412917306,
+        "crest_factor_db": 9.257315048948332,
+        "spectral_centroid_hz": 428.01264517868776,
+        "spectral_flatness": 0.0001947042237153936,
+        "relative_band_energy": {
+          "20_150_hz": 0.0005052073049682243,
+          "150_500_hz": 0.8364432065965658,
+          "500_2000_hz": 0.1556821506550929,
+          "2000_5000_hz": 0.0064177424523431895,
+          "5000_10000_hz": 0.0009066145123305577,
+          "10000_nyquist_hz": 3.114034696250551e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\ju_je_jo.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 146510
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 146510,
+        "channels": 1,
+        "duration_seconds": 3.3222222222222224,
+        "peak_dbfs": 0.51904296875,
+        "rms_dbfs": -14.137640400288733,
+        "crest_factor_db": 8.441706644678806,
+        "spectral_centroid_hz": 433.26531747728234,
+        "spectral_flatness": 0.00012526237468783898,
+        "relative_band_energy": {
+          "20_150_hz": 0.0003170661996122217,
+          "150_500_hz": 0.7998468669748104,
+          "500_2000_hz": 0.19379686103364846,
+          "2000_5000_hz": 0.005369301127429188,
+          "5000_10000_hz": 0.0006363225762351502,
+          "10000_nyquist_hz": 2.3021318930077096e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\ka_ki_ku.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 145014
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 145014,
+        "channels": 1,
+        "duration_seconds": 3.288299319727891,
+        "peak_dbfs": 0.514190673828125,
+        "rms_dbfs": -15.372263503127856,
+        "crest_factor_db": 9.594747409719233,
+        "spectral_centroid_hz": 405.9845609502219,
+        "spectral_flatness": 9.34667594605569e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00027493817402659296,
+          "150_500_hz": 0.8706952293526974,
+          "500_2000_hz": 0.12587435358984794,
+          "2000_5000_hz": 0.0029076390445301635,
+          "5000_10000_hz": 0.00021884314323578722,
+          "10000_nyquist_hz": 1.5128773882777242e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\ku_ke_ko.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 145182
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 145182,
+        "channels": 1,
+        "duration_seconds": 3.292108843537415,
+        "peak_dbfs": 0.50689697265625,
+        "rms_dbfs": -14.601964769527065,
+        "crest_factor_db": 8.700358719360596,
+        "spectral_centroid_hz": 419.54961903783277,
+        "spectral_flatness": 5.932963310030242e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00026109222859243766,
+          "150_500_hz": 0.8084377592868403,
+          "500_2000_hz": 0.18762671154501218,
+          "2000_5000_hz": 0.003502528099298449,
+          "5000_10000_hz": 0.0001488171561202922,
+          "10000_nyquist_hz": 1.0770370349310117e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\kya_kyu_kyo.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 144620
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 144620,
+        "channels": 1,
+        "duration_seconds": 3.2793650793650793,
+        "peak_dbfs": 0.55413818359375,
+        "rms_dbfs": -14.67572915216645,
+        "crest_factor_db": 9.548090688218455,
+        "spectral_centroid_hz": 419.2740073079079,
+        "spectral_flatness": 0.00011399376040073935,
+        "relative_band_energy": {
+          "20_150_hz": 0.00029967904661940995,
+          "150_500_hz": 0.8256011041681458,
+          "500_2000_hz": 0.1702317545876688,
+          "2000_5000_hz": 0.0034772962871123738,
+          "5000_10000_hz": 0.0003544360137451583,
+          "10000_nyquist_hz": 2.0570421438539134e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\ma_mi_mu.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 145092
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 145092,
+        "channels": 1,
+        "duration_seconds": 3.2900680272108844,
+        "peak_dbfs": 0.440765380859375,
+        "rms_dbfs": -15.177078297481206,
+        "crest_factor_db": 8.061227823240936,
+        "spectral_centroid_hz": 389.20750909307594,
+        "spectral_flatness": 4.085070672283483e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0005844696937050823,
+          "150_500_hz": 0.9014733768958266,
+          "500_2000_hz": 0.09570004588793084,
+          "2000_5000_hz": 0.0021410249290591695,
+          "5000_10000_hz": 8.145344380999355e-05,
+          "10000_nyquist_hz": 3.917358774432463e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\mu_me_mo.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 145763
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 145763,
+        "channels": 1,
+        "duration_seconds": 3.3052834467120182,
+        "peak_dbfs": 0.60797119140625,
+        "rms_dbfs": -13.574057225362035,
+        "crest_factor_db": 9.251717241418124,
+        "spectral_centroid_hz": 433.0101402382157,
+        "spectral_flatness": 2.400945027500971e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0002546226966648817,
+          "150_500_hz": 0.7031895149262983,
+          "500_2000_hz": 0.29442297167411524,
+          "2000_5000_hz": 0.002071843648200413,
+          "5000_10000_hz": 4.544868626886987e-05,
+          "10000_nyquist_hz": 2.023958409279413e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\mya_myu_myo.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 145834
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 145834,
+        "channels": 1,
+        "duration_seconds": 3.3068934240362813,
+        "peak_dbfs": 0.535614013671875,
+        "rms_dbfs": -14.082553419417565,
+        "crest_factor_db": 8.659592044646743,
+        "spectral_centroid_hz": 416.25010924552464,
+        "spectral_flatness": 2.9810226501290482e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.000250186524078545,
+          "150_500_hz": 0.7839381910228536,
+          "500_2000_hz": 0.21358115662628988,
+          "2000_5000_hz": 0.002153985685611254,
+          "5000_10000_hz": 5.6727707605583944e-05,
+          "10000_nyquist_hz": 2.2626460040727184e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\n_bo_ba.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142354
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142354,
+        "channels": 1,
+        "duration_seconds": 3.227981859410431,
+        "peak_dbfs": 0.515655517578125,
+        "rms_dbfs": -16.05693052535825,
+        "crest_factor_db": 10.304123907668203,
+        "spectral_centroid_hz": 387.4384786862388,
+        "spectral_flatness": 2.1623904098918448e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0004686612362328616,
+          "150_500_hz": 0.7982596834121113,
+          "500_2000_hz": 0.19809156315310267,
+          "2000_5000_hz": 0.003092398803439189,
+          "5000_10000_hz": 6.815534752636206e-05,
+          "10000_nyquist_hz": 1.6576807698604566e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\n_cho_cha.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142666
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142666,
+        "channels": 1,
+        "duration_seconds": 3.2350566893424038,
+        "peak_dbfs": 0.6070556640625,
+        "rms_dbfs": -15.828943015038146,
+        "crest_factor_db": 11.493513327047534,
+        "spectral_centroid_hz": 416.28118712409764,
+        "spectral_flatness": 0.0001589218020374041,
+        "relative_band_energy": {
+          "20_150_hz": 0.00040033174286881185,
+          "150_500_hz": 0.7607608333321491,
+          "500_2000_hz": 0.23005470819483861,
+          "2000_5000_hz": 0.007907617877465651,
+          "5000_10000_hz": 0.0008351005239809045,
+          "10000_nyquist_hz": 1.8961212354009828e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\n_do_da.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142687
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142687,
+        "channels": 1,
+        "duration_seconds": 3.235532879818594,
+        "peak_dbfs": 0.537109375,
+        "rms_dbfs": -15.541381325366217,
+        "crest_factor_db": 10.142635982454856,
+        "spectral_centroid_hz": 393.15687218010675,
+        "spectral_flatness": 3.196599766487122e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0004535912991167906,
+          "150_500_hz": 0.7804414061510216,
+          "500_2000_hz": 0.21512340163428081,
+          "2000_5000_hz": 0.0038791910406260404,
+          "5000_10000_hz": 8.02468638949662e-05,
+          "10000_nyquist_hz": 2.4159778736401116e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\n_fo_fa.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 143321
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 143321,
+        "channels": 1,
+        "duration_seconds": 3.249909297052154,
+        "peak_dbfs": 0.507354736328125,
+        "rms_dbfs": -15.772536979022746,
+        "crest_factor_db": 9.878771359331232,
+        "spectral_centroid_hz": 397.852150395231,
+        "spectral_flatness": 8.930325719404287e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0004020129531406245,
+          "150_500_hz": 0.7792138907802904,
+          "500_2000_hz": 0.21715588064852,
+          "2000_5000_hz": 0.003087729930607042,
+          "5000_10000_hz": 7.876501998940021e-05,
+          "10000_nyquist_hz": 4.464449828127129e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\n_go_ga.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142787
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142787,
+        "channels": 1,
+        "duration_seconds": 3.237800453514739,
+        "peak_dbfs": 0.534759521484375,
+        "rms_dbfs": -15.533873464839749,
+        "crest_factor_db": 10.09704398483252,
+        "spectral_centroid_hz": 420.95180222237076,
+        "spectral_flatness": 2.6464781964734524e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00034564427056986885,
+          "150_500_hz": 0.7027730832404201,
+          "500_2000_hz": 0.29370769113029366,
+          "2000_5000_hz": 0.0030793485493710695,
+          "5000_10000_hz": 7.32201997376841e-05,
+          "10000_nyquist_hz": 1.924940758804045e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\n_ho_ha.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142505
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142505,
+        "channels": 1,
+        "duration_seconds": 3.23140589569161,
+        "peak_dbfs": 0.6510009765625,
+        "rms_dbfs": -15.200714542473879,
+        "crest_factor_db": 11.4723473434963,
+        "spectral_centroid_hz": 401.7051343498187,
+        "spectral_flatness": 2.426299996249032e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0004652056075634364,
+          "150_500_hz": 0.7637765700034305,
+          "500_2000_hz": 0.23211146078440603,
+          "2000_5000_hz": 0.0035583842359606386,
+          "5000_10000_hz": 6.49660262868683e-05,
+          "10000_nyquist_hz": 1.5269455146235752e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\n_hyo_hya.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142444
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142444,
+        "channels": 1,
+        "duration_seconds": 3.2300226757369614,
+        "peak_dbfs": 0.55963134765625,
+        "rms_dbfs": -15.70510005785988,
+        "crest_factor_db": 10.663140726536835,
+        "spectral_centroid_hz": 411.7417449896941,
+        "spectral_flatness": 0.00018811013361014184,
+        "relative_band_energy": {
+          "20_150_hz": 0.0005862262039332991,
+          "150_500_hz": 0.7667025704364061,
+          "500_2000_hz": 0.22542730770670347,
+          "2000_5000_hz": 0.006515036383806226,
+          "5000_10000_hz": 0.000704949577134539,
+          "10000_nyquist_hz": 4.844014751423213e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\n_jo_ja.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142282
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142282,
+        "channels": 1,
+        "duration_seconds": 3.2263492063492065,
+        "peak_dbfs": 0.5364990234375,
+        "rms_dbfs": -15.47164058102906,
+        "crest_factor_db": 10.063019296589763,
+        "spectral_centroid_hz": 403.9072161084617,
+        "spectral_flatness": 0.00012592031216617395,
+        "relative_band_energy": {
+          "20_150_hz": 0.0004196291905785888,
+          "150_500_hz": 0.7816925457377022,
+          "500_2000_hz": 0.21189915116845728,
+          "2000_5000_hz": 0.0054815023244399975,
+          "5000_10000_hz": 0.0004601201101753959,
+          "10000_nyquist_hz": 1.989984391676887e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\n_ko_ka.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142147
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142147,
+        "channels": 1,
+        "duration_seconds": 3.2232879818594102,
+        "peak_dbfs": 0.487457275390625,
+        "rms_dbfs": -16.179831194740544,
+        "crest_factor_db": 9.93856232875574,
+        "spectral_centroid_hz": 398.4130503459003,
+        "spectral_flatness": 3.0887526547292785e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00045746145415668274,
+          "150_500_hz": 0.7692628858135541,
+          "500_2000_hz": 0.22662781727666986,
+          "2000_5000_hz": 0.0035522400111063796,
+          "5000_10000_hz": 7.054384476797787e-05,
+          "10000_nyquist_hz": 3.912421635955023e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\n_mo_ma.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142169
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142169,
+        "channels": 1,
+        "duration_seconds": 3.2237868480725624,
+        "peak_dbfs": 0.51104736328125,
+        "rms_dbfs": -14.54457923848906,
+        "crest_factor_db": 8.713802276740196,
+        "spectral_centroid_hz": 411.88503166050805,
+        "spectral_flatness": 1.9669735966418987e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0002782411707870836,
+          "150_500_hz": 0.777119960769806,
+          "500_2000_hz": 0.2211134540477572,
+          "2000_5000_hz": 0.001432186645516495,
+          "5000_10000_hz": 4.056766909947531e-05,
+          "10000_nyquist_hz": 1.7373835105940545e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\n_n_o.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 141737
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 141737,
+        "channels": 1,
+        "duration_seconds": 3.2139909297052154,
+        "peak_dbfs": 0.47265625,
+        "rms_dbfs": -14.089033500438514,
+        "crest_factor_db": 7.579941600530525,
+        "spectral_centroid_hz": 412.34814378285864,
+        "spectral_flatness": 2.6737774147572115e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0002476821249400694,
+          "150_500_hz": 0.8086672600146332,
+          "500_2000_hz": 0.18920203294442978,
+          "2000_5000_hz": 0.001727928274949596,
+          "5000_10000_hz": 0.0001434347791693375,
+          "10000_nyquist_hz": 2.896696326464465e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\n_no_na.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142395
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142395,
+        "channels": 1,
+        "duration_seconds": 3.22891156462585,
+        "peak_dbfs": 0.572265625,
+        "rms_dbfs": -15.317983836928601,
+        "crest_factor_db": 10.469937024494175,
+        "spectral_centroid_hz": 381.62025808263627,
+        "spectral_flatness": 2.2200015853514113e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00033748013683623275,
+          "150_500_hz": 0.7860960423690048,
+          "500_2000_hz": 0.20927591048612745,
+          "2000_5000_hz": 0.004201538979643827,
+          "5000_10000_hz": 6.430633720955787e-05,
+          "10000_nyquist_hz": 1.7260439739481878e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\n_po_pa.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142221
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142221,
+        "channels": 1,
+        "duration_seconds": 3.2249659863945577,
+        "peak_dbfs": 0.616241455078125,
+        "rms_dbfs": -15.165049577306913,
+        "crest_factor_db": 10.96006778364072,
+        "spectral_centroid_hz": 387.5524338626755,
+        "spectral_flatness": 2.3750899572668368e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0004915916009473844,
+          "150_500_hz": 0.7843756309024154,
+          "500_2000_hz": 0.21174086875987605,
+          "2000_5000_hz": 0.0033271210988093996,
+          "5000_10000_hz": 4.255218037741028e-05,
+          "10000_nyquist_hz": 1.6577374924482383e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\n_ro_ra.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 143265
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 143265,
+        "channels": 1,
+        "duration_seconds": 3.248639455782313,
+        "peak_dbfs": 0.567047119140625,
+        "rms_dbfs": -15.309185166466005,
+        "crest_factor_db": 10.38156813383118,
+        "spectral_centroid_hz": 386.5875945459352,
+        "spectral_flatness": 2.4548155939559072e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0004251760989403773,
+          "150_500_hz": 0.7865314930988129,
+          "500_2000_hz": 0.20921779808549373,
+          "2000_5000_hz": 0.0037231812196629097,
+          "5000_10000_hz": 7.832793679216543e-05,
+          "10000_nyquist_hz": 1.8111710931124235e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\n_sho_sha.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142443
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142443,
+        "channels": 1,
+        "duration_seconds": 3.23,
+        "peak_dbfs": 0.56719970703125,
+        "rms_dbfs": -15.263048901785792,
+        "crest_factor_db": 10.337768858870469,
+        "spectral_centroid_hz": 452.62938421177876,
+        "spectral_flatness": 0.0003346713718727307,
+        "relative_band_energy": {
+          "20_150_hz": 0.000461470237828176,
+          "150_500_hz": 0.7161653561982727,
+          "500_2000_hz": 0.2706375827812244,
+          "2000_5000_hz": 0.010695020327821662,
+          "5000_10000_hz": 0.0018932353635653866,
+          "10000_nyquist_hz": 0.00012620468982819341
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\n_so_sa.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142641
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142641,
+        "channels": 1,
+        "duration_seconds": 3.234489795918367,
+        "peak_dbfs": 0.529296875,
+        "rms_dbfs": -15.283088478419904,
+        "crest_factor_db": 9.757075076391404,
+        "spectral_centroid_hz": 404.83465399427064,
+        "spectral_flatness": 0.0003150692570761532,
+        "relative_band_energy": {
+          "20_150_hz": 0.00042718271750585065,
+          "150_500_hz": 0.770603598203556,
+          "500_2000_hz": 0.22305249853473946,
+          "2000_5000_hz": 0.004236818564282344,
+          "5000_10000_hz": 0.0014297646948248249,
+          "10000_nyquist_hz": 0.0002290827276785843
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\n_to_ta.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142141
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142141,
+        "channels": 1,
+        "duration_seconds": 3.223151927437642,
+        "peak_dbfs": 0.581939697265625,
+        "rms_dbfs": -14.808863044696093,
+        "crest_factor_db": 10.106422720455248,
+        "spectral_centroid_hz": 389.27902118503624,
+        "spectral_flatness": 3.683901261243312e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00040985961115364624,
+          "150_500_hz": 0.7883257635481886,
+          "500_2000_hz": 0.20819003197749675,
+          "2000_5000_hz": 0.0029919283836955155,
+          "5000_10000_hz": 6.322390363317275e-05,
+          "10000_nyquist_hz": 4.790564816518308e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\n_tsu.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142447
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142447,
+        "channels": 1,
+        "duration_seconds": 3.230090702947846,
+        "peak_dbfs": 0.482269287109375,
+        "rms_dbfs": -14.887254062297487,
+        "crest_factor_db": 8.553046165191452,
+        "spectral_centroid_hz": 340.8693592335339,
+        "spectral_flatness": 6.82116610785287e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0002928972321154607,
+          "150_500_hz": 0.9396072375539617,
+          "500_2000_hz": 0.05629157381493951,
+          "2000_5000_hz": 0.0036203233331549823,
+          "5000_10000_hz": 0.00014016938730873575,
+          "10000_nyquist_hz": 2.000592958015489e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\n_wo_wa.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142434
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142434,
+        "channels": 1,
+        "duration_seconds": 3.229795918367347,
+        "peak_dbfs": 0.55340576171875,
+        "rms_dbfs": -14.694163235274761,
+        "crest_factor_db": 9.555036763958652,
+        "spectral_centroid_hz": 392.8135724704279,
+        "spectral_flatness": 1.728434308287583e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00033928849213128704,
+          "150_500_hz": 0.7836193512633839,
+          "500_2000_hz": 0.21343088660414283,
+          "2000_5000_hz": 0.00255545233114573,
+          "5000_10000_hz": 3.06708996484042e-05,
+          "10000_nyquist_hz": 1.2680268746575653e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\n_yo_ya.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 145494
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 145494,
+        "channels": 1,
+        "duration_seconds": 3.2991836734693876,
+        "peak_dbfs": 0.70794677734375,
+        "rms_dbfs": -12.165388245256533,
+        "crest_factor_db": 9.165400428013669,
+        "spectral_centroid_hz": 389.17639782243054,
+        "spectral_flatness": 3.1472040436779474e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00034524233424736844,
+          "150_500_hz": 0.7928482824116604,
+          "500_2000_hz": 0.20297148510624918,
+          "2000_5000_hz": 0.0037608799595021908,
+          "5000_10000_hz": 5.660976158682189e-05,
+          "10000_nyquist_hz": 2.875179465460227e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\n_zo_za.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 145792
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 145792,
+        "channels": 1,
+        "duration_seconds": 3.3059410430839002,
+        "peak_dbfs": 0.707916259765625,
+        "rms_dbfs": -12.723739159620573,
+        "crest_factor_db": 9.723376910234617,
+        "spectral_centroid_hz": 390.4117118332081,
+        "spectral_flatness": 0.0001745504663757344,
+        "relative_band_energy": {
+          "20_150_hz": 0.000388362264221288,
+          "150_500_hz": 0.7909736587049326,
+          "500_2000_hz": 0.20407076603515598,
+          "2000_5000_hz": 0.004003869726062893,
+          "5000_10000_hz": 0.0003982803996918971,
+          "10000_nyquist_hz": 0.00014087156425036097
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\na_ni_nu.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 145443
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 145443,
+        "channels": 1,
+        "duration_seconds": 3.298027210884354,
+        "peak_dbfs": 0.515533447265625,
+        "rms_dbfs": -14.662132770404488,
+        "crest_factor_db": 8.907269712423554,
+        "spectral_centroid_hz": 405.00531454832714,
+        "spectral_flatness": 5.336870209081967e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0010021344792095791,
+          "150_500_hz": 0.8454065550103401,
+          "500_2000_hz": 0.15102945574361973,
+          "2000_5000_hz": 0.0024090229230080305,
+          "5000_10000_hz": 0.00013704865501543812,
+          "10000_nyquist_hz": 5.203546992392875e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\nu_ne_no.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 145748
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 145748,
+        "channels": 1,
+        "duration_seconds": 3.3049433106575963,
+        "peak_dbfs": 0.56781005859375,
+        "rms_dbfs": -13.800156906734403,
+        "crest_factor_db": 8.884218539959445,
+        "spectral_centroid_hz": 424.3251475722302,
+        "spectral_flatness": 3.565580187798811e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0006404096326711712,
+          "150_500_hz": 0.752288770341573,
+          "500_2000_hz": 0.24386752367513326,
+          "2000_5000_hz": 0.00304722733792624,
+          "5000_10000_hz": 0.0001369362405626751,
+          "10000_nyquist_hz": 5.443508396435915e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\nya_nyu_nyo.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 146606
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 146606,
+        "channels": 1,
+        "duration_seconds": 3.3243990929705216,
+        "peak_dbfs": 0.554595947265625,
+        "rms_dbfs": -14.012951544738774,
+        "crest_factor_db": 8.892485377285455,
+        "spectral_centroid_hz": 413.6883698771788,
+        "spectral_flatness": 2.8210411870738926e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00023400830976627845,
+          "150_500_hz": 0.7850042359725549,
+          "500_2000_hz": 0.21238592987018104,
+          "2000_5000_hz": 0.0023077612615171076,
+          "5000_10000_hz": 4.7014916353620304e-05,
+          "10000_nyquist_hz": 2.120832118926664e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\o_o_n.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 141587
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 141587,
+        "channels": 1,
+        "duration_seconds": 3.2105895691609976,
+        "peak_dbfs": 0.591461181640625,
+        "rms_dbfs": -12.818069268332009,
+        "crest_factor_db": 8.25659420018963,
+        "spectral_centroid_hz": 431.54880326938684,
+        "spectral_flatness": 1.4231468939526484e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00024167678998397978,
+          "150_500_hz": 0.6391067479318984,
+          "500_2000_hz": 0.35874090578466805,
+          "2000_5000_hz": 0.0018788523442612832,
+          "5000_10000_hz": 1.659018274997175e-05,
+          "10000_nyquist_hz": 1.0079941523038365e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\o_tsu.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142861
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142861,
+        "channels": 1,
+        "duration_seconds": 3.2394784580498865,
+        "peak_dbfs": 0.548736572265625,
+        "rms_dbfs": -13.898061490630065,
+        "crest_factor_db": 8.685339612133182,
+        "spectral_centroid_hz": 390.4390011985859,
+        "spectral_flatness": 7.432111029805775e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00018844112613921268,
+          "150_500_hz": 0.9066288134789279,
+          "500_2000_hz": 0.09254860016913515,
+          "2000_5000_hz": 0.00037853591912082155,
+          "5000_10000_hz": 0.00021095440267484585,
+          "10000_nyquist_hz": 3.167067719909951e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\pa_pi_pu.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 144365
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 144365,
+        "channels": 1,
+        "duration_seconds": 3.273582766439909,
+        "peak_dbfs": 0.58612060546875,
+        "rms_dbfs": -14.451094805162759,
+        "crest_factor_db": 9.81083459652392,
+        "spectral_centroid_hz": 402.7673854797472,
+        "spectral_flatness": 5.2737653014359404e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00037069171914898296,
+          "150_500_hz": 0.8593036145510161,
+          "500_2000_hz": 0.13810679069617549,
+          "2000_5000_hz": 0.0020871810768139138,
+          "5000_10000_hz": 0.00010849673274447081,
+          "10000_nyquist_hz": 4.6825625058648085e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\pu_pe_po.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 144962
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 144962,
+        "channels": 1,
+        "duration_seconds": 3.287120181405896,
+        "peak_dbfs": 0.510406494140625,
+        "rms_dbfs": -13.723915439140477,
+        "crest_factor_db": 7.882239268743333,
+        "spectral_centroid_hz": 411.21058083475145,
+        "spectral_flatness": 3.2764656181852466e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0002874087791640746,
+          "150_500_hz": 0.8109562113655452,
+          "500_2000_hz": 0.18688009437891276,
+          "2000_5000_hz": 0.001796043761419439,
+          "5000_10000_hz": 6.078186134649098e-05,
+          "10000_nyquist_hz": 3.44748416562213e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\pya_pyu_pyo.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142976
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142976,
+        "channels": 1,
+        "duration_seconds": 3.2420861678004536,
+        "peak_dbfs": 0.559661865234375,
+        "rms_dbfs": -13.634828624298027,
+        "crest_factor_db": 8.593342935292522,
+        "spectral_centroid_hz": 419.29513868892104,
+        "spectral_flatness": 4.031043821135441e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00029592896799239673,
+          "150_500_hz": 0.7838749551166567,
+          "500_2000_hz": 0.2134086162763893,
+          "2000_5000_hz": 0.0023366403678354397,
+          "5000_10000_hz": 6.630796669658002e-05,
+          "10000_nyquist_hz": 3.63742817783184e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\ra_ri_ru.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 145908
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 145908,
+        "channels": 1,
+        "duration_seconds": 3.3085714285714287,
+        "peak_dbfs": 0.53509521484375,
+        "rms_dbfs": -13.863226150490895,
+        "crest_factor_db": 8.431847495662907,
+        "spectral_centroid_hz": 406.1983833486709,
+        "spectral_flatness": 4.114945063291361e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00041828926379413445,
+          "150_500_hz": 0.8383092527314191,
+          "500_2000_hz": 0.15870054039046358,
+          "2000_5000_hz": 0.002447054343560881,
+          "5000_10000_hz": 0.00010589797347713086,
+          "10000_nyquist_hz": 3.840321629561953e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\ru_re_ro.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 144687
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 144687,
+        "channels": 1,
+        "duration_seconds": 3.2808843537414965,
+        "peak_dbfs": 0.661376953125,
+        "rms_dbfs": -12.930875007217095,
+        "crest_factor_db": 9.339856148524973,
+        "spectral_centroid_hz": 421.3654671189635,
+        "spectral_flatness": 2.7830066521504006e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00037977057688974613,
+          "150_500_hz": 0.7844751901266471,
+          "500_2000_hz": 0.21233895169759126,
+          "2000_5000_hz": 0.002672677026720383,
+          "5000_10000_hz": 0.00011620565802578108,
+          "10000_nyquist_hz": 3.246786902277031e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\rya_ryu_ryo.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 145277
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 145277,
+        "channels": 1,
+        "duration_seconds": 3.294263038548753,
+        "peak_dbfs": 0.605133056640625,
+        "rms_dbfs": -14.23790448687164,
+        "crest_factor_db": 9.874922043106872,
+        "spectral_centroid_hz": 411.5558480876273,
+        "spectral_flatness": 3.06775764071564e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00027726435272926506,
+          "150_500_hz": 0.8062316720094358,
+          "500_2000_hz": 0.191540493423288,
+          "2000_5000_hz": 0.001889159498244839,
+          "5000_10000_hz": 4.230836936438313e-05,
+          "10000_nyquist_hz": 2.297431206951353e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\sha_shi_shu.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 150985
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 150985,
+        "channels": 1,
+        "duration_seconds": 3.4236961451247168,
+        "peak_dbfs": 0.550323486328125,
+        "rms_dbfs": -15.020261185627696,
+        "crest_factor_db": 9.832622140198922,
+        "spectral_centroid_hz": 459.21179881120156,
+        "spectral_flatness": 0.00040135815907610015,
+        "relative_band_energy": {
+          "20_150_hz": 0.0003544120058594583,
+          "150_500_hz": 0.818068126758242,
+          "500_2000_hz": 0.1669584244879976,
+          "2000_5000_hz": 0.011839608659757112,
+          "5000_10000_hz": 0.002628904628463237,
+          "10000_nyquist_hz": 0.00013733409605320442
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\shu_she_sho.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 144463
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 144463,
+        "channels": 1,
+        "duration_seconds": 3.2758049886621317,
+        "peak_dbfs": 0.49029541015625,
+        "rms_dbfs": -14.45427111526888,
+        "crest_factor_db": 8.263427668622237,
+        "spectral_centroid_hz": 450.175673265519,
+        "spectral_flatness": 0.00032603501637620976,
+        "relative_band_energy": {
+          "20_150_hz": 0.0002913447861441216,
+          "150_500_hz": 0.8447985872131536,
+          "500_2000_hz": 0.140854799526595,
+          "2000_5000_hz": 0.011597352990997966,
+          "5000_10000_hz": 0.0023305216462728416,
+          "10000_nyquist_hz": 0.00011271258510077295
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\su_se_so.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 148720
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 148720,
+        "channels": 1,
+        "duration_seconds": 3.3723356009070296,
+        "peak_dbfs": 0.511962890625,
+        "rms_dbfs": -14.513003399732964,
+        "crest_factor_db": 8.697773049684354,
+        "spectral_centroid_hz": 424.41368505754764,
+        "spectral_flatness": 0.0003006914996223197,
+        "relative_band_energy": {
+          "20_150_hz": 0.0003391318755796578,
+          "150_500_hz": 0.8277190631039778,
+          "500_2000_hz": 0.16731035061229668,
+          "2000_5000_hz": 0.0029348027399209616,
+          "5000_10000_hz": 0.001469498231545732,
+          "10000_nyquist_hz": 0.00021388634614459388
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\ta_ti_tu.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 144100
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 144100,
+        "channels": 1,
+        "duration_seconds": 3.2675736961451247,
+        "peak_dbfs": 0.5164794921875,
+        "rms_dbfs": -14.174957411686552,
+        "crest_factor_db": 8.436019045677334,
+        "spectral_centroid_hz": 396.5440047489782,
+        "spectral_flatness": 9.038448398128823e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0003137094211203852,
+          "150_500_hz": 0.8922787592093495,
+          "500_2000_hz": 0.10505288986944254,
+          "2000_5000_hz": 0.002156213356256178,
+          "5000_10000_hz": 0.0001663531676908615,
+          "10000_nyquist_hz": 2.038542916344627e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\tsu_tsu.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 148863
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 148863,
+        "channels": 1,
+        "duration_seconds": 3.375578231292517,
+        "peak_dbfs": 0.50909423828125,
+        "rms_dbfs": -12.79074586779203,
+        "crest_factor_db": 6.9267095057763015,
+        "spectral_centroid_hz": 381.8537695058169,
+        "spectral_flatness": 0.00010396873904147032,
+        "relative_band_energy": {
+          "20_150_hz": 0.00018045316737931642,
+          "150_500_hz": 0.9745893507059378,
+          "500_2000_hz": 0.024251522432353415,
+          "2000_5000_hz": 0.0005428631582344287,
+          "5000_10000_hz": 0.00036672430966772784,
+          "10000_nyquist_hz": 5.4370411432002735e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\tu_te_to.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 144716
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 144716,
+        "channels": 1,
+        "duration_seconds": 3.281541950113379,
+        "peak_dbfs": 0.654052734375,
+        "rms_dbfs": -13.200898425381686,
+        "crest_factor_db": 9.513153738190375,
+        "spectral_centroid_hz": 423.9435896888198,
+        "spectral_flatness": 7.619560886270462e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0002541612984046633,
+          "150_500_hz": 0.8123555132111193,
+          "500_2000_hz": 0.18385475572709165,
+          "2000_5000_hz": 0.003311087766631776,
+          "5000_10000_hz": 0.00019347113100632947,
+          "10000_nyquist_hz": 1.9370621368589692e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\u_n_u.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 141657
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 141657,
+        "channels": 1,
+        "duration_seconds": 3.212176870748299,
+        "peak_dbfs": 0.514068603515625,
+        "rms_dbfs": -13.971654655648113,
+        "crest_factor_db": 8.192076262796535,
+        "spectral_centroid_hz": 394.26016117964815,
+        "spectral_flatness": 1.0385771329405266e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00024276168730499254,
+          "150_500_hz": 0.8239394450119303,
+          "500_2000_hz": 0.17465551894926737,
+          "2000_5000_hz": 0.0011355738777421235,
+          "5000_10000_hz": 7.795048407794263e-06,
+          "10000_nyquist_hz": 1.077603688552419e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\u_o_u.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 141644
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 141644,
+        "channels": 1,
+        "duration_seconds": 3.2118820861678006,
+        "peak_dbfs": 0.50634765625,
+        "rms_dbfs": -12.346202627550309,
+        "crest_factor_db": 6.435178709255265,
+        "spectral_centroid_hz": 390.54062743162825,
+        "spectral_flatness": 6.636339749561205e-06,
+        "relative_band_energy": {
+          "20_150_hz": 0.00015466244266373853,
+          "150_500_hz": 0.9177969948140361,
+          "500_2000_hz": 0.08187109792433758,
+          "2000_5000_hz": 0.00015656767239073378,
+          "5000_10000_hz": 4.742755056999707e-06,
+          "10000_nyquist_hz": 7.566453984406826e-07
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\u_u_e.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 142691
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 142691,
+        "channels": 1,
+        "duration_seconds": 3.23562358276644,
+        "peak_dbfs": 0.5533447265625,
+        "rms_dbfs": -13.151836728150412,
+        "crest_factor_db": 8.011752236689059,
+        "spectral_centroid_hz": 423.7622246754061,
+        "spectral_flatness": 2.81143964354374e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00015599518247214417,
+          "150_500_hz": 0.8210450552596111,
+          "500_2000_hz": 0.1756845455642801,
+          "2000_5000_hz": 0.0029690471232168307,
+          "5000_10000_hz": 0.00012745732666591696,
+          "10000_nyquist_hz": 4.013079772230129e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\u_we_wo.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 141994
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 141994,
+        "channels": 1,
+        "duration_seconds": 3.2198185941043085,
+        "peak_dbfs": 0.51519775390625,
+        "rms_dbfs": -13.389829979672658,
+        "crest_factor_db": 7.629309199151568,
+        "spectral_centroid_hz": 427.421619667799,
+        "spectral_flatness": 2.2187815810462085e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00018424651190402904,
+          "150_500_hz": 0.7677192208927076,
+          "500_2000_hz": 0.22989477226283137,
+          "2000_5000_hz": 0.0021162075607809687,
+          "5000_10000_hz": 7.48015518674927e-05,
+          "10000_nyquist_hz": 2.48734288757595e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\wa_wi_wa.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 146813
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 146813,
+        "channels": 1,
+        "duration_seconds": 3.329092970521542,
+        "peak_dbfs": 0.532196044921875,
+        "rms_dbfs": -15.194908188367833,
+        "crest_factor_db": 9.716341042694486,
+        "spectral_centroid_hz": 426.0040021743535,
+        "spectral_flatness": 4.6634465344843775e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.0003403513516057032,
+          "150_500_hz": 0.7054643583505785,
+          "500_2000_hz": 0.2914605986598656,
+          "2000_5000_hz": 0.0025768671578228065,
+          "5000_10000_hz": 0.00014033681406827765,
+          "10000_nyquist_hz": 3.693752565192699e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\yu_ye_yo.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 148920
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 148920,
+        "channels": 1,
+        "duration_seconds": 3.3768707482993197,
+        "peak_dbfs": 0.70794677734375,
+        "rms_dbfs": -10.559136943945386,
+        "crest_factor_db": 7.559149126702523,
+        "spectral_centroid_hz": 410.69376703800594,
+        "spectral_flatness": 3.9555900537218706e-05,
+        "relative_band_energy": {
+          "20_150_hz": 0.00027750880425903186,
+          "150_500_hz": 0.825973504799561,
+          "500_2000_hz": 0.1696579170209035,
+          "2000_5000_hz": 0.003969098662433663,
+          "5000_10000_hz": 0.00010034376980257593,
+          "10000_nyquist_hz": 4.76004531907586e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\4. F3\\zu_ze_zo.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 151101
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 151101,
+        "channels": 1,
+        "duration_seconds": 3.426326530612245,
+        "peak_dbfs": 0.70794677734375,
+        "rms_dbfs": -11.942936343549885,
+        "crest_factor_db": 8.94294852630702,
+        "spectral_centroid_hz": 419.8780659099999,
+        "spectral_flatness": 0.0002100177208821198,
+        "relative_band_energy": {
+          "20_150_hz": 0.0002956466431792961,
+          "150_500_hz": 0.8337007406183797,
+          "500_2000_hz": 0.1622816662204811,
+          "2000_5000_hz": 0.002920384675480855,
+          "5000_10000_hz": 0.0006417029624507286,
+          "10000_nyquist_hz": 0.00014567597003440933
+        }
+      }
+    }
+  ]
+}

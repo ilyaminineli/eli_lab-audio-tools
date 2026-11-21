@@ -1,0 +1,212 @@
+{
+  "files": [
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\12. BONUS PHONETIC EXTRAS\\cough 1.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 18706
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 18706,
+        "channels": 1,
+        "duration_seconds": 0.424172335600907,
+        "peak_dbfs": 0.186126708984375,
+        "rms_dbfs": -29.56005875938352,
+        "crest_factor_db": 14.956232727343183,
+        "spectral_centroid_hz": 3282.4264362630547,
+        "spectral_flatness": 0.0287555975892332,
+        "relative_band_energy": {
+          "20_150_hz": 0.0006012349767741212,
+          "150_500_hz": 0.16005910766499382,
+          "500_2000_hz": 0.08853652124163676,
+          "2000_5000_hz": 0.6229672496375189,
+          "5000_10000_hz": 0.10048460960727677,
+          "10000_nyquist_hz": 0.027348726587371038
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\12. BONUS PHONETIC EXTRAS\\cough 2.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 24792
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 24792,
+        "channels": 1,
+        "duration_seconds": 0.5621768707482994,
+        "peak_dbfs": 0.210235595703125,
+        "rms_dbfs": -28.978392507628573,
+        "crest_factor_db": 15.432517503477172,
+        "spectral_centroid_hz": 2478.4487003748463,
+        "spectral_flatness": 0.025869586928969547,
+        "relative_band_energy": {
+          "20_150_hz": 0.0015396037076335553,
+          "150_500_hz": 0.29482051389249664,
+          "500_2000_hz": 0.30204607539843065,
+          "2000_5000_hz": 0.3049170223903167,
+          "5000_10000_hz": 0.07516810685138517,
+          "10000_nyquist_hz": 0.02150824771876029
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\12. BONUS PHONETIC EXTRAS\\gasp.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 52920
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 52920,
+        "channels": 1,
+        "duration_seconds": 1.2,
+        "peak_dbfs": 0.271392822265625,
+        "rms_dbfs": -32.73937283723385,
+        "crest_factor_db": 21.411339984352768,
+        "spectral_centroid_hz": 323.4987645669336,
+        "spectral_flatness": 0.00046851646459599474,
+        "relative_band_energy": {
+          "20_150_hz": 0.00722605224408071,
+          "150_500_hz": 0.8714008036771519,
+          "500_2000_hz": 0.1179281590880464,
+          "2000_5000_hz": 0.0031682000483841547,
+          "5000_10000_hz": 0.00018411280530813558,
+          "10000_nyquist_hz": 8.228778843020232e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\12. BONUS PHONETIC EXTRAS\\giggle.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 21914
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 21914,
+        "channels": 1,
+        "duration_seconds": 0.49691609977324264,
+        "peak_dbfs": 0.75970458984375,
+        "rms_dbfs": -14.850140241310637,
+        "crest_factor_db": 12.463035246368612,
+        "spectral_centroid_hz": 454.566943432324,
+        "spectral_flatness": 0.0007038897556053831,
+        "relative_band_energy": {
+          "20_150_hz": 0.0004530246654444738,
+          "150_500_hz": 0.6845746914079804,
+          "500_2000_hz": 0.3049858507383268,
+          "2000_5000_hz": 0.009465107964415182,
+          "5000_10000_hz": 0.0003495952601283401,
+          "10000_nyquist_hz": 0.00015415753402566295
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\12. BONUS PHONETIC EXTRAS\\laugh 1.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 35841
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 35841,
+        "channels": 1,
+        "duration_seconds": 0.8127210884353742,
+        "peak_dbfs": 0.8466796875,
+        "rms_dbfs": -14.675143399851045,
+        "crest_factor_db": 13.229526216579012,
+        "spectral_centroid_hz": 565.9325956080316,
+        "spectral_flatness": 0.000607776629377703,
+        "relative_band_energy": {
+          "20_150_hz": 0.0008651539419351191,
+          "150_500_hz": 0.3097528663654387,
+          "500_2000_hz": 0.680117866051259,
+          "2000_5000_hz": 0.0089017791000222,
+          "5000_10000_hz": 0.00027138408977013924,
+          "10000_nyquist_hz": 8.789324145543379e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\12. BONUS PHONETIC EXTRAS\\laugh 2.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 23232
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 23232,
+        "channels": 1,
+        "duration_seconds": 0.5268027210884354,
+        "peak_dbfs": 0.79583740234375,
+        "rms_dbfs": -17.40293688541286,
+        "crest_factor_db": 15.419423806043223,
+        "spectral_centroid_hz": 553.3358710882502,
+        "spectral_flatness": 0.0008308334380680401,
+        "relative_band_energy": {
+          "20_150_hz": 0.000544329196333066,
+          "150_500_hz": 0.35460047489241403,
+          "500_2000_hz": 0.637402637420205,
+          "2000_5000_hz": 0.006917339777715433,
+          "5000_10000_hz": 0.000369423814800537,
+          "10000_nyquist_hz": 0.00016477118870060164
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\12. BONUS PHONETIC EXTRAS\\sob.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 19535
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 19535,
+        "channels": 1,
+        "duration_seconds": 0.4429705215419501,
+        "peak_dbfs": 0.146270751953125,
+        "rms_dbfs": -32.64871499271746,
+        "crest_factor_db": 15.951864873358858,
+        "spectral_centroid_hz": 5328.581818583025,
+        "spectral_flatness": 0.05094769029153982,
+        "relative_band_energy": {
+          "20_150_hz": 1.1719044138856436e-05,
+          "150_500_hz": 0.0015329925264706411,
+          "500_2000_hz": 0.005708361131355376,
+          "2000_5000_hz": 0.6496733205595795,
+          "5000_10000_hz": 0.2723458411399914,
+          "10000_nyquist_hz": 0.0707277226202609
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\12. BONUS PHONETIC EXTRAS\\throat.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 26786
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 26786,
+        "channels": 1,
+        "duration_seconds": 0.6073922902494331,
+        "peak_dbfs": 0.169769287109375,
+        "rms_dbfs": -32.42499568287566,
+        "crest_factor_db": 17.02217818249786,
+        "spectral_centroid_hz": 4537.909649976663,
+        "spectral_flatness": 0.04793090295411942,
+        "relative_band_energy": {
+          "20_150_hz": 1.232199727111869e-05,
+          "150_500_hz": 0.0029148817584376085,
+          "500_2000_hz": 0.011967752543267037,
+          "2000_5000_hz": 0.7437965597248093,
+          "5000_10000_hz": 0.20314303181563761,
+          "10000_nyquist_hz": 0.03816529972260677
+        }
+      }
+    }
+  ]
+}

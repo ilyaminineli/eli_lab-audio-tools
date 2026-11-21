@@ -1,0 +1,82 @@
+{
+  "files": [
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\8. V\\n_vo_va.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 56077
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 56077,
+        "channels": 1,
+        "duration_seconds": 1.2715873015873016,
+        "peak_dbfs": 0.753692626953125,
+        "rms_dbfs": -14.410585721858036,
+        "crest_factor_db": 11.954471057432219,
+        "spectral_centroid_hz": 435.4866740394509,
+        "spectral_flatness": 0.00021143283560007595,
+        "relative_band_energy": {
+          "20_150_hz": 3.832857071691519e-05,
+          "150_500_hz": 0.7299618310806434,
+          "500_2000_hz": 0.2644343415397776,
+          "2000_5000_hz": 0.005382707074207083,
+          "5000_10000_hz": 9.887747965554783e-05,
+          "10000_nyquist_hz": 5.9358572165142776e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\8. V\\va_vi_vu.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 59457
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 59457,
+        "channels": 1,
+        "duration_seconds": 1.3482312925170068,
+        "peak_dbfs": 0.719268798828125,
+        "rms_dbfs": -13.193632081558453,
+        "crest_factor_db": 10.331456510411003,
+        "spectral_centroid_hz": 457.3303069575473,
+        "spectral_flatness": 0.00020773375647383603,
+        "relative_band_energy": {
+          "20_150_hz": 3.552539034234318e-05,
+          "150_500_hz": 0.7842112112360269,
+          "500_2000_hz": 0.21009424480205055,
+          "2000_5000_hz": 0.005462031915788519,
+          "5000_10000_hz": 0.00013694238329517121,
+          "10000_nyquist_hz": 4.718932047485855e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\8. V\\vu_ve_vo.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 59698
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 59698,
+        "channels": 1,
+        "duration_seconds": 1.3536961451247165,
+        "peak_dbfs": 0.74664306640625,
+        "rms_dbfs": -13.567975172818695,
+        "crest_factor_db": 11.030235901585833,
+        "spectral_centroid_hz": 481.85256678945944,
+        "spectral_flatness": 0.0004538199079588161,
+        "relative_band_energy": {
+          "20_150_hz": 1.0004592959921816e-05,
+          "150_500_hz": 0.6541994564415717,
+          "500_2000_hz": 0.33961331878557505,
+          "2000_5000_hz": 0.005760955834199147,
+          "5000_10000_hz": 0.0002578703230079019,
+          "10000_nyquist_hz": 0.0001551621655927844
+        }
+      }
+    }
+  ]
+}

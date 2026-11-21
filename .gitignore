@@ -1,2 +1,3 @@
 /.idea
 /eli_lab_audio_tools.egg-info
+*.pyc

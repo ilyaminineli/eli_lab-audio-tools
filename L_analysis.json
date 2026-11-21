@@ -1,0 +1,160 @@
+{
+  "files": [
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\7. L\\la_li_lu.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 60088
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 60088,
+        "channels": 1,
+        "duration_seconds": 1.3625396825396825,
+        "peak_dbfs": 0.69818115234375,
+        "rms_dbfs": -13.808451801349154,
+        "crest_factor_db": 10.68781421530108,
+        "spectral_centroid_hz": 430.9614089248932,
+        "spectral_flatness": 8.994638064579143e-05,
+        "relative_band_energy": {
+          "20_150_hz": 4.234906815469641e-05,
+          "150_500_hz": 0.843951861388472,
+          "500_2000_hz": 0.14982058898321585,
+          "2000_5000_hz": 0.006048580647630951,
+          "5000_10000_hz": 0.0001175195335629821,
+          "10000_nyquist_hz": 1.2158536647042484e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\7. L\\lu_le_lo.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 58377
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 58377,
+        "channels": 1,
+        "duration_seconds": 1.3237414965986394,
+        "peak_dbfs": 0.777130126953125,
+        "rms_dbfs": -12.680887211516849,
+        "crest_factor_db": 10.49076212256643,
+        "spectral_centroid_hz": 477.97243349406716,
+        "spectral_flatness": 5.609347740337106e-05,
+        "relative_band_energy": {
+          "20_150_hz": 4.910899984961602e-05,
+          "150_500_hz": 0.6454529081671977,
+          "500_2000_hz": 0.3497194452188465,
+          "2000_5000_hz": 0.004602729998665033,
+          "5000_10000_hz": 0.00015233876517864754,
+          "10000_nyquist_hz": 1.2161890150145286e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\7. L\\lya_li_lyu.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 62931
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 62931,
+        "channels": 1,
+        "duration_seconds": 1.4270068027210885,
+        "peak_dbfs": 0.671051025390625,
+        "rms_dbfs": -13.744911449429058,
+        "crest_factor_db": 10.280022335761538,
+        "spectral_centroid_hz": 436.7343700418564,
+        "spectral_flatness": 8.661035333512845e-05,
+        "relative_band_energy": {
+          "20_150_hz": 4.6694299877101865e-06,
+          "150_500_hz": 0.854811779412012,
+          "500_2000_hz": 0.1352103881901405,
+          "2000_5000_hz": 0.009846696020789206,
+          "5000_10000_hz": 0.00010223390040532862,
+          "10000_nyquist_hz": 1.3303395123129964e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\7. L\\lyu_lye_lyo.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 64365
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 64365,
+        "channels": 1,
+        "duration_seconds": 1.4595238095238094,
+        "peak_dbfs": 0.821868896484375,
+        "rms_dbfs": -13.674823090813856,
+        "crest_factor_db": 11.970873989681646,
+        "spectral_centroid_hz": 467.583930699267,
+        "spectral_flatness": 8.961019357209807e-05,
+        "relative_band_energy": {
+          "20_150_hz": 7.708975813767692e-06,
+          "150_500_hz": 0.6849514991668728,
+          "500_2000_hz": 0.30680412652554667,
+          "2000_5000_hz": 0.008096062980143214,
+          "5000_10000_hz": 0.00011874896642445977,
+          "10000_nyquist_hz": 1.280495223604869e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\7. L\\n_lo_la.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 56227
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 56227,
+        "channels": 1,
+        "duration_seconds": 1.2749886621315192,
+        "peak_dbfs": 0.619903564453125,
+        "rms_dbfs": -14.494960058149909,
+        "crest_factor_db": 10.341442729297288,
+        "spectral_centroid_hz": 434.9310617353285,
+        "spectral_flatness": 4.731746382163954e-05,
+        "relative_band_energy": {
+          "20_150_hz": 9.200379146298248e-06,
+          "150_500_hz": 0.7487673662988937,
+          "500_2000_hz": 0.24374848949164774,
+          "2000_5000_hz": 0.007370060959849634,
+          "5000_10000_hz": 8.499446437354754e-05,
+          "10000_nyquist_hz": 4.724161866780447e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\7. L\\n_lyo_lya.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 56996
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 56996,
+        "channels": 1,
+        "duration_seconds": 1.2924263038548753,
+        "peak_dbfs": 0.668060302734375,
+        "rms_dbfs": -14.494422357715479,
+        "crest_factor_db": 10.990735677967718,
+        "spectral_centroid_hz": 463.4290475179583,
+        "spectral_flatness": 7.095819037400602e-05,
+        "relative_band_energy": {
+          "20_150_hz": 6.733920534702463e-06,
+          "150_500_hz": 0.6884627288619596,
+          "500_2000_hz": 0.30178834928789916,
+          "2000_5000_hz": 0.00960615494121843,
+          "5000_10000_hz": 0.00010470478827444067,
+          "10000_nyquist_hz": 9.766446032895784e-06
+        }
+      }
+    }
+  ]
+}

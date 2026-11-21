@@ -1,0 +1,82 @@
+{
+  "files": [
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\9. TH\\n_tho_tha.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 56051
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 56051,
+        "channels": 1,
+        "duration_seconds": 1.2709977324263038,
+        "peak_dbfs": 0.691558837890625,
+        "rms_dbfs": -15.675219472511854,
+        "crest_factor_db": 12.471802189160158,
+        "spectral_centroid_hz": 449.2104927738636,
+        "spectral_flatness": 0.00016915534234192086,
+        "relative_band_energy": {
+          "20_150_hz": 0.00010703351904921034,
+          "150_500_hz": 0.6684872991935609,
+          "500_2000_hz": 0.32353630348617224,
+          "2000_5000_hz": 0.007664967141293564,
+          "5000_10000_hz": 0.00015301288439736015,
+          "10000_nyquist_hz": 2.7919182830541574e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\9. TH\\tha_thi_thu.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 56497
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 56497,
+        "channels": 1,
+        "duration_seconds": 1.281111111111111,
+        "peak_dbfs": 0.844390869140625,
+        "rms_dbfs": -14.47420796189194,
+        "crest_factor_db": 13.005078529846333,
+        "spectral_centroid_hz": 443.1145627408078,
+        "spectral_flatness": 0.0004699425425657992,
+        "relative_band_energy": {
+          "20_150_hz": 1.4243030394536305e-05,
+          "150_500_hz": 0.7934190759568084,
+          "500_2000_hz": 0.20192116998582416,
+          "2000_5000_hz": 0.004036503916331839,
+          "5000_10000_hz": 0.00018358568968035384,
+          "10000_nyquist_hz": 0.000410141423480458
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\9. TH\\thu_the_tho.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 57455
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 57455,
+        "channels": 1,
+        "duration_seconds": 1.3028344671201815,
+        "peak_dbfs": 0.783355712890625,
+        "rms_dbfs": -12.811224444171895,
+        "crest_factor_db": 10.690404744474726,
+        "spectral_centroid_hz": 489.33619947006775,
+        "spectral_flatness": 0.00017639123068094868,
+        "relative_band_energy": {
+          "20_150_hz": 4.060381648931674e-05,
+          "150_500_hz": 0.5518856063433161,
+          "500_2000_hz": 0.44493770629866647,
+          "2000_5000_hz": 0.0028909904313700026,
+          "5000_10000_hz": 0.00018409430358640698,
+          "10000_nyquist_hz": 5.448326793309122e-05
+        }
+      }
+    }
+  ]
+}

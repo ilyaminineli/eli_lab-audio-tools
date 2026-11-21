@@ -1,0 +1,82 @@
+{
+  "files": [
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\10. R ENGLISH\\@a_@i_@u.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 59494
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 59494,
+        "channels": 1,
+        "duration_seconds": 1.3490702947845805,
+        "peak_dbfs": 0.64068603515625,
+        "rms_dbfs": -13.091357452688692,
+        "crest_factor_db": 9.224262610825335,
+        "spectral_centroid_hz": 435.9334519377675,
+        "spectral_flatness": 6.343466611249654e-05,
+        "relative_band_energy": {
+          "20_150_hz": 1.7050598408597117e-05,
+          "150_500_hz": 0.832143143157484,
+          "500_2000_hz": 0.1595167272097473,
+          "2000_5000_hz": 0.008259664331162443,
+          "5000_10000_hz": 5.021005931568585e-05,
+          "10000_nyquist_hz": 6.961466873866176e-06
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\10. R ENGLISH\\@u_@e_@o.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 58870
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 58870,
+        "channels": 1,
+        "duration_seconds": 1.3349206349206348,
+        "peak_dbfs": 0.720794677734375,
+        "rms_dbfs": -13.087784183598481,
+        "crest_factor_db": 10.244015607637763,
+        "spectral_centroid_hz": 462.20305970011196,
+        "spectral_flatness": 6.177500368730057e-05,
+        "relative_band_energy": {
+          "20_150_hz": 1.910296797631871e-05,
+          "150_500_hz": 0.7577224985071148,
+          "500_2000_hz": 0.23161346052551832,
+          "2000_5000_hz": 0.010549945361679264,
+          "5000_10000_hz": 7.431931012073911e-05,
+          "10000_nyquist_hz": 1.2326855007249325e-05
+        }
+      }
+    },
+    {
+      "file": "C:\\Users\\photo\\OneDrive\\\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b\\UtauV\\Data\\Singers\\EugeneRE\\10. R ENGLISH\\n_@o_@a.wav",
+      "metadata": {
+        "subtype": "PCM_16",
+        "frames": 55748
+      },
+      "analysis": {
+        "sample_rate_hz": 44100,
+        "frames": 55748,
+        "channels": 1,
+        "duration_seconds": 1.2641269841269842,
+        "peak_dbfs": 0.673370361328125,
+        "rms_dbfs": -14.710923909484197,
+        "crest_factor_db": 11.276003845954065,
+        "spectral_centroid_hz": 440.09368224897315,
+        "spectral_flatness": 5.014610081228989e-05,
+        "relative_band_energy": {
+          "20_150_hz": 2.956994757369195e-05,
+          "150_500_hz": 0.7726951547051665,
+          "500_2000_hz": 0.22042751782268696,
+          "2000_5000_hz": 0.0067827786807932505,
+          "5000_10000_hz": 4.816405426981221e-05,
+          "10000_nyquist_hz": 5.031908621745536e-06
+        }
+      }
+    }
+  ]
+}
