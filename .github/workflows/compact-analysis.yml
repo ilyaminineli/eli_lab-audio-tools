@@ -45,3 +45,5 @@ jobs:
             git commit -m "Build compact Eugene processing feature profile"
             git push
           fi
+
+# Rebuild after the compact extractor test import fix.
