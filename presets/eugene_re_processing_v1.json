@@ -1,0 +1,113 @@
+{
+  "version": "1.0",
+  "name": "Eugene:RE cautious OTO-aware restoration v1",
+  "intent": "Small pitch-layer body-presence tests. Preserve synthetic/uncanny identity; protect fixed OTO regions and keep extensions/consonants/events on independent routes.",
+  "wet_default": 0.5,
+  "oto_mask": {
+    "minimum_stretchable_ms": 60,
+    "marker_protection_ms": 8,
+    "edge_fade_ms": 12,
+    "fixed_region_policy": "union",
+    "note": "If any alias marks material as fixed, that region is protected for the shared WAV."
+  },
+  "pitch_layers": {
+    "B2": {
+      "enabled": true,
+      "name": "B2-gentle-body-presence",
+      "description": "Very gentle wide upper-mid presence test; no low-end filtering.",
+      "highpass_hz": 0,
+      "bands": [
+        {
+          "frequency_hz": 1450,
+          "gain_db": 0.6,
+          "q": 0.7
+        }
+      ],
+      "reason": "B2 median centroid ~443 Hz; the 500–2000 Hz band carries ~45.9% of energy while 2–5 kHz is only ~0.27%. Start with a restrained occupied-midrange lift, not high-frequency cuts."
+    },
+    "F3": {
+      "enabled": true,
+      "name": "F3-micro-presence",
+      "description": "Lighter version of the B2 body-presence test.",
+      "highpass_hz": 0,
+      "bands": [
+        {
+          "frequency_hz": 1450,
+          "gain_db": 0.3,
+          "q": 0.7
+        }
+      ],
+      "reason": "F3 has a similar broad 300–400 Hz envelope hump, but more energy concentrated in 150–500 Hz (~79.3%); use a smaller lift."
+    },
+    "G4": {
+      "enabled": false,
+      "name": "G4-neutral",
+      "description": "Neutral reference; G4 has a distinct higher spectral balance.",
+      "highpass_hz": 0,
+      "bands": [],
+      "reason": "G4 has higher median centroid (~567 Hz) and ~0.76% energy in 2–5 kHz versus ~0.27–0.29% for B2/F3. Keep neutral until auditioned."
+    }
+  },
+  "phonetic_extensions": {
+    "L": {
+      "enabled": false,
+      "name": "L-neutral-reference-F3",
+      "reference_pitch": "F3",
+      "reason": "L median F0 ~196 Hz, close to F3, but only six recordings; retain its own route and keep it neutral."
+    },
+    "V": {
+      "enabled": false,
+      "name": "V-neutral-reference-F3",
+      "reference_pitch": "F3",
+      "reason": "V median F0 ~195 Hz, close to F3; small three-sample set and elevated flatness, so preserve until auditioned."
+    },
+    "TH": {
+      "enabled": false,
+      "name": "TH-transient-preserve",
+      "reference_pitch": "F3",
+      "reason": "TH has fricative aliases and a larger residual-energy fraction than the pitch layers; do not apply pitch-body EQ."
+    }
+  },
+  "english_extensions": {
+    "R_ENGLISH": {
+      "enabled": false,
+      "name": "R-English-neutral-reference-F3",
+      "reference_pitch": "F3",
+      "reason": "R English median F0 ~195 Hz, close to F3, but it retains a separate phonetic route."
+    }
+  },
+  "non_tonal_families": {
+    "CONSONANT_RELEASES": {
+      "enabled": false,
+      "route": "preserve_transients",
+      "reason": "Higher spectral flatness/flux than pitch layers; avoid global smoothing, denoising or tonal-body EQ."
+    },
+    "BONUS_PHONETIC_EXTRAS": {
+      "enabled": false,
+      "route": "event_class_bypass",
+      "event_classes": [
+        "cough",
+        "gasp_or_breath",
+        "laughter",
+        "sob_or_cry",
+        "throat_or_growl"
+      ],
+      "reason": "Non-lexical events have much higher residual energy and spectral flux; keep outside singing-vowel processing."
+    },
+    "ROOT": {
+      "enabled": false,
+      "route": "manual_review",
+      "reason": "Root-level material is not automatically assumed to be phonetic voicebank content."
+    }
+  },
+  "safeguards": {
+    "modify_oto": false,
+    "edit_aliases": false,
+    "change_duration": false,
+    "pitch_shift": false,
+    "normalize_loudness": false,
+    "process_unmatched_oto": false,
+    "process_fixed_consonant_regions": false,
+    "copy_non_wav_metadata_verbatim": true
+  }
+}

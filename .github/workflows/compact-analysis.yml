@@ -23,9 +23,9 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install extraction and test dependencies
-        run: python -m pip install --upgrade numpy pytest
-      - name: Test feature extractor
-        run: pytest -q tests/test_extract_voicebank_profile.py
+        run: python -m pip install --upgrade numpy pytest scipy soundfile
+      - name: Test feature extractor and routing chain
+        run: pytest -q tests/test_extract_voicebank_profile.py tests/test_auto_processing_chain.py
       - name: Extract compact processing features
         run: >-
           python tools/extract_voicebank_profile.py
@@ -45,5 +45,3 @@ jobs:
             git commit -m "Build compact Eugene processing feature profile"
             git push
           fi
-
-# Rebuild after the compact extractor test import fix.
