@@ -61,6 +61,10 @@ def percentile(values):
     return {"p10": q(.1), "median": q(.5), "p90": q(.9)}
 
 
+def median_value(values):
+    return percentile(values)["median"]
+
+
 def group_kind(name):
     u = name.upper().replace(" ", "_")
     if u in PITCH: return "pitch_layer"
@@ -241,13 +245,13 @@ def summarize_group(name, samples, source):
             "token_roles": acc["token_roles"],
             "transition_class": acc["transition_class"],
             "consonant_classes": acc["consonant_classes"],
-            "aliases_seen": sorted(acc["aliases_seen"])[:3],
+            "alias": sorted(acc["aliases_seen"])[0] if acc["aliases_seen"] else core,
             "sample_count": len(acc["samples"]),
             "entry_count": acc["line_count"],
             "oto_timing_ms": {
-                key: percentile(values) for key, values in sorted(acc["timing"].items())
+                key: median_value(values) for key, values in sorted(acc["timing"].items())
             },
-            "stretchable_duration_ms": percentile(acc["stretchable_duration_ms"]),
+            "stretchable_duration_ms": median_value(acc["stretchable_duration_ms"]),
             "region_features": {
                 key: finish_region_aggregate(value)
                 for key, value in acc["region"].items()
