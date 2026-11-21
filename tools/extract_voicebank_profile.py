@@ -185,7 +185,8 @@ def summarize_group(name, samples, source):
                     "canonical_alias": core, "tokens": tokens, "token_roles": roles,
                     "transition_class": transition, "consonant_classes": consonant_roles,
                     "aliases_seen": set(), "samples": set(), "line_count": 0,
-                    "timing": defaultdict(list), "region": {
+                    "timing": defaultdict(list), "stretchable_duration_ms": [],
+                    "region": {
                         key: {"status": Counter(), "duration_ms": [],
                               "metrics": defaultdict(list)}
                         for key in ("source_window", "fixed_region", "stretchable_region")
@@ -200,6 +201,9 @@ def summarize_group(name, samples, source):
             for key, value in (timing.get("oto_values_ms") or {}).items():
                 if num(value) is not None:
                     accumulator["timing"][key].append(float(value))
+            stretch_duration = num(timing.get("stretchable_duration_ms"))
+            if stretch_duration is not None:
+                accumulator["stretchable_duration_ms"].append(stretch_duration)
             for warning in timing.get("warnings", []) or []:
                 accumulator["warnings"][str(warning)] += 1
             regions = entry.get("region_analysis") or {}
@@ -233,10 +237,7 @@ def summarize_group(name, samples, source):
             "oto_timing_ms": {
                 key: percentile(values) for key, values in sorted(acc["timing"].items())
             },
-            "stretchable_duration_ms": percentile([
-                num(entry["stretchable_duration_ms"])
-                for entry in [] if False
-            ]),
+            "stretchable_duration_ms": percentile(acc["stretchable_duration_ms"]),
             "region_features": {
                 key: finish_region_aggregate(value)
                 for key, value in acc["region"].items()
