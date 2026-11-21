@@ -87,6 +87,8 @@ Run the initial non-destructive test chain into a separate voicebank folder:
 eugene-timbre process-auto "C:\\Users\\photo\\OneDrive\\Документы\\UtauV\\Data\\Singers\\EugeneRE" -o "D:\\EugeneRE_Restoration_TEST" --wet 0.5
 \`\`\`
 
-Only B2 and F3 currently receive tiny pitch-body presence tests. G4, consonant releases, L/V/TH, R English and bonus events have their own routes and remain neutral/bypassed pending listening tests. Processing is restricted to eligible OTO stretchable regions. If any alias marks part of a shared WAV as fixed, the chain protects that area. OTO files and other non-WAV bank files are copied unchanged to the output tree.
+Only B2 and F3 currently receive tiny pitch-body presence tests. G4, consonant releases, L/V/TH, R English and bonus events have their own routes and remain neutral/bypassed pending listening tests. Processing is restricted to eligible OTO stretchable regions. If any alias marks part of a shared WAV as fixed, the chain protects that area.
+
+Before a first wet run, inspect the dry-run report's per-alias OTO windows, timing warnings, unmatched/orphan OTO entries, duplicate aliases and alias-token audit. Samples with less than 5% eligible mask coverage are marked `partial` and copied unchanged by default; samples with missing/ambiguous aliases or invalid OTO timing are marked `manual_review`. Only use `--allow-partial` after reviewing the low-coverage samples. Filtered segments receive 80 ms of surrounding source context, while only the eligible OTO mask is blended into the output. OTO files and other non-WAV bank files are copied unchanged to the output tree.
 
 This is a first comparison chain, not a final restoration preset. Do not overwrite the original bank. Render matching UST phrases in the target resamplers and compare the dry-run report, originals and processed output at matched loudness. See [docs/processing-chain-design.md](docs/processing-chain-design.md).
