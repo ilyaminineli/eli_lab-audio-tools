@@ -28,14 +28,51 @@ ALIAS_METRICS = (
 )
 VOWELS = {"a", "i", "u", "e", "o", "@a", "@i", "@u", "@e", "@o",
           "aa", "ae", "ah", "ao", "aw", "ay", "eh", "er", "ey",
-          "ih", "iy", "ow", "oy", "uh", "uw"}
+          "ih", "iy", "ow", "oy", "uh", "uw",
+          "あ", "い", "う", "え", "お", "ア", "イ", "ウ", "エ", "オ",
+          "ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ァ", "ィ", "ゥ", "ェ", "ォ"}
 PHONEME_CLASSES = {
-    "nasal": {"m", "n", "ng", "ん", "ン"},
-    "stop": {"b", "d", "g", "k", "p", "t", "q", "ts", "ch", "j"},
-    "fricative": {"f", "h", "s", "sh", "th", "v", "z", "zh", "ふ"},
-    "liquid": {"l", "r", "rr"},
-    "glide": {"w", "y", "j"},
+    "nasal": {"m", "n", "ng", "ん", "ン",
+              "な", "に", "ぬ", "ね", "の", "ま", "み", "む", "め", "も",
+              "ナ", "ニ", "ヌ", "ネ", "ノ", "マ", "ミ", "ム", "メ", "モ"},
+    "stop": {"b", "d", "g", "k", "p", "t", "q", "ch", "j",
+             "か", "き", "く", "け", "こ", "が", "ぎ", "ぐ", "げ", "ご",
+             "た", "て", "と", "だ", "で", "ど", "ば", "び", "ぶ", "べ", "ぼ",
+             "ぱ", "ぴ", "ぷ", "ぺ", "ぽ",
+             "カ", "キ", "ク", "ケ", "コ", "ガ", "ギ", "グ", "ゲ", "ゴ",
+             "タ", "テ", "ト", "ダ", "デ", "ド", "バ", "ビ", "ブ", "ベ", "ボ",
+             "パ", "ピ", "プ", "ペ", "ポ"},
+    "affricate": {"ts", "ち", "つ", "ぢ", "づ", "じ",
+                  "チ", "ツ", "ヂ", "ヅ", "ジ"},
+    "fricative": {"f", "h", "s", "sh", "th", "v", "z", "zh", "ふ",
+                  "さ", "し", "す", "せ", "そ", "ざ", "ず", "ぜ", "ぞ",
+                  "は", "ひ", "ふ", "へ", "ほ", "ゔ",
+                  "サ", "シ", "ス", "セ", "ソ", "ザ", "ズ", "ゼ", "ゾ",
+                  "ハ", "ヒ", "フ", "ヘ", "ホ", "ヴ"},
+    "liquid": {"l", "r", "rr", "ら", "り", "る", "れ", "ろ",
+               "ラ", "リ", "ル", "レ", "ロ"},
+    "glide": {"w", "y", "や", "ゆ", "よ", "わ", "を",
+              "ヤ", "ユ", "ヨ", "ワ", "ヲ"},
 }
+
+def token_role(token):
+    low = token.lower()
+    if low in VOWELS:
+        return "vowel"
+    if low in {"-", "sil", "pau"}:
+        return "boundary"
+    role = next((kind for kind, values in PHONEME_CLASSES.items()
+                 if low in values or token in values), None)
+    if role:
+        return role
+    # Contracted Japanese syllables inherit the consonant class of their first kana.
+    first = token[:1]
+    if first and first != token:
+        role = next((kind for kind, values in PHONEME_CLASSES.items()
+                     if first in values), None)
+        if role:
+            return role
+    return "kana_or_unknown"
 
 
 def num(value):
@@ -80,13 +117,7 @@ def alias_parts(alias):
     tokens = [t for t in re.split(r"[\s_]+", core) if t]
     roles = []
     for token in tokens:
-        low = token.lower()
-        if low in VOWELS:
-            role = "vowel"
-        else:
-            role = next((kind for kind, members in PHONEME_CLASSES.items()
-                         if low in members), "kana_or_unknown")
-        roles.append(role)
+        roles.append(token_role(token))
     if len(tokens) >= 2:
         transition = f"{roles[0]}_to_{roles[1]}"
     elif roles:
