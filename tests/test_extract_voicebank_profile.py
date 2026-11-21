@@ -4,12 +4,8 @@ from pathlib import Path
 from tools.extract_voicebank_profile import build
 
 
-def test_build_profile_compacts_pitch_full_bank_and_legacy(tmp_path: Path):
-    def deep(path: Path, groups: dict):
-        path.write_text(json.dumps({"manifest": {}, "groups": groups}), encoding="utf-8")
-        return path
-
-    sample = {
+def sample(alias="a b_G4"):
+    return {
         "relative_path": "5. G4/vowel.wav",
         "basic": {
             "duration_seconds": 1.0, "rms_dbfs": -14.0,
@@ -24,29 +20,46 @@ def test_build_profile_compacts_pitch_full_bank_and_legacy(tmp_path: Path):
             "harmonic_profile_relative_to_h1_db": [{"harmonic": 1, "median_db": 0}],
         },
         "oto": {"status": "matched", "entries": [{
-            "alias": "a i_G4", "wav": "vowel.wav", "oto_line_number": 1,
+            "alias": alias, "wav": "vowel.wav", "oto_line_number": 1,
             "timing": {
-                "oto_values_ms": {"offset": 100, "consonant": 200},
-                "markers_ms": {"offset": 100},
-                "regions_ms": {"stretchable_region": [300, 500]},
+                "oto_values_ms": {"offset": 100, "consonant": 200, "preutter": 150},
                 "stretchable_duration_ms": 200,
                 "warnings": [],
             },
-            "region_analysis": {"stretchable_region": {
-                "duration_ms": 200, "deep_analysis_status": "analysed",
-                "timbre": {"f0_hz": {"median": 392}},
-            }},
+            "region_analysis": {
+                "source_window": {"duration_ms": 400, "deep_analysis_status": "analysed",
+                                  "timbre": {"f0_hz": {"median": 390}}},
+                "fixed_region": {"duration_ms": 200, "deep_analysis_status": "analysed",
+                                 "timbre": {"f0_hz": {"median": 391}}},
+                "stretchable_region": {"duration_ms": 200, "deep_analysis_status": "analysed",
+                                       "timbre": {"f0_hz": {"median": 392}}},
+            },
         }]},
     }
-    pitch = deep(tmp_path / "G4_analysis.json", {"G4": {"files": [sample]}})
+
+
+def deep(path: Path, groups: dict):
+    path.write_text(json.dumps({"manifest": {}, "groups": groups}), encoding="utf-8")
+    return path
+
+
+def test_build_profile_compacts_pitch_full_bank_and_legacy(tmp_path: Path):
+    pitch = deep(tmp_path / "G4_analysis.json", {"G4": {"files": [sample()]}})
     b2 = deep(tmp_path / "B2_analysis.json", {"B2": {"files": []}})
     f3 = deep(tmp_path / "F3_analysis.json", {"F3": {"files": []}})
-    full = deep(tmp_path / "EugeneRE_analysis.json", {"CONSONANT_RELEASES": {"files": []}})
+    full = deep(tmp_path / "EugeneRE_analysis.json", {
+        "CONSONANT_RELEASES": {"files": [sample("a sh_G4")]}
+    })
     legacy = tmp_path / "CONSONANT_analysis.json"
     legacy.write_text(json.dumps({"files": []}), encoding="utf-8")
 
     profile = build([b2, f3, pitch], full, [legacy])
-    assert profile["processing_families"]["G4"]["sample_count"] == 1
-    assert profile["processing_families"]["G4"]["aliases"][0]["canonical_alias"] == "a i"
+    g4 = profile["processing_families"]["G4"]
+    assert g4["sample_count"] == 1
+    assert "a b" in g4["alias_profiles"]
+    assert g4["alias_profiles"]["a b"]["consonant_classes"] == ["stop"]
+    assert g4["metrics"]["f0_hz"]["median"] == 392.0
+    assert "stretchable_region" in g4["alias_profiles"]["a b"]["region_features"]
     assert profile["processing_families"]["CONSONANT_RELEASES"]["group_kind"] == "consonant_release"
-    assert profile["processing_families"]["G4"]["metrics"]["f0_hz"]["median"] == 392.0
+    assert profile["processing_families"]["CONSONANT_RELEASES"]["alias_profiles"]["a sh"]["consonant_classes"] == ["fricative"]
+    assert len(json.dumps(profile)) < 50000

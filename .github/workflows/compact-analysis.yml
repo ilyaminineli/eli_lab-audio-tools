@@ -22,8 +22,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install streaming JSON parser
-        run: python -m pip install --upgrade ijson numpy
+      - name: Install extraction and test dependencies
+        run: python -m pip install --upgrade numpy pytest
+      - name: Test feature extractor
+        run: pytest -q tests/test_extract_voicebank_profile.py
       - name: Extract compact processing features
         run: >-
           python tools/extract_voicebank_profile.py

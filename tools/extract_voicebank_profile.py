@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Compact large Eugene:RE analysis reports into processing-oriented features."""
+"""Extract a compact, structured Eugene:RE processing profile from deep JSON reports."""
 from __future__ import annotations
 import argparse
 import json
 import math
 import re
-from collections import defaultdict, Counter
+from collections import Counter, defaultdict
 from pathlib import Path
 
 PITCH = {"B2", "F3", "G4"}
@@ -20,6 +20,16 @@ METRICS = (
 )
 BASIC = ("duration_seconds", "rms_dbfs", "crest_factor_db",
          "spectral_centroid_hz", "spectral_flatness")
+VOWELS = {"a", "i", "u", "e", "o", "@a", "@i", "@u", "@e", "@o",
+          "aa", "ae", "ah", "ao", "aw", "ay", "eh", "er", "ey",
+          "ih", "iy", "ow", "oy", "uh", "uw"}
+PHONEME_CLASSES = {
+    "nasal": {"m", "n", "ng", "ん", "ン"},
+    "stop": {"b", "d", "g", "k", "p", "t", "q", "ts", "ch", "j"},
+    "fricative": {"f", "h", "s", "sh", "th", "v", "z", "zh", "ふ"},
+    "liquid": {"l", "r", "rr"},
+    "glide": {"w", "y", "j"},
+}
 
 
 def num(value):
@@ -34,7 +44,7 @@ def median_of(node):
     return num(node.get("median")) if isinstance(node, dict) else num(node)
 
 
-def pct(values):
+def percentile(values):
     values = sorted(v for x in values if (v := num(x)) is not None)
     if not values:
         return {"p10": None, "median": None, "p90": None}
@@ -57,142 +67,217 @@ def group_kind(name):
 
 def alias_parts(alias):
     core = PITCH_SUFFIX.sub("", alias.strip())
-    return core, [t for t in re.split(r"[\s_]+", core) if t]
+    tokens = [t for t in re.split(r"[\s_]+", core) if t]
+    roles = []
+    for token in tokens:
+        low = token.lower()
+        if low in VOWELS:
+            role = "vowel"
+        else:
+            role = next((kind for kind, members in PHONEME_CLASSES.items()
+                         if low in members), "kana_or_unknown")
+        roles.append(role)
+    if len(tokens) >= 2:
+        transition = f"{roles[0]}_to_{roles[1]}"
+    elif roles:
+        transition = roles[0]
+    else:
+        transition = "unclassified"
+    onset_classes = [r for r in roles if r in PHONEME_CLASSES]
+    return core, tokens, roles, transition, onset_classes
 
 
-def compact_region(region):
-    if not isinstance(region, dict): return None
+def collect_metric_values(target, prefix, node, keys):
+    for key in keys:
+        value = median_of(node.get(key)) if isinstance(node, dict) else None
+        if value is not None:
+            target[f"{prefix}{key}"].append(value)
+
+
+def compact_region(region, aggregate):
+    if not isinstance(region, dict):
+        return
+    status = region.get("deep_analysis_status", "not_reported")
+    aggregate["status"][status] += 1
+    duration = num(region.get("duration_ms"))
+    if duration is not None:
+        aggregate["duration_ms"].append(duration)
     timbre = region.get("timbre") or {}
-    result = {k: median_of(timbre.get(k)) for k in METRICS
-              if median_of(timbre.get(k)) is not None}
-    result.update({
-        "duration_ms": num(region.get("duration_ms")),
-        "status": region.get("deep_analysis_status"),
-        "reason": region.get("reason"),
-    })
-    env = timbre.get("spectral_envelope") or {}
-    if env:
-        result["spectral_envelope"] = {
-            "frequency_hz": env.get("frequency_hz"),
-            "median_relative_db": env.get("median_relative_db"),
-        }
-    if timbre.get("harmonic_profile_relative_to_h1_db"):
-        result["harmonic_profile"] = timbre["harmonic_profile_relative_to_h1_db"]
-    return result
+    collect_metric_values(aggregate["metrics"], "", timbre, METRICS)
 
 
-def summarise_group(name, samples, source):
-    values, bands = defaultdict(list), defaultdict(list)
-    envelopes, harmonic_values = [], defaultdict(list)
-    aliases, sample_rows, oto_status = [], [], Counter()
+def finish_region_aggregate(aggregate):
+    return {
+        "analysis_status_counts": dict(aggregate["status"]),
+        "duration_ms": percentile(aggregate["duration_ms"]),
+        "metrics": {k: percentile(v) for k, v in sorted(aggregate["metrics"].items())},
+    }
+
+
+def summarize_group(name, samples, source):
+    value_lists = defaultdict(list)
+    band_lists = defaultdict(list)
+    env_rows = []
+    harmonic_values = defaultdict(list)
+    alias_acc = {}
+    sample_summaries = []
+    oto_status = Counter()
+    group_sample_count = 0
+
     for sample in samples:
+        group_sample_count += 1
         path = sample.get("relative_path") or sample.get("file") or ""
         sample_id = str(path).replace("\\", "/").split("/")[-1]
         basic = sample.get("basic") or sample.get("analysis") or {}
         timbre = sample.get("timbre") or {}
-        features = {}
+        file_metrics = {}
         for key in BASIC:
             value = num(basic.get(key))
             if value is not None:
-                features[key] = value
-                values[key].append(value)
+                file_metrics[key] = value
+                value_lists[key].append(value)
         for key in METRICS:
             value = median_of(timbre.get(key))
             if value is not None:
-                features[key] = value
-                values[key].append(value)
-        # Old reports mislabeled a linear amplitude as peak_dbfs; don't treat it as dBFS.
+                file_metrics[key] = value
+                value_lists[key].append(value)
+
+        # Legacy files mislabeled linear peak amplitude as peak_dbfs; never interpret it as dBFS.
         peak = num(basic.get("peak_amplitude"))
         if peak is not None:
-            features["peak_amplitude"] = peak
-        elif num(basic.get("peak_dbfs")) is not None:
-            peak = num(basic["peak_dbfs"])
-            features["peak_dbfs"] = peak if peak <= 0 else None
-            if peak > 0:
-                features["legacy_peak_field_linear_amplitude"] = peak
+            file_metrics["peak_amplitude"] = peak
+        else:
+            legacy_peak = num(basic.get("peak_dbfs"))
+            if legacy_peak is not None:
+                if legacy_peak <= 0:
+                    file_metrics["peak_dbfs"] = legacy_peak
+                else:
+                    file_metrics["legacy_peak_field_linear_amplitude"] = legacy_peak
+
         for key, value in (basic.get("relative_band_energy") or {}).items():
             if num(value) is not None:
-                bands[key].append(float(value))
-        env = timbre.get("spectral_envelope") or {}
-        if env.get("median_relative_db"):
-            envelopes.append(env)
+                band_lists[key].append(float(value))
+        envelope = timbre.get("spectral_envelope") or {}
+        if envelope.get("median_relative_db"):
+            env_rows.append(envelope)
         for row in timbre.get("harmonic_profile_relative_to_h1_db", []) or []:
-            h, value = row.get("harmonic"), num(row.get("median_db"))
-            if h and value is not None:
-                harmonic_values[int(h)].append(value)
+            harmonic, value = row.get("harmonic"), num(row.get("median_db"))
+            if harmonic and value is not None:
+                harmonic_values[int(harmonic)].append(value)
 
         oto = sample.get("oto") or {}
         status = oto.get("status", "not_reported")
         oto_status[status] += 1
         entries = oto.get("entries", []) or []
-        sample_rows.append({
-            "sample": sample_id, "metrics": features,
-            "oto_status": status, "alias_count": len(entries),
+        sample_summaries.append({
+            "sample": sample_id,
+            "metrics": file_metrics,
+            "oto_status": status,
+            "alias_count": len(entries),
         })
+
         for entry in entries:
             alias = str(entry.get("alias", ""))
-            core, tokens = alias_parts(alias)
+            core, tokens, roles, transition, consonant_roles = alias_parts(alias)
+            accumulator = alias_acc.get(core)
+            if accumulator is None:
+                accumulator = {
+                    "canonical_alias": core, "tokens": tokens, "token_roles": roles,
+                    "transition_class": transition, "consonant_classes": consonant_roles,
+                    "aliases_seen": set(), "samples": set(), "line_count": 0,
+                    "timing": defaultdict(list), "region": {
+                        key: {"status": Counter(), "duration_ms": [],
+                              "metrics": defaultdict(list)}
+                        for key in ("source_window", "fixed_region", "stretchable_region")
+                    },
+                    "warnings": Counter(),
+                }
+                alias_acc[core] = accumulator
+            accumulator["aliases_seen"].add(alias)
+            accumulator["samples"].add(sample_id)
+            accumulator["line_count"] += 1
             timing = entry.get("timing") or {}
+            for key, value in (timing.get("oto_values_ms") or {}).items():
+                if num(value) is not None:
+                    accumulator["timing"][key].append(float(value))
+            for warning in timing.get("warnings", []) or []:
+                accumulator["warnings"][str(warning)] += 1
             regions = entry.get("region_analysis") or {}
-            aliases.append({
-                "group": name, "group_kind": group_kind(name), "sample": sample_id,
-                "alias": alias, "canonical_alias": core, "tokens": tokens,
-                "oto_values_ms": timing.get("oto_values_ms", {}),
-                "markers_ms": timing.get("markers_ms", {}),
-                "regions_ms": timing.get("regions_ms", {}),
-                "stretchable_duration_ms": num(timing.get("stretchable_duration_ms")),
-                "warnings": timing.get("warnings", []),
-                "region_features": {
-                    region: compact_region(regions.get(region))
-                    for region in ("source_window", "fixed_region", "stretchable_region")
-                },
-            })
+            for region_name in accumulator["region"]:
+                compact_region(regions.get(region_name), accumulator["region"][region_name])
 
     envelope_summary = None
-    if envelopes:
+    if env_rows:
         import numpy as np
-        rows = [e for e in envelopes if e.get("median_relative_db")]
-        width = min(len(e["median_relative_db"]) for e in rows)
-        matrix = np.asarray([e["median_relative_db"][:width] for e in rows], dtype=float)
+        width = min(len(row.get("median_relative_db", [])) for row in env_rows)
+        matrix = np.asarray([row["median_relative_db"][:width] for row in env_rows], dtype=float)
         envelope_summary = {
-            "sample_count": len(rows),
-            "frequency_hz": rows[0].get("frequency_hz", [])[:width],
+            "sample_count": len(env_rows),
+            "frequency_hz": env_rows[0].get("frequency_hz", [])[:width],
             "median_of_sample_medians_db": np.median(matrix, axis=0).tolist(),
             "p10_of_sample_medians_db": np.percentile(matrix, 10, axis=0).tolist(),
             "p90_of_sample_medians_db": np.percentile(matrix, 90, axis=0).tolist(),
         }
 
+    aliases = {}
+    for core, acc in sorted(alias_acc.items()):
+        aliases[core] = {
+            "tokens": acc["tokens"],
+            "token_roles": acc["token_roles"],
+            "transition_class": acc["transition_class"],
+            "consonant_classes": acc["consonant_classes"],
+            "aliases_seen": sorted(acc["aliases_seen"]),
+            "sample_count": len(acc["samples"]),
+            "sample_examples": sorted(acc["samples"])[:5],
+            "entry_count": acc["line_count"],
+            "oto_timing_ms": {
+                key: percentile(values) for key, values in sorted(acc["timing"].items())
+            },
+            "stretchable_duration_ms": percentile([
+                num(entry["stretchable_duration_ms"])
+                for entry in [] if False
+            ]),
+            "region_features": {
+                key: finish_region_aggregate(value)
+                for key, value in acc["region"].items()
+            },
+            "warnings": dict(acc["warnings"]),
+        }
+
     return {
-        "sample_count": len(sample_rows), "group_kind": group_kind(name),
-        "metrics": {k: pct(v) for k, v in sorted(values.items())},
-        "relative_band_energy": {k: pct(v) for k, v in sorted(bands.items())},
+        "sample_count": group_sample_count,
+        "group_kind": group_kind(name),
+        "metrics": {k: percentile(v) for k, v in sorted(value_lists.items())},
+        "relative_band_energy": {k: percentile(v) for k, v in sorted(band_lists.items())},
         "spectral_envelope": envelope_summary,
         "harmonic_profile": [
-            {"harmonic": h, **pct(v)} for h, v in sorted(harmonic_values.items())
+            {"harmonic": h, **percentile(v)} for h, v in sorted(harmonic_values.items())
         ],
         "oto_coverage": dict(oto_status),
-        "samples": sample_rows, "aliases": aliases, "source_report": source,
+        "alias_profiles": aliases,
+        "samples": sample_summaries,
+        "source_report": source,
     }
 
 
 def add_deep_report(path, target, allow=None, skip=()):
     data = json.loads(path.read_text(encoding="utf-8"))
-    result = {}
+    counts = {}
     for name, group in (data.get("groups") or {}).items():
         if name.upper() in {x.upper() for x in skip}:
             continue
         if allow is not None and name.upper() not in {x.upper() for x in allow}:
             continue
-        target[name] = summarise_group(name, group.get("files", []), path.name)
-        result[name] = target[name]["sample_count"]
-    return result
+        target[name] = summarize_group(name, group.get("files", []), path.name)
+        counts[name] = target[name]["sample_count"]
+    return counts
 
 
 def add_legacy_report(path, name, target):
     if name in target:
         return None
     data = json.loads(path.read_text(encoding="utf-8"))
-    target[name] = summarise_group(name, data.get("files", []), path.name)
+    target[name] = summarize_group(name, data.get("files", []), path.name)
     return target[name]["sample_count"]
 
 
@@ -213,37 +298,37 @@ def build(pitch_reports, full_bank, supplemental):
         if count is not None:
             sources.append({
                 "file": path.name, "bytes": path.stat().st_size,
-                "purpose": "legacy fallback for group not present in full-bank report",
+                "purpose": "legacy fallback for groups absent from full-bank report",
                 "samples": count,
             })
 
-    cross_pitch = defaultdict(lambda: defaultdict(list))
+    cross_pitch = defaultdict(dict)
     for name, group in groups.items():
         if name.upper() not in PITCH:
             continue
-        for entry in group["aliases"]:
-            region = entry["region_features"].get("stretchable_region") or {}
-            cross_pitch[entry["canonical_alias"]][name].append({
-                "alias": entry["alias"], "sample": entry["sample"],
-                "stretchable_duration_ms": entry["stretchable_duration_ms"],
-                "metrics": {k: region[k] for k in METRICS if k in region},
-            })
+        for canonical, profile in group["alias_profiles"].items():
+            cross_pitch[canonical][name] = {
+                "entry_count": profile["entry_count"],
+                "sample_count": profile["sample_count"],
+                "stretchable_duration_ms": profile["region_features"]["stretchable_region"]["duration_ms"],
+                "region_features": profile["region_features"]["stretchable_region"]["metrics"],
+            }
 
     return {
-        "schema_version": "1.0",
+        "schema_version": "2.0",
         "profile_type": "eugene_re_compact_processing_features",
         "source_reports": sources,
         "processing_families": groups,
         "cross_pitch_aliases": {
-            key: dict(banks) for key, banks in sorted(cross_pitch.items())
-            if len(banks) > 1
+            key: banks for key, banks in sorted(cross_pitch.items()) if len(banks) > 1
         },
         "interpretation_limits": [
-            "Compact reduction of submitted reports; listening tests remain necessary.",
-            "Harmonic/residual ratio and inharmonicity are analysis proxies, not naturalness scores.",
-            "Dedicated B2/F3/G4 reports are used; the full-bank report supplies non-pitch groups to avoid duplicate weighting.",
-            "Legacy peak_dbfs values above 0 are linear amplitudes and are excluded from loudness decisions.",
-            "OTO windows are diagnostic; one WAV may have multiple aliases with different time regions.",
+            "This compact profile is derived from the submitted reports; audition remains necessary.",
+            "Harmonic/residual and inharmonicity measurements are proxies, not naturalness scores.",
+            "Pitch reports supply B2/F3/G4; the full-bank report supplies non-pitch groups to avoid double-counting.",
+            "Positive legacy peak_dbfs values were linear amplitudes and are excluded from dBFS comparisons.",
+            "One WAV may have multiple OTO aliases; alias features are aggregated per canonical alias and keep original timing statistics.",
+            "Phoneme labels are heuristic from alias tokens; ambiguous kana tokens are retained as kana_or_unknown instead of guessed.",
         ],
     }
 
