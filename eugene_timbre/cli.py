@@ -1,4 +1,4 @@
-"""CLI for bank analysis, detailed timbre measurement and tonal processing."""
+"""CLI for bank analysis, OTO-aware timbre measurement and tonal processing."""
 import argparse
 import json
 import sys
@@ -12,6 +12,9 @@ from .dsp import (
     apply_profile, describe_profile,
 )
 from .io import read_wav, write_wav
+from .oto_analysis import (
+    analyse_oto_entry, find_nearest_oto, match_entries, parse_oto,
+)
 from .timbre_analysis import TimbreAnalysisConfig, analyze_timbre
 
 PROFILES = {
@@ -46,25 +49,72 @@ def make_config(args):
         max_harmonics=args.max_harmonics,
     )
 
+def add_deep_options(parser):
+    parser.add_argument("--frame-ms", type=float, default=85.0)
+    parser.add_argument("--hop-ms", type=float, default=20.0)
+    parser.add_argument("--f0-min", type=float, default=65.0)
+    parser.add_argument("--f0-max", type=float, default=850.0)
+    parser.add_argument("--max-harmonics", type=int, default=20)
+
 def analyze_sample_deep(args):
-    audio, sr, meta = read_wav(Path(args.input))
+    input_path = Path(args.input).resolve()
+    audio, sr, meta = read_wav(input_path)
+    config = make_config(args)
+    oto_path = Path(args.oto_file).resolve() if args.oto_file else None
+    if oto_path is None:
+        oto_path = find_nearest_oto(input_path, input_path.parent)
+    oto_report = {"status": "oto_ini_not_found", "entries": []}
+    if oto_path is not None:
+        parsed = parse_oto(oto_path)
+        try:
+            relative = input_path.relative_to(oto_path.parent).as_posix()
+        except ValueError:
+            relative = input_path.name
+        matches = match_entries(parsed.index(), relative, input_path.name)
+        if args.alias:
+            matches = [entry for entry in matches if entry.alias == args.alias]
+        oto_report = {
+            "status": "matched" if matches else "no_matching_oto_entries",
+            "oto_ini": str(oto_path),
+            "encoding": parsed.encoding,
+            "parse_errors": parsed.errors,
+            "entry_count": len(matches),
+            "entries": [analyse_oto_entry(entry, audio, sr, config) for entry in matches],
+        }
     report = {
-        "file": str(Path(args.input).resolve()),
+        "file": str(input_path),
         "metadata": meta,
         "basic": analyze_audio(audio, sr),
-        "timbre": analyze_timbre(audio, sr, make_config(args)),
+        "timbre": analyze_timbre(audio, sr, config),
+        "oto": oto_report,
     }
-    Path(args.output).write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+    Path(args.output).write_text(
+        json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
     print(f"Deep sample report written: {args.output}")
     return 0
 
 def analyze_bank_deep(args):
     groups = set(args.groups) if args.groups else None
-    report = analyze_bank(Path(args.input), Path(args.output), make_config(args), groups)
-    print(f"Analysed {report['total_wav_files_analysed']} of {report['total_wav_files_found']} WAV(s).")
+    report = analyze_bank(
+        Path(args.input), Path(args.output), make_config(args), groups,
+        oto_file=Path(args.oto_file) if args.oto_file else None,
+        use_oto=not args.no_oto,
+    )
+    print(
+        f"Analysed {report['total_wav_files_analysed']} of "
+        f"{report['total_wav_files_found']} WAV(s)."
+    )
     print(f"Deep reports written to: {args.output}")
+    oto = report["oto_analysis"]
+    if oto["enabled"]:
+        print(
+            f"OTO: {oto['oto_ini_files_read']} file(s), "
+            f"{oto['oto_entries_matched']} matched alias entries, "
+            f"{oto['oto_entries_unmatched']} unmatched entries."
+        )
     if report["failed_files"]:
-        print(f"Failed files: {len(report['failed_files'])}; see bank_deep_analysis.json")
+        print(f"Failed WAVs: {len(report['failed_files'])}; see bank_deep_analysis.json")
     return 0
 
 def compare(args):
@@ -98,13 +148,6 @@ def process(args):
     print(f"Processed {len(items)} WAV(s) to {dst}. Originals untouched.")
     return 0
 
-def add_deep_options(parser):
-    parser.add_argument("--frame-ms", type=float, default=85.0)
-    parser.add_argument("--hop-ms", type=float, default=20.0)
-    parser.add_argument("--f0-min", type=float, default=65.0)
-    parser.add_argument("--f0-max", type=float, default=850.0)
-    parser.add_argument("--max-harmonics", type=int, default=20)
-
 def main():
     parser = argparse.ArgumentParser(prog="eugene-timbre")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -114,16 +157,26 @@ def main():
     basic.add_argument("-o", "--output", default="timbre_analysis.json")
     basic.set_defaults(func=analyze)
 
-    sample = sub.add_parser("analyze-deep-sample", help="Deep harmonic and spectral-envelope analysis of one WAV.")
+    sample = sub.add_parser(
+        "analyze-deep-sample",
+        help="Deep harmonic, spectral-envelope and optional OTO analysis of one WAV."
+    )
     sample.add_argument("input")
     sample.add_argument("-o", "--output", default="deep_timbre_analysis.json")
+    sample.add_argument("--oto-file", help="Optional explicit oto.ini; otherwise auto-discovered beside the WAV.")
+    sample.add_argument("--alias", help="Optional exact OTO alias to analyse.")
     add_deep_options(sample)
     sample.set_defaults(func=analyze_sample_deep)
 
-    bank = sub.add_parser("analyze-deep-bank", help="Recursively analyse a voicebank into per-folder JSON reports.")
-    bank.add_argument("input")
+    bank = sub.add_parser(
+        "analyze-deep-bank",
+        help="Recursively analyse a voicebank and align sample analysis with nearby oto.ini files."
+    )
+    bank.add_argument("input", help="Voicebank folder; a pitch-layer folder such as '5. G4' is also accepted.")
     bank.add_argument("-o", "--output", required=True, help="Separate report directory.")
     bank.add_argument("--groups", nargs="*", help="Optional group filter, e.g. B2 F3 G4.")
+    bank.add_argument("--oto-file", help="Optional explicit oto.ini; otherwise each WAV uses the nearest oto.ini.")
+    bank.add_argument("--no-oto", action="store_true", help="Disable OTO parsing.")
     add_deep_options(bank)
     bank.set_defaults(func=analyze_bank_deep)
 
