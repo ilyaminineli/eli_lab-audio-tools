@@ -1,4 +1,4 @@
-"CLI for bank analysis, detailed timbre measurement and tonal processing."""
+"""CLI for bank analysis, detailed timbre measurement and tonal processing."""
 import argparse
 import json
 import sys
