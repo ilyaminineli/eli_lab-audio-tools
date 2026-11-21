@@ -291,7 +291,11 @@ def add_deep_report(path, target, allow=None, skip=()):
 
 
 def add_legacy_report(path, name, target):
-    if name in target:
+    equivalent = {
+        "CONSONANT": "CONSONANT_RELEASES",
+        "BONUS": "BONUS_PHONETIC_EXTRAS",
+    }.get(name, name)
+    if name in target or equivalent in target:
         return None
     data = json.loads(path.read_text(encoding="utf-8"))
     target[name] = summarize_group(name, data.get("files", []), path.name)
