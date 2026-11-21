@@ -21,6 +21,10 @@ def test_alias_and_event_recognition():
     alias = classify_alias("a sh_G4")
     assert alias["canonical_alias"] == "a sh"
     assert alias["consonant_classes"] == ["fricative"]
+    assert classify_alias("a ch_G4")["consonant_classes"] == ["affricate"]
+    assert classify_alias("a しゃ_G4")["consonant_classes"] == ["fricative"]
+    assert classify_alias("a にゃ_G4")["consonant_classes"] == ["nasal"]
+    assert classify_alias("- あ_B2")["token_roles"] == ["boundary", "vowel"]
     assert classify_event("cough 1.wav") == "cough"
     assert classify_event("laugh 2.wav") == "laughter"
 
