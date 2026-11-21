@@ -204,11 +204,15 @@ def process_automatic(args):
         config_path=Path(args.config) if args.config else None,
         oto_file=Path(args.oto_file) if args.oto_file else None,
         dry_run=args.dry_run,
+        allow_partial=args.allow_partial,
     )
     label = "Dry run" if args.dry_run else "Processing complete"
+    summary = report["summary"]
     print(
-        f"{label}: {report['files_found']} WAV(s), "
-        f"{report['processed_files']} processed, {report['bypassed_files']} bypassed."
+        f"{label}: {report['files_found']} WAV(s) | "
+        f"{summary['processed']} processed, {summary['ready']} ready, "
+        f"{summary['partial']} partial, {summary['manual_review']} manual review, "
+        f"{summary['bypassed']} intentionally bypassed."
     )
     print(f"Output/report: {args.output}")
     return 0
@@ -279,6 +283,10 @@ def main():
     auto_proc.add_argument("--config", help="Optional processing preset JSON.")
     auto_proc.add_argument("--oto-file", help="Optional explicit oto.ini; otherwise auto-discovered.")
     auto_proc.add_argument("--dry-run", action="store_true", help="Write only the routing report; do not copy or process WAVs.")
+    auto_proc.add_argument(
+        "--allow-partial", action="store_true",
+        help="Also process samples below the configured OTO mask-coverage threshold.",
+    )
     auto_proc.set_defaults(func=process_automatic)
 
     args = parser.parse_args()

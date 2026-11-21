@@ -6,6 +6,7 @@ import soundfile as sf
 
 from eugene_timbre.auto_routing import identify_family, classify_alias, classify_event
 from eugene_timbre.oto_analysis import OtoEntry
+from eugene_timbre.dsp import PeakingBand, TimbreProfile, apply_profile_masked
 from eugene_timbre.processing_chain import build_oto_body_mask, process_auto
 
 
@@ -25,6 +26,9 @@ def test_alias_and_event_recognition():
     assert classify_alias("a しゃ_G4")["consonant_classes"] == ["fricative"]
     assert classify_alias("a にゃ_G4")["consonant_classes"] == ["nasal"]
     assert classify_alias("- あ_B2")["token_roles"] == ["boundary", "vowel"]
+    assert classify_alias("うぉ_B2")["token_roles"] == ["vowel"]
+    assert classify_alias("あL_G4")["token_roles"] == ["vowel"]
+    assert classify_alias("a @_G4")["unclassified_tokens"] == ["@"]
     assert classify_event("cough 1.wav") == "cough"
     assert classify_event("laugh 2.wav") == "laughter"
 
@@ -67,3 +71,76 @@ def test_process_auto_preserves_source_and_copies_oto_unchanged(tmp_path: Path):
     assert np.allclose(after[:int(0.29*sr)], before[:int(0.29*sr)], atol=1e-7)
     assert np.max(np.abs(after[int(0.4*sr):int(0.55*sr)] - before[int(0.4*sr):int(0.55*sr)])) > 1e-5
     assert report["files"][0]["family"] == "pitch_layer"
+
+
+
+def test_masked_eq_changes_only_eligible_frames():
+    sr = 44100
+    t = np.arange(sr * 2, dtype=np.float32) / sr
+    audio = (
+        0.2 * np.sin(2 * np.pi * 390 * t)
+        + 0.1 * np.sin(2 * np.pi * 1450 * t)
+    ).astype(np.float32)
+    mask = np.zeros(audio.shape[0], dtype=np.float32)
+    mask[int(0.6 * sr):int(1.3 * sr)] = 1.0
+    profile = TimbreProfile(
+        name="test", description="masked test",
+        bands=(PeakingBand(1450.0, 1.0, 0.7),),
+    )
+    restored = apply_profile_masked(
+        audio, sr, profile, mask, wet=1.0, context_padding_ms=80.0
+    )
+    assert np.array_equal(restored[mask == 0], audio[mask == 0])
+    assert np.max(np.abs(restored[mask > 0] - audio[mask > 0])) > 1e-5
+
+
+def test_low_coverage_pitch_sample_is_reported_partial_and_not_processed(tmp_path: Path):
+    root = tmp_path / "EugeneRE"
+    pitch = root / "6. B2"
+    pitch.mkdir(parents=True)
+    sr = 44100
+    t = np.arange(sr * 2) / sr
+    audio = (0.2 * np.sin(2 * np.pi * 392 * t)).astype(np.float32)
+    source = pitch / "short_body.wav"
+    sf.write(source, audio, sr, subtype="PCM_16")
+    # 60 ms stretchable body in a 2 s sample; below the 5% preflight threshold.
+    oto_bytes = "short_body.wav=a あ_B2,100,1840,0,20,20\n".encode("utf-8")
+    (pitch / "oto.ini").write_bytes(oto_bytes)
+
+    report = process_auto(root, tmp_path / "dry", dry_run=True)
+    item = report["files"][0]
+    assert item["status"] == "partial"
+    assert item["mask"]["mask_coverage_percent"] < 5.0
+    assert report["partial_files"] == 1
+    assert report["ready_files"] == 0
+
+    # A normal wet run also copies this low-coverage source unchanged by default.
+    wet_output = tmp_path / "wet"
+    wet_report = process_auto(root, wet_output, wet=1.0)
+    wet_item = wet_report["files"][0]
+    assert wet_item["status"] == "partial"
+    source_audio, _ = sf.read(source, dtype="float32")
+    copied_audio, _ = sf.read(wet_output / "6. B2" / "short_body.wav", dtype="float32")
+    assert np.array_equal(copied_audio, source_audio)
+    assert (wet_output / "6. B2" / "oto.ini").read_bytes() == oto_bytes
+
+
+def test_unmatched_oto_and_alias_tokens_are_audited(tmp_path: Path):
+    root = tmp_path / "EugeneRE"
+    pitch = root / "6. B2"
+    pitch.mkdir(parents=True)
+    sr = 44100
+    audio = np.zeros(sr, dtype=np.float32)
+    sf.write(pitch / "v.wav", audio, sr, subtype="PCM_16")
+    oto_bytes = (
+        "missing.wav=a あ_B2,100,200,-500,150,80\n"
+        "v.wav=a @_B2,100,200,-500,150,80\n"
+    ).encode("utf-8")
+    (pitch / "oto.ini").write_bytes(oto_bytes)
+
+    report = process_auto(root, tmp_path / "dry", dry_run=True)
+    item = report["files"][0]
+    assert item["status"] == "manual_review"
+    assert item["alias_audit"]["unclassified_tokens"] == ["@"]
+    oto_summary = report["oto_files"][0]
+    assert oto_summary["orphan_entry_count"] == 1

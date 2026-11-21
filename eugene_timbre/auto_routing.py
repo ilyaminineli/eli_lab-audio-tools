@@ -8,6 +8,9 @@ PREFIX_RE = re.compile(r"^\s*\d+\s*[._ -]*")
 VOWELS = {"a", "i", "u", "e", "o", "@a", "@i", "@u", "@e", "@o",
           "あ", "い", "う", "え", "お", "ア", "イ", "ウ", "エ", "オ",
           "ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ァ", "ィ", "ゥ", "ェ", "ォ"}
+# Keep compound vowels and bank-specific vowel suffixes (e.g. うぉ / あL)
+# classified as vowels without rewriting the original OTO alias.
+JP_VOWEL_PARTS = set("あいうえおぁぃぅぇぉアイウエオァィゥェォ")
 PHONEME_CLASSES = {
     "nasal": {"m", "n", "ng", "ん", "ン",
               "な", "に", "ぬ", "ね", "の", "ま", "み", "む", "め", "も",
@@ -36,6 +39,11 @@ def token_role(token):
     low = token.lower()
     if low in VOWELS:
         return "vowel"
+    if token and token[0] in JP_VOWEL_PARTS and all(
+        char in JP_VOWEL_PARTS or (char.isascii() and char.isalnum())
+        for char in token[1:]
+    ):
+        return "vowel"
     if low in {"-", "sil", "pau"}:
         return "boundary"
     role = next((kind for kind, values in PHONEME_CLASSES.items()
@@ -62,12 +70,18 @@ def classify_alias(alias: str) -> dict:
     for token in tokens:
         roles.append(token_role(token))
     classes = sorted({role for role in roles if role in PHONEME_CLASSES})
+    unclassified_tokens = [
+        token for token, role in zip(tokens, roles)
+        if role == "kana_or_unknown"
+    ]
     transition = f"{roles[0]}_to_{roles[1]}" if len(roles) >= 2 else (
         roles[0] if roles else "unclassified"
     )
     return {
         "alias": alias, "canonical_alias": core, "tokens": tokens,
         "token_roles": roles, "consonant_classes": classes,
+        "unclassified_tokens": unclassified_tokens,
+        "has_unclassified_tokens": bool(unclassified_tokens),
         "transition_class": transition,
     }
 
