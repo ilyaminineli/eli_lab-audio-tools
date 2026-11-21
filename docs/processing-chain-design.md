@@ -39,7 +39,10 @@ H/R and residual-energy measurements are analyzer proxies, not laboratory HNR or
 2. Parse OTO aliases into token sequences and heuristic consonant classes.
 3. Apply only small B2 (+0.6 dB at 1.45 kHz) and F3 (+0.3 dB at 1.45 kHz) presence tests. G4 remains neutral.
 4. Apply those edits only inside eligible stretchable OTO windows. If any alias sharing the same WAV marks a region as fixed, protect that region for the entire WAV. Protect preutter/overlap markers and fade mask edges.
-5. Keep consonant releases, L/V/TH, R English and non-lexical extras on separate routes. They are not forced through vowel processing.
-6. Export to a separate tree and copy non-WAV files (including oto.ini) byte-for-byte.
+5. Filter each contiguous eligible region with 80 ms of source context on both sides, then blend only the OTO mask into the original. Samples outside the mask remain unchanged.
+6. Require at least 5% mask coverage for automatic processing. Lower-coverage samples are marked partial and copied unchanged unless `--allow-partial` is explicitly supplied. Missing matches, duplicate aliases, unclassified pitch-layer alias tokens, timing warnings and empty masks are marked for manual review.
+7. Audit every discovered oto.ini for parse errors, missing WAV references and duplicate aliases, and retain per-alias stretchable-window diagnostics in the processing report.
+8. Keep consonant releases, L/V/TH, R English and non-lexical extras on separate routes. They are not forced through vowel processing.
+9. Export to a separate tree and copy non-WAV files (including oto.ini) byte-for-byte.
 
 The v1 chain intentionally avoids denoising, saturation, noise injection, time stretching, pitch shifting, loudness normalization and OTO edits. Those stages need matched UTAU renders and listening comparisons before tuning.
