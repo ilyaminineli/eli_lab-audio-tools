@@ -1,0 +1,27 @@
+{
+  "name": "warm-uncanny-b2",
+  "purpose": "Conservative B2 starting EQ; preserve lower harmonics and uncanny quality.",
+  "filters": [
+    {
+      "type": "highpass",
+      "frequency_hz": 35,
+      "slope_db_oct": 12,
+      "purpose": "Subsonic cleanup only; preserve B2 fundamentals."
+    },
+    {
+      "type": "bell",
+      "frequency_hz": 3200,
+      "gain_db": -1.2,
+      "q": 1,
+      "purpose": "Gentle upper-mid edge softening."
+    },
+    {
+      "type": "bell",
+      "frequency_hz": 5200,
+      "gain_db": -0.5,
+      "q": 0.85,
+      "purpose": "Very slight top-end softening; optional."
+    }
+  ],
+  "caution": "Experimental. The supplied RX screenshot alone cannot prove these are the offending resonances."
+}
