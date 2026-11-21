@@ -207,9 +207,12 @@ def process_automatic(args):
         allow_partial=args.allow_partial,
     )
     label = "Dry run" if args.dry_run else "Processing complete"
+    summary = report["summary"]
     print(
-        f"{label}: {report['files_found']} WAV(s), "
-        f"{report['processed_files']} processed, {report['bypassed_files']} bypassed."
+        f"{label}: {report['files_found']} WAV(s) | "
+        f"{summary['processed']} processed, {summary['ready']} ready, "
+        f"{summary['partial']} partial, {summary['manual_review']} manual review, "
+        f"{summary['bypassed']} intentionally bypassed."
     )
     print(f"Output/report: {args.output}")
     return 0
