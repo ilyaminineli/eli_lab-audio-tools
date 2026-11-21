@@ -88,6 +88,65 @@ def apply_profile(audio: np.ndarray, sample_rate: int,
                                     band.gain_db, band.q), y)
     return ((1.0 - wet) * x + wet * y).astype(np.float32)
 
+
+def apply_profile_masked(audio: np.ndarray, sample_rate: int,
+                         profile: TimbreProfile, mask: np.ndarray,
+                         wet: float = 1.0,
+                         context_padding_ms: float = 80.0) -> np.ndarray:
+    """Apply EQ to contiguous eligible regions with surrounding source context.
+
+    The filter receives real audio on both sides of each target region, but
+    only the original mask is blended into the final result. Samples outside
+    the mask therefore remain bit-identical to the input.
+    """
+    x = np.asarray(audio, dtype=np.float64)
+    if x.ndim not in (1, 2) or x.size == 0 or not np.all(np.isfinite(x)):
+        raise ValueError("Audio must be finite, non-empty mono or multi-channel data.")
+    if not np.isfinite(context_padding_ms) or context_padding_ms < 0:
+        raise ValueError("context_padding_ms must be finite and non-negative.")
+    blend = np.asarray(mask, dtype=np.float32)
+    if blend.ndim != 1 or blend.shape[0] != x.shape[0]:
+        raise ValueError("Mask must be one-dimensional and match the audio frame count.")
+    if not np.all(np.isfinite(blend)) or np.any(blend < 0) or np.any(blend > 1):
+        raise ValueError("Mask values must be finite and in [0, 1].")
+    if not np.isfinite(wet) or not 0 <= wet <= 1:
+        raise ValueError("wet must be finite and in [0, 1].")
+    if not np.any(blend > 0) or wet == 0 or (
+        not profile.bands and profile.highpass_hz <= 0
+    ):
+        return x.astype(np.float32)
+
+    padding = int(round(context_padding_ms * sample_rate / 1000.0))
+    active = blend > 0
+    changes = np.diff(np.concatenate(([False], active, [False])).astype(np.int8))
+    starts = np.flatnonzero(changes == 1)
+    ends = np.flatnonzero(changes == -1)
+    filtered_target = x.astype(np.float32, copy=True)
+
+    for start, end in zip(starts, ends):
+        context_start = max(0, int(start) - padding)
+        context_end = min(x.shape[0], int(end) + padding)
+        context_audio = x[context_start:context_end]
+        # The configured mask has a minimum 60 ms body window. Keep a clear
+        # error for malformed callers rather than silently changing the filter.
+        if context_audio.shape[0] < 16:
+            raise ValueError(
+                f"Eligible region {start}:{end} is too short for stable zero-phase filtering."
+            )
+        filtered_context = apply_profile(
+            context_audio, sample_rate, profile, wet=wet
+        )
+        local_start = int(start) - context_start
+        local_end = int(end) - context_start
+        filtered_target[start:end] = filtered_context[local_start:local_end]
+
+    expanded_mask = blend if x.ndim == 1 else blend[:, None]
+    result = (
+        x.astype(np.float32) * (1.0 - expanded_mask)
+        + filtered_target * expanded_mask
+    )
+    return result.astype(np.float32)
+
 def describe_profile(profile: TimbreProfile) -> dict:
     return {
         "name": profile.name,
