@@ -14,7 +14,7 @@ from .oto_analysis import OtoEntry, derive_timing, find_nearest_oto, match_entri
 
 def load_processing_config(path: Path | None = None) -> dict:
     if path is None:
-        path = Path(__file__).resolve().parent.parent / "presets" / "eugene_re_processing_v1.json"
+        path = Path(__file__).resolve().parent / "presets" / "eugene_re_processing_v1.json"
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 def _profile(spec: dict, name: str) -> TimbreProfile:
@@ -138,8 +138,8 @@ def process_auto(root: Path, output: Path, wet: float = 0.5,
     root, output = Path(root).resolve(), Path(output).resolve()
     if not root.is_dir():
         raise NotADirectoryError(root)
-    if root == output or root in output.parents:
-        raise ValueError("Output must be separate from, and outside, the source bank.")
+    if root == output or root in output.parents or output in root.parents:
+        raise ValueError("Output must be separate from and not overlap the source bank.")
     if not 0.0 <= wet <= 1.0:
         raise ValueError("wet must be between 0 and 1.")
     config = load_processing_config(config_path)

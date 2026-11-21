@@ -15,6 +15,7 @@ from .dsp import (
 from .io import read_wav, write_wav
 from .oto_analysis import analyse_oto_entry, find_nearest_oto, match_entries, parse_oto
 from .timbre_analysis import TimbreAnalysisConfig, analyze_timbre
+from .processing_chain import process_auto
 
 PROFILES = {
     "neutral": NEUTRAL,
@@ -197,6 +198,21 @@ def process(args):
     print(f"Processed {len(items)} WAV(s) to {dst}. Originals untouched.")
     return 0
 
+def process_automatic(args):
+    report = process_auto(
+        Path(args.input), Path(args.output), wet=args.wet,
+        config_path=Path(args.config) if args.config else None,
+        oto_file=Path(args.oto_file) if args.oto_file else None,
+        dry_run=args.dry_run,
+    )
+    label = "Dry run" if args.dry_run else "Processing complete"
+    print(
+        f"{label}: {report['files_found']} WAV(s), "
+        f"{report['processed_files']} processed, {report['bypassed_files']} bypassed."
+    )
+    print(f"Output/report: {args.output}")
+    return 0
+
 def main():
     parser = argparse.ArgumentParser(prog="eugene-timbre")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -252,6 +268,18 @@ def main():
     proc.add_argument("--profile", choices=sorted(PROFILES), default="warm-uncanny-b2")
     proc.add_argument("--wet", type=float, default=1.0)
     proc.set_defaults(func=process)
+
+    auto_proc = sub.add_parser(
+        "process-auto",
+        help="Automatically route a voicebank and apply conservative OTO-aware pitch-body tests."
+    )
+    auto_proc.add_argument("input", help="Voicebank root or a pitch-layer folder.")
+    auto_proc.add_argument("-o", "--output", required=True, help="Separate output voicebank folder.")
+    auto_proc.add_argument("--wet", type=float, default=0.5)
+    auto_proc.add_argument("--config", help="Optional processing preset JSON.")
+    auto_proc.add_argument("--oto-file", help="Optional explicit oto.ini; otherwise auto-discovered.")
+    auto_proc.add_argument("--dry-run", action="store_true", help="Write only the routing report; do not copy or process WAVs.")
+    auto_proc.set_defaults(func=process_automatic)
 
     args = parser.parse_args()
     try:
