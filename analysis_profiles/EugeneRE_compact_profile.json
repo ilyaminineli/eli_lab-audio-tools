@@ -4376,11 +4376,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "a ch_B2",
           "sample_count": 1,
@@ -5072,11 +5072,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "a j_B2",
           "sample_count": 1,
@@ -8398,11 +8398,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "e ch_B2",
           "sample_count": 1,
@@ -9094,11 +9094,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "e j_B2",
           "sample_count": 1,
@@ -11916,11 +11916,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "i ch_B2",
           "sample_count": 1,
@@ -12612,11 +12612,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "i j_B2",
           "sample_count": 1,
@@ -15406,12 +15406,12 @@
           ],
           "token_roles": [
             "nasal",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "nasal_to_stop",
+          "transition_class": "nasal_to_affricate",
           "consonant_classes": [
             "nasal",
-            "stop"
+            "affricate"
           ],
           "alias": "n ch_B2",
           "sample_count": 1,
@@ -16108,12 +16108,12 @@
           ],
           "token_roles": [
             "nasal",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "nasal_to_stop",
+          "transition_class": "nasal_to_affricate",
           "consonant_classes": [
             "nasal",
-            "stop"
+            "affricate"
           ],
           "alias": "n j_B2",
           "sample_count": 1,
@@ -18944,11 +18944,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "o ch_B2",
           "sample_count": 1,
@@ -19640,11 +19640,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "o j_B2",
           "sample_count": 1,
@@ -22548,11 +22548,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "u ch_B2",
           "sample_count": 1,
@@ -23360,11 +23360,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "u j_B2",
           "sample_count": 1,
@@ -51049,11 +51049,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "a ch_F3",
           "sample_count": 1,
@@ -51745,11 +51745,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "a j_F3",
           "sample_count": 1,
@@ -55082,11 +55082,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "e ch_F3",
           "sample_count": 1,
@@ -55778,11 +55778,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "e j_F3",
           "sample_count": 1,
@@ -58636,11 +58636,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "i ch_F3",
           "sample_count": 1,
@@ -59332,11 +59332,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "i j_F3",
           "sample_count": 1,
@@ -62080,12 +62080,12 @@
           ],
           "token_roles": [
             "nasal",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "nasal_to_stop",
+          "transition_class": "nasal_to_affricate",
           "consonant_classes": [
             "nasal",
-            "stop"
+            "affricate"
           ],
           "alias": "n ch_F3",
           "sample_count": 1,
@@ -62838,12 +62838,12 @@
           ],
           "token_roles": [
             "nasal",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "nasal_to_stop",
+          "transition_class": "nasal_to_affricate",
           "consonant_classes": [
             "nasal",
-            "stop"
+            "affricate"
           ],
           "alias": "n j_F3",
           "sample_count": 1,
@@ -65588,11 +65588,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "o ch_F3",
           "sample_count": 1,
@@ -66284,11 +66284,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "o j_F3",
           "sample_count": 1,
@@ -69258,11 +69258,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "u ch_F3",
           "sample_count": 1,
@@ -70070,11 +70070,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "u j_F3",
           "sample_count": 1,
@@ -97183,11 +97183,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "a ch_G4",
           "sample_count": 1,
@@ -97879,11 +97879,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "a j_G4",
           "sample_count": 1,
@@ -101327,11 +101327,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "e ch_G4",
           "sample_count": 1,
@@ -102023,11 +102023,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "e j_G4",
           "sample_count": 1,
@@ -104845,11 +104845,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "i ch_G4",
           "sample_count": 1,
@@ -105541,11 +105541,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "i j_G4",
           "sample_count": 1,
@@ -108391,12 +108391,12 @@
           ],
           "token_roles": [
             "nasal",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "nasal_to_stop",
+          "transition_class": "nasal_to_affricate",
           "consonant_classes": [
             "nasal",
-            "stop"
+            "affricate"
           ],
           "alias": "n ch_G4",
           "sample_count": 1,
@@ -109093,12 +109093,12 @@
           ],
           "token_roles": [
             "nasal",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "nasal_to_stop",
+          "transition_class": "nasal_to_affricate",
           "consonant_classes": [
             "nasal",
-            "stop"
+            "affricate"
           ],
           "alias": "n j_G4",
           "sample_count": 1,
@@ -111929,11 +111929,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "o ch_G4",
           "sample_count": 1,
@@ -112625,11 +112625,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "o j_G4",
           "sample_count": 1,
@@ -115543,11 +115543,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "u ch_G4",
           "sample_count": 1,
@@ -116355,11 +116355,11 @@
           ],
           "token_roles": [
             "vowel",
-            "stop"
+            "affricate"
           ],
-          "transition_class": "vowel_to_stop",
+          "transition_class": "vowel_to_affricate",
           "consonant_classes": [
-            "stop"
+            "affricate"
           ],
           "alias": "u j_G4",
           "sample_count": 1,
