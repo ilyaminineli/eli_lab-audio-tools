@@ -20,6 +20,12 @@ METRICS = (
 )
 BASIC = ("duration_seconds", "rms_dbfs", "crest_factor_db",
          "spectral_centroid_hz", "spectral_flatness")
+ALIAS_METRICS = (
+    "f0_hz", "harmonic_to_residual_ratio_db",
+    "aperiodic_residual_energy_fraction_percent", "harmonic_slope_db_per_octave",
+    "h1_minus_h2_db", "spectral_centroid_hz_voiced_frames",
+    "spectral_flatness_voiced_frames", "voiced_frame_fraction",
+)
 VOWELS = {"a", "i", "u", "e", "o", "@a", "@i", "@u", "@e", "@o",
           "aa", "ae", "ah", "ao", "aw", "ay", "eh", "er", "ey",
           "ih", "iy", "ow", "oy", "uh", "uw"}
@@ -120,7 +126,8 @@ def summarize_group(name, samples, source):
     env_rows = []
     harmonic_values = defaultdict(list)
     alias_acc = {}
-    sample_summaries = []
+    sample_names = []
+    event_classes = Counter()
     oto_status = Counter()
     group_sample_count = 0
 
@@ -169,12 +176,16 @@ def summarize_group(name, samples, source):
         status = oto.get("status", "not_reported")
         oto_status[status] += 1
         entries = oto.get("entries", []) or []
-        sample_summaries.append({
-            "sample": sample_id,
-            "metrics": file_metrics,
-            "oto_status": status,
-            "alias_count": len(entries),
-        })
+        sample_names.append(sample_id)
+        if group_kind(name) == "phonetic_extra":
+            label = sample_id.lower()
+            event = next((key for words, key in (
+                (("cough",), "cough"), (("gasp", "breath"), "gasp_or_breath"),
+                (("laugh", "giggle"), "laughter"), (("sob", "cry"), "sob_or_cry"),
+                (("throat", "growl"), "throat_or_growl"),
+                (("sigh",), "sigh"),
+            ) if any(word in label for word in words)), "unclassified_extra")
+            event_classes[event] += 1
 
         for entry in entries:
             alias = str(entry.get("alias", ""))
@@ -189,7 +200,7 @@ def summarize_group(name, samples, source):
                     "region": {
                         key: {"status": Counter(), "duration_ms": [],
                               "metrics": defaultdict(list)}
-                        for key in ("source_window", "fixed_region", "stretchable_region")
+                        for key in ("fixed_region", "stretchable_region")
                     },
                     "warnings": Counter(),
                 }
@@ -230,9 +241,8 @@ def summarize_group(name, samples, source):
             "token_roles": acc["token_roles"],
             "transition_class": acc["transition_class"],
             "consonant_classes": acc["consonant_classes"],
-            "aliases_seen": sorted(acc["aliases_seen"]),
+            "aliases_seen": sorted(acc["aliases_seen"])[:3],
             "sample_count": len(acc["samples"]),
-            "sample_examples": sorted(acc["samples"])[:5],
             "entry_count": acc["line_count"],
             "oto_timing_ms": {
                 key: percentile(values) for key, values in sorted(acc["timing"].items())
@@ -255,8 +265,10 @@ def summarize_group(name, samples, source):
             {"harmonic": h, **percentile(v)} for h, v in sorted(harmonic_values.items())
         ],
         "oto_coverage": dict(oto_status),
+        "alias_count": len(aliases),
         "alias_profiles": aliases,
-        "samples": sample_summaries,
+        "sample_name_examples": sorted(set(sample_names))[:12],
+        "phonetic_event_classes": dict(event_classes) if event_classes else {},
         "source_report": source,
     }
 
