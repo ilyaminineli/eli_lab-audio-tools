@@ -1,27 +1,13 @@
 {
   "name": "warm-uncanny-b2",
-  "purpose": "Conservative B2 starting EQ; preserve lower harmonics and uncanny quality.",
+  "purpose": "B2 upper-mid presence test based on the uploaded subbank analysis.",
   "filters": [
-    {
-      "type": "highpass",
-      "frequency_hz": 35,
-      "slope_db_oct": 12,
-      "purpose": "Subsonic cleanup only; preserve B2 fundamentals."
-    },
-    {
-      "type": "bell",
-      "frequency_hz": 3200,
-      "gain_db": -1.2,
-      "q": 1,
-      "purpose": "Gentle upper-mid edge softening."
-    },
-    {
-      "type": "bell",
-      "frequency_hz": 5200,
-      "gain_db": -0.5,
-      "q": 0.85,
-      "purpose": "Very slight top-end softening; optional."
-    }
+    {"type": "highpass", "enabled": false, "purpose": "Keep low fundamentals; do not use a routine high-pass on B2."},
+    {"type": "bell", "frequency_hz": 1450, "gain_db": 1.0, "q": 0.7, "purpose": "Broad, restrained presence lift in the occupied 500 Hz-2 kHz region."}
   ],
-  "caution": "Experimental. The supplied RX screenshot alone cannot prove these are the offending resonances."
+  "not_used": [
+    {"frequency_hz": 3200, "gain_db": -1.2, "q": 1.0},
+    {"frequency_hz": 5200, "gain_db": -0.5, "q": 0.85}
+  ],
+  "caution": "This is a listening-test curve, not a validated de-synthesizer. Do not copy to F3/G4 unchanged."
 }
