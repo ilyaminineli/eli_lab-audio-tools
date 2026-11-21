@@ -125,6 +125,8 @@ def analyze_directory_json(args):
                 group_reports[group_name] = json.loads(
                     report_path.read_text(encoding="utf-8")
                 )
+                # The reports are embedded below, so do not leave temporary paths in the manifest.
+                group_info["report"] = f"groups.{group_name}"
             combined = {
                 "report_type": "voicebank_deep_timbre_analysis",
                 "manifest": manifest,

@@ -26,6 +26,7 @@ def test_analyze_command_writes_single_oto_aware_json(tmp_path: Path, monkeypatc
     report = json.loads(output.read_text(encoding="utf-8"))
     assert report["report_type"] == "voicebank_deep_timbre_analysis"
     assert report["manifest"]["oto_analysis"]["oto_entries_matched"] == 1
+    assert report["manifest"]["groups"]["G4"]["report"] == "groups.G4"
     file_report = report["groups"]["G4"]["files"][0]
     assert file_report["oto"]["entries"][0]["alias"] == "あ_G4"
     assert file_report["oto"]["entries"][0]["timing"]["stretchable_duration_ms"] == 300.0
