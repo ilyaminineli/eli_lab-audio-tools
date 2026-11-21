@@ -114,6 +114,16 @@ def test_low_coverage_pitch_sample_is_reported_partial_and_not_processed(tmp_pat
     assert report["partial_files"] == 1
     assert report["ready_files"] == 0
 
+    # A normal wet run also copies this low-coverage source unchanged by default.
+    wet_output = tmp_path / "wet"
+    wet_report = process_auto(root, wet_output, wet=1.0)
+    wet_item = wet_report["files"][0]
+    assert wet_item["status"] == "partial"
+    source_audio, _ = sf.read(source, dtype="float32")
+    copied_audio, _ = sf.read(wet_output / "6. B2" / "short_body.wav", dtype="float32")
+    assert np.array_equal(copied_audio, source_audio)
+    assert (wet_output / "6. B2" / "oto.ini").read_bytes() == oto_bytes
+
 
 def test_unmatched_oto_and_alias_tokens_are_audited(tmp_path: Path):
     root = tmp_path / "EugeneRE"
