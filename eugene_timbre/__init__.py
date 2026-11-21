@@ -1,2 +1,2 @@
-"""Eugene:RE timbre restoration utilities."""
-__version__ = "0.2.0"
+"""Eugene:RE timbre analysis and restoration utilities."""
+__version__ = "0.4.0"
