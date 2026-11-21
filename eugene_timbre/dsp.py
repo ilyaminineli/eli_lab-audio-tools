@@ -1,8 +1,13 @@
-"""Conservative, phase-stable spectral shaping for UTAU source samples."""
+"""Conservative spectral shaping for existing UTAU source samples.
+
+The default Eugene:RE B2 profile is intentionally a broad midrange test, not
+an automatic de-synthesizer. It does not add noise, modulation, reverb, or
+change duration/pitch/timing.
+"""
 from __future__ import annotations
 from dataclasses import dataclass
 import numpy as np
-from scipy.signal import sosfiltfilt, butter
+from scipy.signal import butter, sosfiltfilt
 
 @dataclass(frozen=True)
 class PeakingBand:
@@ -18,15 +23,26 @@ class TimbreProfile:
     highpass_slope: int = 2
     bands: tuple[PeakingBand, ...] = ()
 
+# B2 carries very little energy above 2 kHz in the uploaded subbank analysis.
+# A small wide lift in the occupied upper-midrange is a better listening test
+# than the previous 3.2/5.2 kHz cuts. No high-pass: preserve low fundamentals.
 WARM_UNCANNY_B2 = TimbreProfile(
     name="warm-uncanny-b2",
-    description="Subtle B2 listening-test profile; retain dark/uncanny identity.",
-    highpass_hz=35.0,
-    highpass_slope=2,
-    bands=(
-        PeakingBand(3200.0, -1.2, 1.0),
-        PeakingBand(5200.0, -0.5, 0.85),
-    ),
+    description="B2 upper-mid presence test; retain low fundamentals and uncanny character.",
+    highpass_hz=0.0,
+    bands=(PeakingBand(1450.0, 1.0, 0.7),),
+)
+F3_GENTLE = TimbreProfile(
+    name="f3-gentle-presence",
+    description="Gentler upper-mid presence test for F3.",
+    highpass_hz=0.0,
+    bands=(PeakingBand(1450.0, 0.5, 0.7),),
+)
+G4_NEUTRAL = TimbreProfile(
+    name="g4-neutral",
+    description="Neutral starting point for the already brighter G4 subbank.",
+    highpass_hz=0.0,
+    bands=(),
 )
 NEUTRAL = TimbreProfile(name="neutral", description="No EQ; bypass reference.")
 
@@ -51,7 +67,7 @@ def _apply(sos: np.ndarray, x: np.ndarray) -> np.ndarray:
 def apply_profile(audio: np.ndarray, sample_rate: int,
                   profile: TimbreProfile = WARM_UNCANNY_B2,
                   wet: float = 1.0) -> np.ndarray:
-    """Process in float; preserve frame count and channel count; wet blends bypass."""
+    """Apply zero-phase EQ; preserve frame count and channel count."""
     if sample_rate <= 0:
         raise ValueError("sample_rate must be positive.")
     if not np.isfinite(wet) or not 0 <= wet <= 1:
@@ -70,13 +86,14 @@ def apply_profile(audio: np.ndarray, sample_rate: int,
         if band.gain_db:
             y = _apply(_peaking_sos(sample_rate, band.frequency_hz,
                                     band.gain_db, band.q), y)
-    return ((1-wet)*x + wet*y).astype(np.float32)
+    return ((1.0 - wet) * x + wet * y).astype(np.float32)
 
 def describe_profile(profile: TimbreProfile) -> dict:
     return {
         "name": profile.name,
         "description": profile.description,
-        "highpass": {"frequency_hz": profile.highpass_hz,
+        "highpass": {"enabled": profile.highpass_hz > 0,
+                     "frequency_hz": profile.highpass_hz,
                      "slope_db_oct": profile.highpass_slope * 6},
         "bands": [{"frequency_hz": b.frequency_hz, "gain_db": b.gain_db, "q": b.q}
                   for b in profile.bands],

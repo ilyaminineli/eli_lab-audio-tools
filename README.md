@@ -1,10 +1,10 @@
 # eli_lab-audio-tools
 
-Free ELI LAB audio utilities. This repository includes **Eugene:RE Timbre Restoration**, a non-destructive tool for refining existing RVC-derived UTAU source WAVs.
+Free ELI LAB audio utilities. This repository includes **Eugene:RE Timbre Restoration**, a non-destructive analysis and tonal-processing utility for existing RVC-derived UTAU source WAVs.
 
 ## Scope
 
-This tool addresses broad spectral balance only. It does **not** rebuild or retime the voicebank. It never edits oto.ini, aliases, offsets, consonant/cutoff/preutterance/overlap values, filenames, sample duration, pitch, or the original inputs.
+The tool is for timbre experiments only. It does not rebuild or retime the voicebank. It never edits `oto.ini`, aliases, offsets, consonant/cutoff/preutterance/overlap values, filenames, sample duration, pitch, `.frq`, `.llsm`, or TIPS cache files. Output always goes to a separate directory.
 
 ## Install (Windows PowerShell)
 
@@ -15,39 +15,40 @@ python -m pip install --upgrade pip
 pip install -e .
 ```
 
-## Analyse before processing
+## Compare the analysed subbanks
 
 ```powershell
-eugene-timbre analyze "D:\Voicebanks\Eugene_RE\_B2" -o "B2_analysis.json"
+eugene-timbre compare B2_analysis.json F3_analysis.json G4_analysis.json -o subbank_comparison.json
 ```
+
+The comparison reports broad medians; it does not infer narrow EQ notches. See [docs/analysis-findings.md](docs/analysis-findings.md).
+
+## Analyse fresh WAVs
+
+```powershell
+eugene-timbre analyze "D:\Voicebanks\Eugene_RE\6. B2" -o "B2_analysis_v2.json"
+```
+
+The v0.3 analyzer reports `peak_amplitude` and a correctly calculated `peak_dbfs`. Earlier uploaded analysis JSONs used the name `peak_dbfs` for linear peak amplitude; see the analysis findings note.
 
 ## Process a small B2 test set
 
 ```powershell
-eugene-timbre process "D:\Voicebanks\Eugene_RE\_B2\test_samples" --profile warm-uncanny-b2 --wet 0.75 --output "D:\Voicebanks\Eugene_RE_Restored_TEST\_B2"
+eugene-timbre process "D:\Voicebanks\Eugene_RE\6. B2\test_samples" --profile warm-uncanny-b2 --wet 1.0 --output "D:\Voicebanks\Eugene_RE_Restored_TEST\6. B2"
 ```
 
-Use `--wet 0.5` for a subtler blend, or `--profile neutral` for a bypass/reference export. Results go to a separate folder and include `restoration_report.json`.
+Profiles:
 
-## Initial RX-style B2 starting values
+- `warm-uncanny-b2`: HPF off; +1.0 dB bell at 1.45 kHz, Q 0.7.
+- `f3-gentle`: HPF off; +0.5 dB bell at 1.45 kHz, Q 0.7.
+- `g4-neutral`: bypass reference.
+- `neutral`: bypass reference.
 
-| Filter | Frequency | Gain | Q / slope |
-|---|---:|---:|---:|
-| HPF | 35 Hz | — | 12 dB/oct |
-| Bell | 3,200 Hz | -1.2 dB | Q 1.0 |
-| Bell | 5,200 Hz | -0.5 dB | Q 0.85 |
+These are listening-test profiles, not automatic de-synthesis. Match loudness when comparing, then render identical UST notes through your target engines. If the processed version sounds more forward but not more natural, revert it; static EQ cannot restore missing aperiodic detail or fix conversion phase artifacts.
 
-These are deliberately restrained listening-test values, **not a measured final correction**. The screenshot shows a steep low-frequency roll-off already active; this utility intentionally does not reproduce it. The 35 Hz, 12 dB/oct filter only removes subsonic rumble and should be bypassed if it thins the B2 samples.
+## Resampler cache warning
 
-Do not blindly apply this profile to _F3 or _G4. Develop separate profiles from corresponding vowel measurements and listening.
-
-## Validation
-
-1. Select representative B2 samples: sustained vowel, CV, VC and nasal transition.
-2. Compare original and processed at matched playback loudness.
-3. Render identical notes using Moresampler, TIPS and WORLDLINE-R.
-4. If the processed WAV seems smoother solo but loses character or performs worse after resampling, revert it.
-5. Keep Moresampler flags neutral for the baseline comparison.
+The supplied bank tree includes `.frq` and `.wav.llsm` sidecars. After replacing source WAVs in a duplicate bank, refresh the corresponding engine analyses. Moresampler's documentation describes `auto-update-llsm-mrq on` for updating LLSM/MRQ data when a WAV is newer than its analysis. Do not delete or overwrite caches in the original release bank.
 
 ## Python API
 
@@ -56,8 +57,8 @@ import soundfile as sf
 from eugene_timbre.dsp import apply_profile, WARM_UNCANNY_B2
 
 audio, sr = sf.read("sample.wav", dtype="float32")
-out = apply_profile(audio, sr, WARM_UNCANNY_B2, wet=0.75)
+out = apply_profile(audio, sr, WARM_UNCANNY_B2, wet=1.0)
 sf.write("sample_restored.wav", out, sr, subtype="PCM_16")
 ```
 
-Dependencies are NumPy, SciPy and SoundFile. No cloud service, subscription, or AI inference is required.
+Dependencies: NumPy, SciPy and SoundFile. No cloud service, subscription or AI inference is required.
