@@ -39,22 +39,27 @@ def test_oto_mask_protects_fixed_region_and_keeps_body():
 
 def test_process_auto_preserves_source_and_copies_oto_unchanged(tmp_path: Path):
     root = tmp_path / "EugeneRE"
-    pitch = root / "5. G4"
+    pitch = root / "6. B2"
     pitch.mkdir(parents=True)
     sr = 44100
     t = np.arange(sr) / sr
-    audio = (0.3*np.sin(2*np.pi*392*t)).astype(np.float32)
+    audio = (0.2*np.sin(2*np.pi*392*t) + 0.1*np.sin(2*np.pi*1450*t)).astype(np.float32)
     source = pitch / "v.wav"
     sf.write(source, audio, sr, subtype="PCM_16")
-    oto_bytes = "v.wav=a あ_G4,100,200,-500,150,80\n".encode("utf-8")
+    oto_bytes = "v.wav=a b_B2,100,200,-500,150,80\n".encode("utf-8")
     (pitch / "oto.ini").write_bytes(oto_bytes)
     before, _ = sf.read(source, dtype="float32")
     output = tmp_path / "EugeneRE_processed"
     report = process_auto(root, output, wet=1.0)
     assert report["files_found"] == 1
-    assert (output / "5. G4" / "oto.ini").read_bytes() == oto_bytes
-    after, after_sr = sf.read(output / "5. G4" / "v.wav", dtype="float32")
+    assert report["processed_files"] == 1
+    assert report["files"][0]["status"] == "processed"
+    assert (output / "6. B2" / "oto.ini").read_bytes() == oto_bytes
+    after, after_sr = sf.read(output / "6. B2" / "v.wav", dtype="float32")
     assert after_sr == sr and after.shape == before.shape
     original_after, _ = sf.read(source, dtype="float32")
     assert np.array_equal(original_after, before)
+    # The fixed OTO region must remain identical; the later vowel body should change.
+    assert np.allclose(after[:int(0.29*sr)], before[:int(0.29*sr)], atol=1e-7)
+    assert np.max(np.abs(after[int(0.4*sr):int(0.55*sr)] - before[int(0.4*sr):int(0.55*sr)])) > 1e-5
     assert report["files"][0]["family"] == "pitch_layer"
