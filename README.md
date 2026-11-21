@@ -69,3 +69,24 @@ eugene-timbre process "D:\Voicebanks\EugeneRE\6. B2\test_samples" --profile warm
 These profiles remain listening-test starting points, not automatic de-synthesis. Compare at matched loudness and render identical UST notes through the target resamplers.
 
 Dependencies: NumPy, SciPy and SoundFile. No cloud service, subscription or AI inference is required.
+
+
+## Automatic Eugene:RE processing chain (experimental v1)
+
+The analyser also includes a conservative auto-routing stage for pitch layers, consonant releases, L/V/TH extensions, R English, bonus phonetic events and unknown/root-level files.
+
+Preview routing first:
+
+\`\`\`powershell
+eugene-timbre process-auto "C:\\Users\\photo\\OneDrive\\Документы\\UtauV\\Data\\Singers\\EugeneRE" -o "D:\\EugeneRE_Restoration_DRYRUN" --dry-run
+\`\`\`
+
+Run the initial non-destructive test chain into a separate voicebank folder:
+
+\`\`\`powershell
+eugene-timbre process-auto "C:\\Users\\photo\\OneDrive\\Документы\\UtauV\\Data\\Singers\\EugeneRE" -o "D:\\EugeneRE_Restoration_TEST" --wet 0.5
+\`\`\`
+
+Only B2 and F3 currently receive tiny pitch-body presence tests. G4, consonant releases, L/V/TH, R English and bonus events have their own routes and remain neutral/bypassed pending listening tests. Processing is restricted to eligible OTO stretchable regions. If any alias marks part of a shared WAV as fixed, the chain protects that area. OTO files and other non-WAV bank files are copied unchanged to the output tree.
+
+This is a first comparison chain, not a final restoration preset. Do not overwrite the original bank. Render matching UST phrases in the target resamplers and compare the dry-run report, originals and processed output at matched loudness. See [docs/processing-chain-design.md](docs/processing-chain-design.md).
