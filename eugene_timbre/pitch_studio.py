@@ -354,19 +354,41 @@ def process_pitch_folder(
                     output_audio = apply_profile_masked(audio, sample_rate, effective_profile, mask, wet=wet)
                 else:
                     output_audio = apply_profile(audio, sample_rate, effective_profile, wet=wet)
-            difference = np.asarray(output_audio, dtype=np.float64) - np.asarray(audio, dtype=np.float64)
-            peak_difference = float(np.max(np.abs(difference))) if difference.size else 0.0
-            changed_fraction = float(np.mean(np.abs(difference) > 1e-7)) if difference.size else 0.0
             before = analyze_audio(audio, sample_rate)
-            after = analyze_audio(output_audio, sample_rate)
-            if peak_difference > 1e-7:
+            requested_difference = np.asarray(output_audio, dtype=np.float64) - np.asarray(audio, dtype=np.float64)
+            requested_peak_difference = float(np.max(np.abs(requested_difference))) if requested_difference.size else 0.0
+            quantization_checked = False
+
+            if requested_peak_difference > 1e-7:
                 write_wav(target, output_audio, sample_rate, metadata["subtype"])
-                counts["processed"] += 1
-                status = "processed"
-                reason = "Profile applied; output measurements recorded."
+                saved_audio, saved_sample_rate, _ = read_wav(target)
+                if saved_sample_rate != sample_rate or saved_audio.shape != audio.shape:
+                    raise RuntimeError("Exported WAV metadata does not match the source sample.")
+                difference = np.asarray(saved_audio, dtype=np.float64) - np.asarray(audio, dtype=np.float64)
+                peak_difference = float(np.max(np.abs(difference))) if difference.size else 0.0
+                changed_fraction = float(np.mean(np.abs(difference) > 1e-7)) if difference.size else 0.0
+                after = analyze_audio(saved_audio, sample_rate)
+                quantization_checked = True
+                if peak_difference > 1e-7 and changed_fraction > 0.0:
+                    counts["processed"] += 1
+                    status = "processed"
+                    reason = "Exported WAV differs measurably from the source; on-disk measurements recorded."
+                else:
+                    # Keep the exact source bytes when export quantization erased the requested change.
+                    shutil.copy2(path, target)
+                    counts["unchanged"] += 1
+                    status = "unchanged"
+                    reason = "The requested change disappeared during WAV encoding; original copied byte-for-byte."
+                    after = before
             else:
                 shutil.copy2(path, target)
                 counts["unchanged"] += 1
+                status = "unchanged"
+                reason = "Profile is neutral or produced no measurable sample change."
+                peak_difference = 0.0
+                changed_fraction = 0.0
+                after = before
+
             reports.append({
                 "file": relative.as_posix(),
                 "status": status,
@@ -375,8 +397,10 @@ def process_pitch_folder(
                 "bands_applied": [band.frequency_hz for band in effective_profile.bands],
                 "before": before,
                 "after": after,
+                "pre_encoding_peak_abs_difference": requested_peak_difference,
                 "peak_abs_difference": peak_difference,
                 "changed_fraction": changed_fraction,
+                "quantization_checked": quantization_checked,
                 "rms_delta_db": after["rms_dbfs"] - before["rms_dbfs"],
                 "centroid_delta_hz": after["spectral_centroid_hz"] - before["spectral_centroid_hz"],
                 "band_energy_delta": {
@@ -387,7 +411,8 @@ def process_pitch_folder(
         except Exception as exc:
             counts["failed"] += 1
             target.parent.mkdir(parents=True, exist_ok=True)
-            if path.exists() and not target.exists():
+            if path.exists():
+                # A failed re-run must not leave an older processed output in place.
                 shutil.copy2(path, target)
             reports.append({
                 "file": relative.as_posix(), "status": "failed", "reason": str(exc),
@@ -418,6 +443,7 @@ def process_pitch_folder(
         "notes": [
             "Only this selected pitch folder was processed.",
             "Non-WAV metadata, including oto.ini, was copied byte-for-byte.",
+            "Sample deltas are measured after writing and re-reading the exported WAV.",
             "Spectral measurements are diagnostics, not a naturalness score.",
             "Compare matched resampler renders at matched loudness before adopting the profile.",
         ],
