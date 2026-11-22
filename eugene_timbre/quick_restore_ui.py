@@ -372,7 +372,8 @@ class QuickRestoreWindow(QMainWindow):
             self.summary_label.setText(
                 f'{summary["wav_files"]} WAV files found and analysed across their full duration. '
                 f'{summary["changed"]} currently show measurable changes; '
-                f'{summary["unchanged_after_analysis"]} have no detected correction beyond the full-sample pass. '
+                f'{summary["unchanged_after_analysis"]} have no detected correction; '
+                f'{summary["fallback_copied"]} could not be decoded and will be copied unchanged. '
                 "Every WAV is included in export; OTO timing does not gate processing."
             )
             if self.preview_data:
@@ -486,6 +487,7 @@ class QuickRestoreWindow(QMainWindow):
                 f'WAVs processed at full duration: {summary["processed_full_duration"]}\n'
                 f'WAVs with measurable changes: {summary["changed"]}\n'
                 f'WAVs with no detected correction: {summary["unchanged_after_analysis"]}\n'
+                f'WAVs copied as fallback after read/processing error: {summary["fallback_copied"]}\n'
                 f'Engine analysis sidecars removed for changed WAVs: {summary["sidecars_invalidated"]}\n'
                 f'Output: {output}\n\n'
                 "The output mirrors the complete bank. The original voicebank remains untouched. Check processing_report.json before adopting it.",
