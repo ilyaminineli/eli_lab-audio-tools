@@ -16,7 +16,7 @@ ui = ["PySide6>=6.6"]
 
 [project.scripts]
 eugene-timbre = "eugene_timbre.cli:main"
-eugene-timbre-ui = "eugene_timbre.pitch_studio_ui:main"
+eugene-timbre-ui = "eugene_timbre.quick_restore_ui:main"
 
 [tool.setuptools.packages.find]
 include = ["eugene_timbre*"]

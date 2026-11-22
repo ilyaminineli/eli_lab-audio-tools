@@ -219,7 +219,8 @@ def _summarise_oto_files(cache: dict) -> list[dict]:
 
 def process_auto(root: Path, output: Path, wet: float = 0.5,
                  config_path: Path | None = None, oto_file: Path | None = None,
-                 dry_run: bool = False, allow_partial: bool = False) -> dict:
+                 dry_run: bool = False, allow_partial: bool = False,
+                 progress=None) -> dict:
     root, output = Path(root).resolve(), Path(output).resolve()
     if not root.is_dir():
         raise NotADirectoryError(root)
@@ -248,7 +249,7 @@ def process_auto(root: Path, output: Path, wet: float = 0.5,
         if p.is_file() and p.suffix.casefold() == ".wav" and output not in p.resolve().parents
     )
     oto_cache, file_reports, route_counts = {}, [], Counter()
-    for path in wav_paths:
+    for file_index, path in enumerate(wav_paths, start=1):
         relative = path.relative_to(root)
         family = identify_family(relative, root)
         oto_path, entries, parsed_oto = _match_oto(path, root, explicit_oto, oto_cache)
@@ -340,6 +341,8 @@ def process_auto(root: Path, output: Path, wet: float = 0.5,
             "status": status, "reason": reason,
             "mask": mask_info, "profile": applied_profile,
         })
+        if progress:
+            progress(file_index, len(wav_paths), path.relative_to(root).as_posix())
 
     if not dry_run:
         # Copy non-WAV bank files, including oto.ini, byte-for-byte.

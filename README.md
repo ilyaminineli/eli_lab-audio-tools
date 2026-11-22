@@ -1,6 +1,6 @@
 # eli_lab-audio-tools
 
-Free ELI LAB audio utilities. The primary Eugene:RE goal is resampler-aware voicebank preparation: preserve its individual vocal character, add life where the analysis supports it, and reduce artificiality in actual UTAU renders. Source-WAV EQ is only one possible stage; renderer analysis, pitch tracking, aperiodic components, OTO timing and phrase-level synthesis must be evaluated together.
+Free ELI LAB audio utilities. The Eugene:RE workflow is designed to prepare existing artificial voicebank recordings for better UTAU resampling, with a simple scan → preview → export workflow. The source bank is never edited in place.
 
 ## Primary design goal: natural resampling
 
@@ -16,6 +16,37 @@ py -3.11 -m venv .venv
 python -m pip install --upgrade pip
 pip install -e .
 ```
+
+## Quick Restore — recommended workflow
+
+Launch the simple interface:
+
+```powershell
+pip install -e ".[ui]"
+eugene-timbre studio
+```
+
+1. Point **Input bank** at the existing Eugene:RE folder. The supplied path is prefilled.
+2. Point **Output copy** at a separate folder. The supplied path is prefilled.
+3. Click **Scan bank and prepare preview**. The app scans the WAV inventory and OTO-safe regions, then selects a representative pitch-layer sample.
+4. Listen to **Play original** and **Play processed preview**. The preview uses the exact same OTO-aware routing/profile logic as export.
+5. Click **Create processed voicebank copy**. The app exports the full directory tree to the output folder, retaining filenames, folder layout, OTO metadata and unchanged samples. The source bank is never modified.
+
+The first automatic recipe is deliberately conservative and is still an experimental baseline:
+- B2: small +0.6 dB body/presence lift around 1.45 kHz, only in eligible OTO stretchable regions.
+- F3: small +0.3 dB lift around 1.45 kHz, only in eligible OTO stretchable regions.
+- G4, L/V/TH, R English, consonant releases, bonus phonetic extras and root material are copied unchanged until a suitable, tested recipe exists.
+- Samples with duplicate/unknown OTO aliases, timing warnings or insufficient safe body coverage are copied unchanged and listed in `processing_report.json`.
+
+The output is a complete mirrored bank, not just a folder of changed WAVs. Back up the original before replacing it. Review `processing_report.json` to see exactly which files changed and which were copied unchanged.
+
+The former multi-panel editing interface remains available as:
+
+```powershell
+eugene-timbre studio-advanced
+```
+
+The executable shortcut `eugene-timbre-ui` launches Quick Restore.
 
 ## Main analysis command: one JSON per selected pitch layer
 

@@ -219,10 +219,20 @@ def process_automatic(args):
 
 def open_pitch_studio(args):
     try:
-        from .pitch_studio_ui import main as studio_main
+        from .quick_restore_ui import main as studio_main
     except ImportError as exc:
         raise RuntimeError(
             'The graphical studio is optional. Install it with: pip install -e ".[ui]"'
+        ) from exc
+    return studio_main()
+
+
+def open_advanced_pitch_studio(args):
+    try:
+        from .pitch_studio_ui import main as studio_main
+    except ImportError as exc:
+        raise RuntimeError(
+            'The advanced graphical studio is optional. Install it with: pip install -e ".[ui]"'
         ) from exc
     return studio_main()
 
@@ -284,9 +294,16 @@ def main():
 
     studio = sub.add_parser(
         "studio",
-        help="Open the pitch-folder restoration studio (requires the [ui] extra).",
+        help="Open the simple whole-bank restore workflow (requires the [ui] extra).",
     )
     studio.set_defaults(func=open_pitch_studio)
+
+
+    advanced_studio = sub.add_parser(
+        "studio-advanced",
+        help="Open the advanced pitch-layer analysis and editing studio.",
+    )
+    advanced_studio.set_defaults(func=open_advanced_pitch_studio)
 
     auto_proc = sub.add_parser(
         "process-auto",

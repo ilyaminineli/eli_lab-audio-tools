@@ -144,3 +144,169 @@ def test_unmatched_oto_and_alias_tokens_are_audited(tmp_path: Path):
     assert item["alias_audit"]["unclassified_tokens"] == ["@"]
     oto_summary = report["oto_files"][0]
     assert oto_summary["orphan_entry_count"] == 1
+
+
+
+def test_process_auto_reports_per_file_progress(tmp_path: Path):
+    root = tmp_path / "EugeneRE"
+    pitch = root / "6. B2"
+    pitch.mkdir(parents=True)
+    sr = 44100
+    t = np.arange(sr, dtype=np.float32) / sr
+    sf.write(pitch / "v.wav", (0.1 * np.sin(2 * np.pi * 220 * t)).astype(np.float32), sr)
+    (pitch / "oto.ini").write_text(
+        "v.wav=a あ_B2,100,200,-500,150,80\n", encoding="utf-8"
+    )
+
+    updates = []
+    process_auto(
+        root, tmp_path / "output", wet=0.5,
+        dry_run=True,
+        progress=lambda done, total, label: updates.append((done, total, label)),
+    )
+    assert updates == [(1, 1, "6. B2/v.wav")]
+
+
+def test_quick_restore_preview_uses_same_oto_aware_route_as_export(tmp_path: Path):
+    from eugene_timbre.quick_restore_ui import prepare_preview
+
+    root = tmp_path / "EugeneRE"
+    pitch = root / "6. B2"
+    pitch.mkdir(parents=True)
+    sr = 44100
+    t = np.arange(sr, dtype=np.float32) / sr
+    audio = (
+        0.2 * np.sin(2 * np.pi * 220 * t)
+        + 0.08 * np.sin(2 * np.pi * 1450 * t)
+    ).astype(np.float32)
+    source = pitch / "v.wav"
+    sf.write(source, audio, sr, subtype="PCM_16")
+    (pitch / "oto.ini").write_text(
+        "v.wav=a あ_B2,100,200,-500,150,80\n", encoding="utf-8"
+    )
+
+    preview = prepare_preview(root, "6. B2/v.wav", wet=0.5)
+
+    assert preview["status"] == "preview_ready"
+    assert preview["same_audio"] is False
+    assert preview["profile"]["name"] == "B2-gentle-body-presence"
+    assert preview["mask"]["mask_coverage_percent"] > 5
+    assert np.max(np.abs(preview["processed"] - preview["original"])) > 1e-5
+
+
+def test_quick_restore_neutral_pitch_layer_preview_is_transparent(tmp_path: Path):
+    from eugene_timbre.quick_restore_ui import prepare_preview
+
+    root = tmp_path / "EugeneRE"
+    pitch = root / "5. G4"
+    pitch.mkdir(parents=True)
+    sr = 44100
+    t = np.arange(sr, dtype=np.float32) / sr
+    sf.write(pitch / "g4.wav", (0.15 * np.sin(2 * np.pi * 392 * t)).astype(np.float32), sr)
+    (pitch / "oto.ini").write_text(
+        "g4.wav=a あ_G4,100,200,-500,150,80\n", encoding="utf-8"
+    )
+
+    preview = prepare_preview(root, "5. G4/g4.wav")
+
+    assert preview["same_audio"] is True
+    assert preview["status"] == "bypassed"
+
+
+def test_quick_restore_ui_module_compiles_and_is_the_default_cli_studio():
+    ui_path = Path(__file__).parents[1] / "eugene_timbre" / "quick_restore_ui.py"
+    ui_text = ui_path.read_text(encoding="utf-8")
+    compile(ui_text, str(ui_path), "exec")
+    assert "1. Scan bank and prepare preview" in ui_text
+    assert "2. Create processed voicebank copy" in ui_text
+    assert "DEFAULT_INPUT" in ui_text
+    assert "DEFAULT_OUTPUT" in ui_text
+    assert "def prepare_preview" in ui_text
+
+    cli_path = Path(__file__).parents[1] / "eugene_timbre" / "cli.py"
+    cli_text = cli_path.read_text(encoding="utf-8")
+    assert "from .quick_restore_ui import main as studio_main" in cli_text
+    assert 'sub.add_parser(\n        "studio-advanced"' in cli_text
+
+
+
+def test_process_auto_reports_per_file_progress(tmp_path: Path):
+    root = tmp_path / "EugeneRE"
+    pitch = root / "6. B2"
+    pitch.mkdir(parents=True)
+    sr = 44100
+    t = np.arange(sr, dtype=np.float32) / sr
+    sf.write(pitch / "v.wav", (0.1 * np.sin(2 * np.pi * 220 * t)).astype(np.float32), sr)
+    (pitch / "oto.ini").write_text(
+        "v.wav=a あ_B2,100,200,-500,150,80\n", encoding="utf-8"
+    )
+
+    updates = []
+    process_auto(
+        root, tmp_path / "output", wet=0.5,
+        dry_run=True,
+        progress=lambda done, total, label: updates.append((done, total, label)),
+    )
+    assert updates == [(1, 1, "6. B2/v.wav")]
+
+
+def test_quick_restore_preview_uses_same_oto_aware_route_as_export(tmp_path: Path):
+    from eugene_timbre.quick_restore import prepare_preview
+
+    root = tmp_path / "EugeneRE"
+    pitch = root / "6. B2"
+    pitch.mkdir(parents=True)
+    sr = 44100
+    t = np.arange(sr, dtype=np.float32) / sr
+    audio = (
+        0.2 * np.sin(2 * np.pi * 220 * t)
+        + 0.08 * np.sin(2 * np.pi * 1450 * t)
+    ).astype(np.float32)
+    source = pitch / "v.wav"
+    sf.write(source, audio, sr, subtype="PCM_16")
+    (pitch / "oto.ini").write_text(
+        "v.wav=a あ_B2,100,200,-500,150,80\n", encoding="utf-8"
+    )
+
+    preview = prepare_preview(root, "6. B2/v.wav", wet=0.5)
+
+    assert preview["status"] == "preview_ready"
+    assert preview["same_audio"] is False
+    assert preview["profile"]["name"] == "B2-gentle-body-presence"
+    assert preview["mask"]["mask_coverage_percent"] > 5
+    assert np.max(np.abs(preview["processed"] - preview["original"])) > 1e-5
+
+
+def test_quick_restore_neutral_pitch_layer_preview_is_transparent(tmp_path: Path):
+    from eugene_timbre.quick_restore import prepare_preview
+
+    root = tmp_path / "EugeneRE"
+    pitch = root / "5. G4"
+    pitch.mkdir(parents=True)
+    sr = 44100
+    t = np.arange(sr, dtype=np.float32) / sr
+    sf.write(pitch / "g4.wav", (0.15 * np.sin(2 * np.pi * 392 * t)).astype(np.float32), sr)
+    (pitch / "oto.ini").write_text(
+        "g4.wav=a あ_G4,100,200,-500,150,80\n", encoding="utf-8"
+    )
+
+    preview = prepare_preview(root, "5. G4/g4.wav")
+
+    assert preview["same_audio"] is True
+    assert preview["status"] == "bypassed"
+
+
+def test_quick_restore_ui_module_compiles_and_is_the_default_cli_studio():
+    ui_path = Path(__file__).parents[1] / "eugene_timbre" / "quick_restore_ui.py"
+    ui_text = ui_path.read_text(encoding="utf-8")
+    compile(ui_text, str(ui_path), "exec")
+    assert "1. Scan bank and prepare preview" in ui_text
+    assert "2. Create processed voicebank copy" in ui_text
+    assert "DEFAULT_INPUT" in ui_text
+    assert "DEFAULT_OUTPUT" in ui_text
+    assert "from .quick_restore import DEFAULT_WET, prepare_preview" in ui_text
+
+    cli_path = Path(__file__).parents[1] / "eugene_timbre" / "cli.py"
+    cli_text = cli_path.read_text(encoding="utf-8")
+    assert "from .quick_restore_ui import main as studio_main" in cli_text
+    assert '"studio-advanced"' in cli_text
