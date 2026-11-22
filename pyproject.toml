@@ -12,9 +12,11 @@ dependencies = ["numpy>=1.24", "scipy>=1.10", "soundfile>=0.12"]
 
 [project.optional-dependencies]
 dev = ["pytest>=7.4"]
+ui = ["PySide6>=6.6"]
 
 [project.scripts]
 eugene-timbre = "eugene_timbre.cli:main"
+eugene-timbre-ui = "eugene_timbre.pitch_studio_ui:main"
 
 [tool.setuptools.packages.find]
 include = ["eugene_timbre*"]

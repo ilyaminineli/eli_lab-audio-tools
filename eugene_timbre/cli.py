@@ -217,6 +217,15 @@ def process_automatic(args):
     print(f"Output/report: {args.output}")
     return 0
 
+def open_pitch_studio(args):
+    try:
+        from .pitch_studio_ui import main as studio_main
+    except ImportError as exc:
+        raise RuntimeError(
+            'The graphical studio is optional. Install it with: pip install -e ".[ui]"'
+        ) from exc
+    return studio_main()
+
 def main():
     parser = argparse.ArgumentParser(prog="eugene-timbre")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -272,6 +281,12 @@ def main():
     proc.add_argument("--profile", choices=sorted(PROFILES), default="warm-uncanny-b2")
     proc.add_argument("--wet", type=float, default=1.0)
     proc.set_defaults(func=process)
+
+    studio = sub.add_parser(
+        "studio",
+        help="Open the pitch-folder restoration studio (requires the [ui] extra).",
+    )
+    studio.set_defaults(func=open_pitch_studio)
 
     auto_proc = sub.add_parser(
         "process-auto",

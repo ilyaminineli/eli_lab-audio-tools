@@ -71,7 +71,55 @@ These profiles remain listening-test starting points, not automatic de-synthesis
 Dependencies: NumPy, SciPy and SoundFile. No cloud service, subscription or AI inference is required.
 
 
-## Automatic Eugene:RE processing chain (experimental v1)
+## Eugene:RE Pitch Restoration Studio
+
+The pitch-folder-first workflow is the recommended place to begin new restoration work. It does not scan or automatically classify the entire bank: you select individual pitch folders (for example, B2, F3 or G4), analyse them, tune a separate profile for each pitch, audition a source sample against a processed preview, and export selected pitch folders to a separate output directory.
+
+Install the optional graphical interface on Windows:
+
+```powershell
+pip install -e ".[ui]"
+eugene-timbre studio
+```
+
+You can also launch it with `eugene-timbre-ui`. The UI requires PySide6; the core CLI and DSP do not.
+
+Workflow:
+
+1. Choose the voicebank root. The scanner lists immediate subfolders containing a pitch token, such as `6. B2`, `4. F3` and `5. G4`.
+2. Nothing is preselected for export. Use **Select current**, check individual folders, or explicitly use **Select all** when intended.
+3. Select a layer and run **Analyse checked**. The report includes median F0, spectral centroid, harmonic/residual proxy, relative band energy and a median cepstral spectral envelope.
+4. Set that pitch's five-band EQ profile. Each pitch stores its own settings.
+5. Optionally choose an analysed reference pitch and generate a bounded five-band EQ suggestion from the difference between the measured cepstral spectral envelopes. If either envelope is unavailable, it falls back to broad relative-band-energy matching. This is an approximation, not a formant model or a naturalness score.
+6. Select a sample and audition the original and processed preview at the chosen wet blend.
+7. Export checked pitch folders to a separate output root. The source bank is never modified. Non-WAV files, including `oto.ini`, are copied byte-for-byte.
+
+### Moresampler phone A/B testing
+
+The studio can render one selected WAV/OTO alias through a local `moresampler.exe`:
+
+1. Select the Moresampler executable.
+2. Choose the WAV and matching OTO alias.
+3. The target note is initially suggested from the measured sample F0; adjust it when testing a different destination note.
+4. Set the requested phone duration and, optionally, Moresampler flags.
+5. Click **Render original + restored through Moresampler**.
+
+Both variants use the same classic UTAU resampler arguments: note name, velocity, flags, OTO offset, duration, consonant, cutoff, volume, modulation, tempo and a constant-pitch curve. The test runs a temporary copy of `moresampler.exe` and its adjacent DLLs, with an isolated global `moreconfig.txt`; your installed executable folder and existing configuration are not edited. Global output settings enable resampler compatibility and match the source sample rate. Each temporary pitch folder gets a separate voicebank `moreconfig.txt` that preserves existing analysis/synthesis options and sets the F0-analysis bounds to 0.6×–1.7× the measured sample F0.
+
+Outputs are written beneath `moresampler_ab/<pitch>/<sample>/<note>_<duration>ms_<timestamp>/`:
+- `original_moresampler.wav`
+- `restored_moresampler.wav`
+- `moresampler_ab_report.json`
+
+This is a **single phone/alias render**, not a full UST phrase or wavtool render. It is useful for checking whether a restoration survives Moresampler's own source analysis and resynthesis, but it cannot yet evaluate cross-phoneme transitions, note-to-note continuity or full-song phrasing. Listen to both WAVs at matched loudness; the report's spectral metrics are diagnostics, not intelligibility or naturalness scores.
+
+**OTO protection is optional.** When enabled, the studio uses the matching OTO entries to protect fixed regions and skips files without a usable stretchable body region. When disabled, the selected pitch-folder WAVs are processed as complete recordings. This mode deliberately has no whole-file 5% coverage threshold and does not run phonetic alias classification across unrelated folders.
+
+Every processed pitch folder receives a `pitch_restoration_report.json` with before/after loudness, spectral centroid, band-energy changes, peak sample difference, changed-sample fraction and per-file status. A file marked changed has a measurable sample delta; this does not prove that it sounds more natural.
+
+The envelope-match suggestion is only a starting point: it approximates a measured cepstral-envelope difference with five broad EQ bands. It does not infer the ideal vocal-tract envelope, separate individual formants, or guarantee greater naturalness. Choose the target resampler, render identical short phrases, loudness-match the renders, and listen for vowel identity, consonant intelligibility, transitions, and artifacts before adopting a profile.
+
+## Legacy automatic whole-bank processing chain (experimental v1)
 
 The analyser also includes a conservative auto-routing stage for pitch layers, consonant releases, L/V/TH extensions, R English, bonus phonetic events and unknown/root-level files.
 
