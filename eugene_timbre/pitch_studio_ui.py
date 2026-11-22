@@ -27,8 +27,11 @@ from .moresampler import render_moresampler_ab
 from .oto_analysis import OtoEntry, find_nearest_oto, match_entries, parse_oto
 from .pitch_studio import (
     analyze_pitch_folder, default_profile, discover_pitch_layers,
-    pitch_name, preview_sample, process_pitch_folder, suggest_reference_match,
+    pitch_name, preview_sample, process_pitch_folder,
     inventory_voicebank,
+)
+from .recommendations import (
+    get_eq_approach_labels, recommend_profiles, moresampler_flag_templates,
 )
 
 
@@ -184,6 +187,7 @@ class PitchStudioWindow(QMainWindow):
         self.layers: list[dict] = []
         self.profiles: dict[str, dict] = {}
         self.analyses: dict[str, dict] = {}
+        self.profile_recommendations: dict[str, list[dict]] = {}
         self.worker: TaskWorker | None = None
         self.preview_directory = tempfile.TemporaryDirectory(prefix="eugene_pitch_preview_")
         self.audio_output = QAudioOutput(self)
@@ -394,14 +398,35 @@ class PitchStudioWindow(QMainWindow):
             self.band_controls.append((frequency, gain, q_value))
         profile_layout.addWidget(self.eq_table)
 
+        approach_row = QHBoxLayout()
+        approach_row.addWidget(QLabel("Restoration approach"))
+        self.approach_combo = QComboBox()
+        for key, label in get_eq_approach_labels():
+            self.approach_combo.addItem(label, key)
+        self.approach_combo.setMinimumHeight(38)
+        approach_row.addWidget(self.approach_combo, 1)
+        apply_current = QPushButton("Apply to current")
+        apply_current.clicked.connect(self.apply_recommended_current)
+        apply_checked = QPushButton("Apply to checked")
+        apply_checked.clicked.connect(self.apply_recommended_checked)
+        approach_row.addWidget(apply_current)
+        approach_row.addWidget(apply_checked)
+        profile_layout.addLayout(approach_row)
+
+        self.recommendation_hint = QLabel(
+            "After analysis, choose an approach. Suggestions are generated from the measured layer; "
+            "they remain previews until you apply one."
+        )
+        self.recommendation_hint.setObjectName("muted")
+        self.recommendation_hint.setWordWrap(True)
+        profile_layout.addWidget(self.recommendation_hint)
+
         match_row = QHBoxLayout()
-        match_row.addWidget(QLabel("Reference layer"))
+        match_row.addWidget(QLabel("Reference pitch for envelope matching"))
         self.reference_combo = QComboBox()
-        self.reference_combo.addItem("Analyse layers first")
+        self.reference_combo.addItem("Analyse another pitch layer first")
+        self.reference_combo.currentIndexChanged.connect(self.refresh_recommendation_hint)
         match_row.addWidget(self.reference_combo, 1)
-        self.match_button = QPushButton("Suggest envelope match")
-        self.match_button.clicked.connect(self.generate_match)
-        match_row.addWidget(self.match_button)
         profile_layout.addLayout(match_row)
         profile_io_row = QHBoxLayout()
         reset_profile = QPushButton("Reset to neutral")
@@ -475,23 +500,41 @@ class PitchStudioWindow(QMainWindow):
         self.render_duration_spin.setValue(800)
         self.render_duration_spin.setMinimumHeight(38)
         self.render_flags_edit = QLineEdit()
-        self.render_flags_edit.setPlaceholderText("Optional Moresampler flags, e.g. Mt10Mb-5")
+        self.render_flags_edit.setPlaceholderText("Optional Moresampler flags, e.g. Mt+8Mb+6")
         self.render_flags_edit.setMinimumHeight(38)
         moresampler_layout.addWidget(QLabel("Duration (ms)"), 2, 0)
         moresampler_layout.addWidget(self.render_duration_spin, 2, 1)
-        moresampler_layout.addWidget(QLabel("Flags"), 2, 2)
+        moresampler_layout.addWidget(QLabel("Renderer flags"), 2, 2)
         moresampler_layout.addWidget(self.render_flags_edit, 2, 3, 1, 2)
+
+        self.moresampler_style_combo = QComboBox()
+        self.moresampler_style_combo.setMinimumHeight(38)
+        for template in moresampler_flag_templates():
+            self.moresampler_style_combo.addItem(template["label"], template)
+        self.moresampler_style_combo.currentIndexChanged.connect(self.refresh_moresampler_style_hint)
+        moresampler_layout.addWidget(QLabel("Moresampler style template"), 3, 0)
+        moresampler_layout.addWidget(self.moresampler_style_combo, 3, 1, 1, 3)
+        apply_moresampler_style = QPushButton("Use template")
+        apply_moresampler_style.clicked.connect(self.apply_moresampler_template)
+        moresampler_layout.addWidget(apply_moresampler_style, 3, 4)
+        self.moresampler_style_hint = QLabel(
+            "Renderer flags are separate from source-WAV EQ. They affect Moresampler synthesis only."
+        )
+        self.moresampler_style_hint.setObjectName("muted")
+        self.moresampler_style_hint.setWordWrap(True)
+        moresampler_layout.addWidget(self.moresampler_style_hint, 4, 0, 1, 4)
+
         self.moresampler_hint = QLabel(
             "Select a pitch sample with a matching OTO alias. "
-            "The phone-level A/B render does not yet render a complete UST phrase."
+            "This control still renders one OTO phone, not a complete UST phrase."
         )
         self.moresampler_hint.setObjectName("muted")
         self.moresampler_hint.setWordWrap(True)
-        moresampler_layout.addWidget(self.moresampler_hint, 3, 0, 1, 4)
+        moresampler_layout.addWidget(self.moresampler_hint, 5, 0, 1, 4)
         self.moresampler_button = QPushButton("Render original + restored through Moresampler →")
         self.moresampler_button.setMinimumHeight(46)
         self.moresampler_button.clicked.connect(self.render_moresampler)
-        moresampler_layout.addWidget(self.moresampler_button, 3, 4)
+        moresampler_layout.addWidget(self.moresampler_button, 5, 4)
         more_page_layout.addWidget(moresampler_group)
         more_page_layout.addStretch(1)
         more_scroll.setWidget(more_page)
@@ -716,6 +759,7 @@ class PitchStudioWindow(QMainWindow):
         self._load_profile(name)
         self._load_samples(layer)
         self._show_analysis(name)
+        self.refresh_recommendation_hint()
 
     def _load_profile(self, name: str):
         profile = self.profiles.setdefault(name, default_profile(name))
@@ -742,7 +786,14 @@ class PitchStudioWindow(QMainWindow):
         layer = self.current_layer()
         if not layer:
             return
+        previous = self.profiles.get(layer["name"], {})
         profile = default_profile(layer["pitch"])
+        profile["description"] = previous.get("description", "Pitch-folder restoration profile.")
+        for key in ("approach", "generated_from_analysis", "analysis_pitch",
+                    "recommendation_reasons", "recommendation_limit",
+                    "reference_pitch", "match_method", "match_strength", "max_gain_db"):
+            if key in previous:
+                profile[key] = previous[key]
         profile["highpass_hz"] = float(self.highpass_spin.value())
         profile["highpass_slope"] = (2, 4, 6)[self.highpass_slope_combo.currentIndex()]
         profile["bands"] = []
@@ -873,6 +924,7 @@ class PitchStudioWindow(QMainWindow):
         )
         self.envelope_plot.set_data(analysis["spectral_envelope"])
         self.update_processing_state()
+        self.refresh_recommendation_hint()
         if self.current_layer() and self.sample_combo.currentIndex() >= 0:
             self._suggest_target_note(self.current_layer(), Path(self.sample_combo.currentData()))
 
@@ -918,6 +970,8 @@ class PitchStudioWindow(QMainWindow):
 
         def complete(results):
             self.analyses.update(results)
+            for name, report in results.items():
+                self.profile_recommendations[name] = recommend_profiles(report)
             self.reference_combo.clear()
             self.reference_combo.addItem("Choose reference layer…")
             self.reference_combo.addItems([
@@ -926,33 +980,134 @@ class PitchStudioWindow(QMainWindow):
             layer = self.current_layer()
             if layer:
                 self._show_analysis(layer["name"])
-            self.status_label.setText(f'Analysis complete: {sum(x["analysed_count"] for x in results.values())} WAV(s).')
+            self.refresh_recommendation_hint()
+            self.status_label.setText(
+                f'Analysis complete: {sum(x["analysed_count"] for x in results.values())} WAV(s); '
+                f'{len(results) * 4} non-neutral EQ starting points generated.'
+            )
 
         self._start_worker(task, complete)
 
-    def generate_match(self):
+    def _reference_analysis(self, current_layer: dict) -> dict | None:
+        reference_pitch = self.reference_combo.currentData()
+        if not reference_pitch:
+            reference_pitch = self.reference_combo.currentText()
+        reference_layer = next(
+            (item for item in self.layers if item["pitch"] == reference_pitch),
+            None,
+        )
+        if not reference_layer or reference_layer["name"] == current_layer["name"]:
+            return None
+        return self.analyses.get(reference_layer["name"])
+
+    def _recommendation_for(self, layer: dict, approach: str) -> dict | None:
+        analysis = self.analyses.get(layer["name"])
+        if not analysis:
+            return None
+        reference = self._reference_analysis(layer) if approach == "reference_match" else None
+        recommendations = recommend_profiles(analysis, reference)
+        self.profile_recommendations[layer["name"]] = recommendations
+        return next((item for item in recommendations if item["key"] == approach), None)
+
+    def refresh_recommendation_hint(self, *_):
+        layer = self.current_layer()
+        if not layer:
+            self.recommendation_hint.setText("Analyse a pitch layer to generate profile suggestions.")
+            return
+        analysis = self.analyses.get(layer["name"])
+        if not analysis:
+            self.recommendation_hint.setText("Analyse this pitch layer first. Analysis will generate neutral, clarity, warmth, air and soft suggestions automatically.")
+            return
+        approach = self.approach_combo.currentData()
+        recommendation = self._recommendation_for(layer, approach)
+        if not recommendation or not recommendation.get("available"):
+            reason = recommendation.get("reason") if recommendation else "Select an approach."
+            self.recommendation_hint.setText(reason or "Select an approach.")
+            return
+        profile = recommendation["profile"]
+        gains = [
+            f'{band["name"]} {band["gain_db"]:+.2f} dB'
+            for band in profile["bands"] if abs(float(band["gain_db"])) > 0.01
+        ]
+        gain_text = ", ".join(gains) if gains else "neutral / no change"
+        reasons = " ".join(profile.get("recommendation_reasons", []))
+        self.recommendation_hint.setText(
+            f'{recommendation["label"]}: {gain_text}. {reasons} '
+            "Apply it to audition/export; generation itself does not modify WAVs."
+        )
+
+    def apply_recommended_current(self):
         layer = self.current_layer()
         if not layer:
             return
-        current = self.analyses.get(layer["name"])
-        if not current:
-            QMessageBox.information(self, "Analyse first", "Run analysis for this layer and the reference layer first.")
+        approach = self.approach_combo.currentData()
+        recommendation = self._recommendation_for(layer, approach)
+        if not recommendation or not recommendation.get("available"):
+            QMessageBox.information(
+                self, "Recommendation unavailable",
+                recommendation.get("reason") if recommendation else "Analyse this pitch layer first.",
+            )
             return
-        reference_pitch = self.reference_combo.currentText()
-        reference_layer = next((x for x in self.layers if x["pitch"] == reference_pitch), None)
-        reference = self.analyses.get(reference_layer["name"]) if reference_layer else None
-        if not reference:
-            QMessageBox.information(self, "Reference unavailable", "Choose a reference pitch that has already been analysed.")
-            return
-        if current["pitch"] == reference["pitch"]:
-            QMessageBox.information(self, "Same pitch", "Choose a different pitch as the reference.")
-            return
-        suggested = suggest_reference_match(current, reference, strength=0.6, max_gain_db=2.5)
-        self.profiles[layer["name"]] = suggested
+        self.profiles[layer["name"]] = dict(recommendation["profile"])
         self._load_profile(layer["name"])
         self.status_label.setText(
-            f'Suggested a bounded tonal-balance match: {current["pitch"]} → {reference["pitch"]}. Audition before processing.'
+            f'{recommendation["label"]} applied to the {layer["pitch"]} pitch profile. '
+            "Audition before processing."
         )
+
+    def apply_recommended_checked(self):
+        selected = self.checked_layers()
+        if not selected:
+            QMessageBox.information(self, "No pitch layers checked", "Check the pitch folders that should receive this approach.")
+            return
+        approach = self.approach_combo.currentData()
+        applied, missing, unavailable = [], [], []
+        for layer in selected:
+            if layer["name"] not in self.analyses:
+                missing.append(layer["pitch"])
+                continue
+            recommendation = self._recommendation_for(layer, approach)
+            if not recommendation or not recommendation.get("available"):
+                unavailable.append(layer["pitch"])
+                continue
+            self.profiles[layer["name"]] = dict(recommendation["profile"])
+            applied.append(layer)
+        current = self.current_layer()
+        if current and any(item["name"] == current["name"] for item in applied):
+            self._load_profile(current["name"])
+        parts = [f"Applied {approach} to {len(applied)} checked pitch layer(s)."]
+        if missing:
+            parts.append("Not analysed: " + ", ".join(missing) + ".")
+        if unavailable:
+            parts.append("Reference/template unavailable: " + ", ".join(unavailable) + ".")
+        parts.append("Next, audition the selected pitch profiles and press Process checked pitch folders when ready.")
+        message = " ".join(parts)
+        self.status_label.setText(message)
+        QMessageBox.information(self, "Pitch profiles generated", message)
+
+    def refresh_moresampler_style_hint(self, *_):
+        template = self.moresampler_style_combo.currentData()
+        if not template:
+            return
+        self.moresampler_style_hint.setText(
+            f'{template["description"]}  {template["caution"]}'
+        )
+
+    def apply_moresampler_template(self):
+        template = self.moresampler_style_combo.currentData()
+        if not template:
+            return
+        self.render_flags_edit.setText(template["flags"])
+        self.moresampler_style_hint.setText(
+            f'Loaded flags "{template["flags"] or "(none)"}". {template["description"]}  {template["caution"]}'
+        )
+        self.detail_tabs.setCurrentIndex(1)
+
+    def generate_match(self):
+        self.approach_combo.setCurrentIndex(
+            max(0, self.approach_combo.findData("reference_match"))
+        )
+        self.apply_recommended_current()
 
     def save_profiles(self):
         layer = self.current_layer()
