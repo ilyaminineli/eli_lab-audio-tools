@@ -75,6 +75,7 @@ def build_moresampler_arguments(
     duration_ms: float = 800.0,
     velocity: int = 100,
     flags: str = "",
+    original_flags: str | None = None,
     volume: int = 100,
     modulation: int = 0,
     tempo: float = 120.0,
@@ -270,6 +271,8 @@ def render_moresampler_ab(
     original_render = destination / "original_moresampler.wav"
     restored_render = destination / "restored_moresampler.wav"
 
+    original_render_flags = flags if original_flags is None else original_flags
+    restored_render_flags = flags
     run_details = {}
     with tempfile.TemporaryDirectory(prefix="eugene_moresampler_ab_") as temp:
         workspace = Path(temp)
@@ -278,6 +281,7 @@ def render_moresampler_ab(
         )
         config_text = _moreconfig(reference_f0_hz, source_wav.parent / "moreconfig.txt")
         for label, dest in (("original", original_render), ("restored", restored_render)):
+            variant_flags = original_render_flags if label == "original" else restored_render_flags
             # Each variant gets its own analysis directory to force fresh,
             # independent analysis of that exact WAV.
             staged_dir = workspace / label / "pitch"
@@ -291,7 +295,7 @@ def render_moresampler_ab(
             staged_output = staged_dir / "rendered.wav"
             args = build_moresampler_arguments(
                 input_path, staged_output, oto, target_note=target_note,
-                duration_ms=duration_ms, velocity=velocity, flags=flags,
+                duration_ms=duration_ms, velocity=velocity, flags=variant_flags,
                 volume=volume, modulation=modulation, tempo=tempo,
             )
             try:
@@ -320,6 +324,7 @@ def render_moresampler_ab(
                 "return_code": completed.returncode,
                 "stdout_tail": (completed.stdout or "")[-2500:],
                 "stderr_tail": (completed.stderr or "")[-2500:],
+                "flags": variant_flags,
             }
 
     original_metrics = _analyse_render(original_render)
@@ -348,6 +353,8 @@ def render_moresampler_ab(
             "duration_ms": float(duration_ms),
             "velocity": int(velocity),
             "flags": flags,
+            "original_flags": original_render_flags,
+            "restored_flags": restored_render_flags,
             "volume": int(volume),
             "modulation": int(modulation),
             "tempo_bpm": float(tempo),
@@ -377,8 +384,9 @@ def render_moresampler_ab(
             },
         },
         "interpretation": (
-            "This is a single OTO-phone render through Moresampler, not a complete phrase/wavtool render. "
-            "Metrics describe acoustic changes only and do not score intelligibility or naturalness."
+            "This is a single OTO-phone render through Moresampler, not a complete UST phrase/wavtool render. "
+            + ("The two variants use different renderer flags." if original_render_flags != restored_render_flags else "Both variants use identical renderer flags.")
+            + " Metrics describe acoustic changes only and do not score intelligibility or naturalness."
         ),
     }
     (destination / "moresampler_ab_report.json").write_text(
