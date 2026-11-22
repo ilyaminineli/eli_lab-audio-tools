@@ -523,6 +523,7 @@ class PitchStudioWindow(QMainWindow):
                     path, self.profiles[layer["name"]],
                     wet=self.wet_slider.value() / 100.0,
                     protect_oto=self.oto_checkbox.isChecked(),
+                    source_root=Path(layer["path"]),
                 )
             else:
                 audio, sample_rate, _ = read_wav(path)
