@@ -75,7 +75,6 @@ def build_moresampler_arguments(
     duration_ms: float = 800.0,
     velocity: int = 100,
     flags: str = "",
-    original_flags: str | None = None,
     volume: int = 100,
     modulation: int = 0,
     tempo: float = 120.0,
@@ -235,6 +234,7 @@ def render_moresampler_ab(
     duration_ms: float = 800.0,
     velocity: int = 100,
     flags: str = "",
+    original_flags: str | None = None,
     volume: int = 100,
     modulation: int = 0,
     tempo: float = 120.0,
@@ -271,8 +271,17 @@ def render_moresampler_ab(
     original_render = destination / "original_moresampler.wav"
     restored_render = destination / "restored_moresampler.wav"
 
+    # With original_flags=None, retain the classic source-EQ A/B behaviour:
+    # both variants use identical flags. Supplying "" for original_flags
+    # creates an isolated renderer-flag A/B against Moresampler's neutral flags.
     original_render_flags = flags if original_flags is None else original_flags
     restored_render_flags = flags
+    for label, variant_flags in (
+        ("original", original_render_flags),
+        ("restored", restored_render_flags),
+    ):
+        if not SAFE_FLAGS.fullmatch(variant_flags):
+            raise ValueError(f"Unsafe Moresampler flags for {label} render.")
     run_details = {}
     with tempfile.TemporaryDirectory(prefix="eugene_moresampler_ab_") as temp:
         workspace = Path(temp)
