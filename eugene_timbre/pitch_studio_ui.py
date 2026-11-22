@@ -572,6 +572,11 @@ class PitchStudioWindow(QMainWindow):
         self.processing_state_label.setWordWrap(True)
         right_layout.addWidget(self.processing_state_label)
 
+        self.auto_process_button = QPushButton("Generate + process checked using selected approach →")
+        self.auto_process_button.setMinimumHeight(44)
+        self.auto_process_button.clicked.connect(self.process_recommended_checked)
+        right_layout.addWidget(self.auto_process_button)
+
         self.process_button = QPushButton("Process checked pitch folders →")
         self.process_button.setObjectName("primary")
         self.process_button.setMinimumHeight(48)
@@ -937,7 +942,7 @@ class PitchStudioWindow(QMainWindow):
             self._suggest_target_note(self.current_layer(), Path(self.sample_combo.currentData()))
 
     def _set_busy(self, busy: bool):
-        for widget in (self.analyse_button, self.process_button, self.moresampler_button):
+        for widget in (self.analyse_button, self.process_button, self.auto_process_button, self.moresampler_button):
             widget.setDisabled(busy)
         self.progress.setValue(0)
         self.status_label.setText("Working…" if busy else "Ready.")
@@ -1092,6 +1097,61 @@ class PitchStudioWindow(QMainWindow):
         message = " ".join(parts)
         self.status_label.setText(message)
         QMessageBox.information(self, "Pitch profiles generated", message)
+
+    def process_recommended_checked(self):
+        selected = self.checked_layers()
+        if not selected:
+            QMessageBox.information(self, "No pitch layers checked", "Check the pitch folders that should be processed.")
+            return
+        approach = self.approach_combo.currentData()
+        generated = []
+        for layer in selected:
+            if layer["name"] not in self.analyses:
+                QMessageBox.warning(
+                    self, "Analysis required",
+                    f'{layer["pitch"]} has not been analysed. Analyse all checked pitch folders first; no files were processed.',
+                )
+                return
+            recommendation = self._recommendation_for(layer, approach)
+            if not recommendation or not recommendation.get("available"):
+                QMessageBox.warning(
+                    self, "Recommendation unavailable",
+                    f'{layer["pitch"]}: {recommendation.get("reason") if recommendation else "No profile was generated."}\n\n'
+                    "No files were processed. Select a different reference or approach.",
+                )
+                return
+            profile = dict(recommendation["profile"])
+            if not self._profile_is_active(profile):
+                QMessageBox.information(
+                    self, "Neutral approach",
+                    "The selected approach is neutral. It is useful as an A/B control, but it will not change WAV samples.",
+                )
+                return
+            generated.append((layer, profile))
+
+        answer = QMessageBox.question(
+            self,
+            "Generate and process pitch layers",
+            f'Generate "{self.approach_combo.currentText()}" profiles from the analysed measurements and process '
+            f'{len(generated)} checked pitch layer(s)?\n\n'
+            f'Output: {self.output_edit.text().strip()}\n\n'
+            "Only the separate output bank will be written. Existing files in that output folder may be replaced; "
+            "the original voicebank will remain untouched.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if answer != QMessageBox.StandardButton.Yes:
+            return
+
+        for layer, profile in generated:
+            self.profiles[layer["name"]] = profile
+        current = self.current_layer()
+        if current and any(layer["name"] == current["name"] for layer, _ in generated):
+            self._load_profile(current["name"])
+        self.status_label.setText(
+            f'Generated {len(generated)} {approach} profile(s) from the analysis; starting non-destructive export.'
+        )
+        self.process_checked()
 
     def refresh_moresampler_style_hint(self, *_):
         template = self.moresampler_style_combo.currentData()
