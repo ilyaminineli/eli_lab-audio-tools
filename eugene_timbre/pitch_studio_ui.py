@@ -1,6 +1,7 @@
 """PySide6 interface for pitch-folder-first Eugene:RE restoration."""
 from __future__ import annotations
 
+import json
 import sys
 import tempfile
 from pathlib import Path
@@ -256,6 +257,15 @@ class PitchStudioWindow(QMainWindow):
         self.match_button.clicked.connect(self.generate_match)
         match_row.addWidget(self.match_button)
         profile_layout.addLayout(match_row)
+        profile_io_row = QHBoxLayout()
+        load_profiles = QPushButton("Load profiles…")
+        load_profiles.clicked.connect(self.load_profiles)
+        save_profiles = QPushButton("Save profiles…")
+        save_profiles.clicked.connect(self.save_profiles)
+        profile_io_row.addWidget(load_profiles)
+        profile_io_row.addWidget(save_profiles)
+        profile_io_row.addStretch()
+        profile_layout.addLayout(profile_io_row)
         right_layout.addWidget(profile_group)
 
         preview_group = QGroupBox("AUDITION  /  CURRENT SAMPLE")
@@ -510,6 +520,57 @@ class PitchStudioWindow(QMainWindow):
         self.status_label.setText(
             f'Suggested a bounded tonal-balance match: {current["pitch"]} → {reference["pitch"]}. Audition before processing.'
         )
+
+    def save_profiles(self):
+        layer = self.current_layer()
+        if layer:
+            self.save_current_profile()
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Save pitch profiles", "eugene_pitch_profiles.json",
+            "JSON profile files (*.json)",
+        )
+        if not path:
+            return
+        payload = {
+            "format": "eugene_pitch_profiles",
+            "version": 1,
+            "voicebank_root": self.root_edit.text().strip(),
+            "profiles": self.profiles,
+        }
+        try:
+            Path(path).write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+            self.status_label.setText(f"Saved {len(self.profiles)} pitch profile(s).")
+        except Exception as exc:
+            QMessageBox.critical(self, "Could not save profiles", str(exc))
+
+    def load_profiles(self):
+        path, _ = QFileDialog.getOpenFileName(
+            self, "Load pitch profiles", "",
+            "JSON profile files (*.json)",
+        )
+        if not path:
+            return
+        try:
+            payload = json.loads(Path(path).read_text(encoding="utf-8"))
+            if payload.get("format") != "eugene_pitch_profiles":
+                raise ValueError("This file is not an Eugene pitch-profile preset.")
+            profiles = payload.get("profiles")
+            if not isinstance(profiles, dict):
+                raise ValueError("The profile file does not contain a profiles object.")
+            from .pitch_studio import _to_profile
+            checked = {}
+            for name, spec in profiles.items():
+                if not isinstance(spec, dict) or len(spec.get("bands", [])) != 5:
+                    raise ValueError(f"Profile '{name}' must contain exactly five EQ bands.")
+                _to_profile(spec, name=str(name))
+                checked[str(name)] = spec
+            self.profiles.update(checked)
+            layer = self.current_layer()
+            if layer and layer["name"] in self.profiles:
+                self._load_profile(layer["name"])
+            self.status_label.setText(f"Loaded {len(checked)} pitch profile(s).")
+        except Exception as exc:
+            QMessageBox.critical(self, "Could not load profiles", str(exc))
 
     def play_preview(self, processed: bool):
         layer = self.current_layer()
