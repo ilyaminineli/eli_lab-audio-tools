@@ -253,7 +253,7 @@ class PitchStudioWindow(QMainWindow):
         self.reference_combo = QComboBox()
         self.reference_combo.addItem("Analyse layers first")
         match_row.addWidget(self.reference_combo, 1)
-        self.match_button = QPushButton("Suggest tonal-balance match")
+        self.match_button = QPushButton("Suggest envelope match")
         self.match_button.clicked.connect(self.generate_match)
         match_row.addWidget(self.match_button)
         profile_layout.addLayout(match_row)
