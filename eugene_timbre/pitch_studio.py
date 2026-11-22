@@ -19,7 +19,6 @@ from .analysis import analyze_audio
 from .dsp import PeakingBand, TimbreProfile, apply_profile, apply_profile_masked, describe_profile
 from .io import read_wav, write_wav
 from .oto_analysis import find_nearest_oto, match_entries, parse_oto
-from .processing_chain import build_oto_body_mask
 from .timbre_analysis import TimbreAnalysisConfig, analyze_timbre
 
 PITCH_FOLDER_RE = re.compile(r"(?<![A-Z0-9])([A-G](?:#|B)?[0-8])(?![A-Z0-9])", re.IGNORECASE)
@@ -262,7 +261,9 @@ def suggest_reference_match(
 
 
 def _oto_mask_for_file(path: Path, root: Path, sample_count: int, sample_rate: int) -> tuple[np.ndarray | None, str | None]:
-    oto_path = find_nearest_oto(path, root)
+    # Keep the legacy whole-bank router out of the normal pitch-only import path.
+    from .processing_chain import build_oto_body_mask
+\n    oto_path = find_nearest_oto(path, root)
     if oto_path is None:
         return None, "No oto.ini found for this sample."
     parsed = parse_oto(oto_path)
