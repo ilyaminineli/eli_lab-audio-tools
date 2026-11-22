@@ -73,7 +73,7 @@ Dependencies: NumPy, SciPy and SoundFile. No cloud service, subscription or AI i
 
 ## Eugene:RE Pitch Restoration Studio
 
-The pitch-folder-first workflow is the recommended place to begin new restoration work. It does not scan or automatically classify the entire bank: you select individual pitch folders (for example, B2, F3 or G4), analyse them, tune a separate profile for each pitch, audition a source sample against a processed preview, and export selected pitch folders to a separate output directory.
+The pitch-folder-first workflow is the recommended place to begin new restoration work. The studio now indexes the complete voicebank hierarchy first, including pitch folders, L/V/TH extensions, R English, consonant releases, bonus phonetic extras, setup tools, documentation, illustrations, and root-level files. The BANK STRUCTURE tree displays all folders and file names plus WAV/FRQ/LLSM/OTO counts. Only the actual pitch layers (for example, B2, F3 or G4) are currently enabled for this pitch-specific EQ export; add-on folders are inventoried separately and are not silently processed with a pitch EQ.
 
 Install the optional graphical interface on Windows:
 
@@ -86,12 +86,12 @@ You can also launch it with `eugene-timbre-ui`. The UI requires PySide6; the cor
 
 Workflow:
 
-1. Choose the voicebank root. The scanner lists immediate subfolders containing a pitch token, such as `6. B2`, `4. F3` and `5. G4`.
+1. The default paths are prefilled for the supplied Eugene:RE setup. Choose the voicebank root if it differs, then click **Scan whole bank**. The scanner indexes every folder and file recursively and shows the hierarchy in **BANK STRUCTURE**. WAV, FRQ, LLSM and `oto.ini` counts are included.
 2. Nothing is preselected for export. Use **Select current**, check individual folders, or explicitly use **Select all** when intended.
-3. Select a layer and run **Analyse checked**. The report includes median F0, spectral centroid, harmonic/residual proxy, relative band energy and a median cepstral spectral envelope.
-4. Set that pitch's five-band EQ profile. Each pitch stores its own settings.
+3. Select a pitch layer and run **Analyse checked**. The report includes median F0, spectral centroid, harmonic/residual proxy, relative band energy and a median cepstral spectral envelope.
+4. Set that pitch's five-band EQ profile and optional high-pass filter. The graph overlays the measured spectral envelope and the current EQ response; a status line explicitly reports whether processing is neutral or active. Each pitch stores its own settings.
 5. Optionally choose an analysed reference pitch and generate a bounded five-band EQ suggestion from the difference between the measured cepstral spectral envelopes. If either envelope is unavailable, it falls back to broad relative-band-energy matching. This is an approximation, not a formant model or a naturalness score.
-6. Select a sample and audition the original and processed preview at the chosen wet blend.
+6. Select a sample and audition the original and processed preview at the chosen wet blend. The preview reports the measured peak delta, changed-sample fraction and delta RMS. A neutral profile (all gains at 0 dB, high-pass OFF) makes no audible or numerical change, so the app warns before export or Moresampler A/B.
 7. Export checked pitch folders to a separate output root. The source bank is never modified. Non-WAV files, including `oto.ini`, are copied byte-for-byte.
 
 ### Moresampler phone A/B testing
@@ -140,3 +140,14 @@ Only B2 and F3 currently receive tiny pitch-body presence tests. G4, consonant r
 Before a first wet run, inspect the dry-run report's per-alias OTO windows, timing warnings, unmatched/orphan OTO entries, duplicate aliases and alias-token audit. Samples with less than 5% eligible mask coverage are marked `partial` and copied unchanged by default; samples with missing/ambiguous aliases or invalid OTO timing are marked `manual_review`. Only use `--allow-partial` after reviewing the low-coverage samples. Filtered segments receive 80 ms of surrounding source context, while only the eligible OTO mask is blended into the output. OTO files and other non-WAV bank files are copied unchanged to the output tree.
 
 This is a first comparison chain, not a final restoration preset. Do not overwrite the original bank. Render matching UST phrases in the target resamplers and compare the dry-run report, originals and processed output at matched loudness. See [docs/processing-chain-design.md](docs/processing-chain-design.md).
+
+
+### Eugene:RE paths prefilled in the studio
+
+The UI starts with these editable defaults:
+
+- Input: `C:/Users/photo/OneDrive/Документы/UtauV/Data/Singers/EugeneRE`
+- Output: `C:/EugeneRE_Restoration`
+- Moresampler: `C:/Users/photo/OneDrive/Документы/UtauV/Data/Resamplers/moresampler.exe`
+
+The app scans automatically on launch only when the default input folder exists on the computer. The initial pitch EQ remains neutral; use **Suggest envelope match** or adjust the visible bands/high-pass controls to create an explicit filter profile. The OTO body mask is OFF by default and is clearly described in the processing status.
