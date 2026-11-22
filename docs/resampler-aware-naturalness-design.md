@@ -197,3 +197,43 @@ The main screen should communicate this actual goal:
 - Export a tested bank copy.
 
 "Clarity", "warmth", "air" and "dark" can remain optional creative starting points, but they should not be the primary automatic restoration system. The primary recommendation system should say what specific measured issue it is trying to correct, which renderer it targets, and which phrase tests show that it helps.
+
+
+## 9. Practical source-processing modules to prioritise
+
+These are candidate modules for the automatic pipeline. They should be enabled only when their detection criteria pass, and every module must be measured in the subsequent renderer A/B.
+
+### 1. DC-offset correction
+Measure the mean value of each channel and remove it only when it exceeds a small safety threshold. This is a low-risk cleanup operation and does not require tonal EQ. Do not apply a high-pass filter just to remove DC if subtracting the offset is sufficient.
+
+### 2. Subsonic / rumble filtering
+Inspect energy below the useful vocal fundamental. Use a gentle high-pass around 20–30 Hz only when there is actual rumble or handling noise and when the intended voicebank range leaves adequate headroom. Never make a fixed 80–100 Hz high-pass the default: it can remove low fundamentals and body, particularly in lower pitch layers.
+
+### 3. Reference-guided spectral-envelope recovery
+This is the most promising timbre correction for the supplied Eugene:RE / real Akane example, provided the phonetic material can be matched.
+
+1. Identify the stable voiced centre of the same vowel/phoneme in the synthetic source and real reference.
+2. Compare their smooth cepstral spectral envelopes, not their raw FFT bins. Align the pitch or use the smooth envelope so harmonic-spacing differences do not become comb-filter corrections.
+3. Smooth the difference across frequency and apply a regularised, bounded EQ curve. Start with a maximum correction of roughly ±2–3 dB, with stronger limits where the source has little energy or poor voiced confidence.
+4. Use separate curves for different vowels and pitch layers. A \`da\` reference is not a valid direct target for \`du\`, and one short utterance is not enough to infer the whole voicebank.
+5. Apply the correction only to the corresponding OTO-approved vowel/body region. Preserve consonant attacks and unvoiced frication.
+6. Re-analyse the corrected WAV with the target resampler and compare the actual rendered output.
+
+This is spectral-envelope compensation, not neural reconstruction. It can rebalance spectral detail that is still present; it cannot reliably recreate harmonics or articulation that the RVC output never contained.
+
+### 4. Broad resonance / boxiness correction
+Detect broad envelope humps that are consistent across multiple equivalent samples in the same pitch/phoneme group. Use a gentle, low-Q parametric cut rather than narrow notches fitted to individual harmonic peaks. Do not assume every broad resonance is unwanted: vowel formants are part of identity.
+
+### 5. High-frequency recovery / air shelf
+Only consider a gentle shelf when a matched reference shows that the source is consistently missing high-frequency envelope energy and the relevant source region has adequate signal-to-noise/aperiodic confidence. A blanket high shelf can amplify RVC noise, hiss and fricative harshness. Keep it separate from \`s\`/\`sh\`/\`f\` consonant treatment.
+
+### 6. Dynamic resonance control
+A narrow resonance that becomes harsh only in some vowel frames may benefit from a slow dynamic EQ rather than a static cut. Detect it across voiced frames, smooth gain automation over time, and limit attenuation. Do not chase individual harmonics or modulate rapidly enough to create audible pumping.
+
+### 7. Transient- and noise-preserving treatment
+Keep stop releases, fricatives, aspiration and breath regions on a separate route. Do not run global denoising, de-essing, gating or spectral smoothing across the whole voicebank. If a particular consonant is noisy, compare it to the matching real consonant and treat only that phonetic region.
+
+### 8. What not to add automatically
+Do not automatically generate missing harmonics, add random breath/noise, inject jitter or vibrato, use saturation, or compress every source WAV. Such processes may create plausible-looking waveforms while making UTAU resampling less predictable. Add expressive source variation only when matched reference evidence shows what is missing and phrase-level tests confirm it helps.
+
+The simple Quick Restore UI currently wraps the existing cautious OTO-aware B2/F3 EQ baseline. It does not yet enable modules 1–7 automatically. Those must be added one at a time, with reference-pair tests and renderer A/B evidence; the first Quick Restore pass must not be described as full spectral recovery.
