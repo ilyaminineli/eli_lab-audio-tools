@@ -18,7 +18,7 @@ from PySide6.QtMultimedia import QAudioOutput, QMediaPlayer
 from PySide6.QtWidgets import (
     QApplication, QFileDialog, QGridLayout, QGroupBox, QHBoxLayout,
     QLabel, QLineEdit, QMainWindow, QMessageBox, QComboBox, QPushButton,
-    QProgressBar, QVBoxLayout, QWidget, QSizePolicy, QScrollArea, QFrame,
+    QProgressBar, QVBoxLayout, QWidget, QSizePolicy,
 )
 
 from .full_sample_processing import process_full_sample_bank
@@ -227,8 +227,8 @@ class QuickRestoreWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Eugene:RE — Full-Sample Voicebank Restore")
-        self.resize(1180, 860)
-        self.setMinimumSize(820, 620)
+        self.resize(1260, 800)
+        self.setMinimumSize(900, 620)
 
         self.scan_report: dict | None = None
         self.preview_data: dict | None = None
@@ -243,16 +243,8 @@ class QuickRestoreWindow(QMainWindow):
         central = QWidget()
         self.setCentralWidget(central)
         outer_layout = QVBoxLayout(central)
-        outer_layout.setContentsMargins(0, 0, 0, 0)
-        self.scroll_area = QScrollArea()
-        self.scroll_area.setWidgetResizable(True)
-        self.scroll_area.setFrameShape(QFrame.Shape.NoFrame)
-        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-        scroll_content = QWidget()
-        layout = QVBoxLayout(scroll_content)
-        layout.setContentsMargins(24, 20, 24, 20)
-        layout.setSpacing(14)
+        outer_layout.setContentsMargins(24, 20, 24, 20)
+        outer_layout.setSpacing(12)
 
         title = QLabel("EUGENE:RE  /  VOICEBANK PREPARATION")
         title.setObjectName("title")
@@ -260,8 +252,24 @@ class QuickRestoreWindow(QMainWindow):
             "One automatic full-sample pass → sonogram and audio comparison → replacement-ready bank copy."
         )
         subtitle.setObjectName("muted")
-        layout.addWidget(title)
-        layout.addWidget(subtitle)
+        outer_layout.addWidget(title)
+        outer_layout.addWidget(subtitle)
+
+        content_layout = QHBoxLayout()
+        content_layout.setSpacing(16)
+        left_panel = QWidget()
+        left_panel.setMinimumWidth(320)
+        left_panel.setMaximumWidth(390)
+        left_layout = QVBoxLayout(left_panel)
+        left_layout.setContentsMargins(0, 0, 0, 0)
+        left_layout.setSpacing(10)
+        right_panel = QWidget()
+        right_layout = QVBoxLayout(right_panel)
+        right_layout.setContentsMargins(0, 0, 0, 0)
+        right_layout.setSpacing(8)
+        content_layout.addWidget(left_panel, 0)
+        content_layout.addWidget(right_panel, 1)
+        outer_layout.addLayout(content_layout, 1)
 
         paths = QGroupBox("VOICEBANK")
         path_grid = QGridLayout(paths)
@@ -277,12 +285,12 @@ class QuickRestoreWindow(QMainWindow):
         path_grid.addWidget(QLabel("Output copy"), 1, 0)
         path_grid.addWidget(self.output_edit, 1, 1)
         path_grid.addWidget(self.output_browse, 1, 2)
-        layout.addWidget(paths)
+        left_layout.addWidget(paths)
 
         self.scan_button = QPushButton("1. Scan bank and prepare preview")
         self.scan_button.setMinimumHeight(44)
         self.scan_button.clicked.connect(self.scan_bank)
-        layout.addWidget(self.scan_button)
+        left_layout.addWidget(self.scan_button)
 
         self.summary_group = QGroupBox("SCAN RESULT")
         summary_layout = QVBoxLayout(self.summary_group)
@@ -299,54 +307,61 @@ class QuickRestoreWindow(QMainWindow):
         self.sample_combo.currentIndexChanged.connect(self.change_preview_sample)
         summary_layout.addWidget(QLabel("Preview sample"))
         summary_layout.addWidget(self.sample_combo)
-        self.spectrogram_view = SpectrogramComparisonWidget()
-        summary_layout.addWidget(self.spectrogram_view, 1)
-        self.preview_note = QLabel(
-            "Original and processed log-frequency sonograms will appear here, with a spectral-difference view below."
-        )
-        self.preview_note.setWordWrap(True)
-        self.preview_note.setObjectName("muted")
-        self.preview_note.setMinimumHeight(54)
-        summary_layout.addWidget(self.preview_note)
-        self.summary_group.setMinimumHeight(590)
-        layout.addWidget(self.summary_group)
+        self.summary_group.setMinimumHeight(150)
+        self.summary_group.setMaximumHeight(230)
+        left_layout.addWidget(self.summary_group)
 
-        audition = QHBoxLayout()
+        audition_group = QGroupBox("AUDITION")
+        audition_layout = QVBoxLayout(audition_group)
         self.play_original_button = QPushButton("Play original")
         self.play_processed_button = QPushButton("Play processed preview")
-        self.play_original_button.setMinimumHeight(40)
-        self.play_processed_button.setMinimumHeight(40)
+        self.play_original_button.setMinimumHeight(38)
+        self.play_processed_button.setMinimumHeight(38)
         self.play_original_button.clicked.connect(lambda: self.play_audio("original"))
         self.play_processed_button.clicked.connect(lambda: self.play_audio("processed"))
         self.play_original_button.setEnabled(False)
         self.play_processed_button.setEnabled(False)
-        audition.addWidget(self.play_original_button)
-        audition.addWidget(self.play_processed_button)
-        layout.addLayout(audition)
+        audition_layout.addWidget(self.play_original_button)
+        audition_layout.addWidget(self.play_processed_button)
+        left_layout.addWidget(audition_group)
+
+        preview_group = QGroupBox("SPECTROGRAM COMPARISON")
+        preview_layout = QVBoxLayout(preview_group)
+        self.spectrogram_view = SpectrogramComparisonWidget()
+        self.spectrogram_view.setMinimumHeight(500)
+        preview_layout.addWidget(self.spectrogram_view, 1)
+        self.preview_note = QLabel(
+            "Original and processed log-frequency sonograms share a dB scale. "
+            "The lower panel shows processed minus original spectral level."
+        )
+        self.preview_note.setWordWrap(True)
+        self.preview_note.setObjectName("muted")
+        self.preview_note.setMinimumHeight(44)
+        preview_layout.addWidget(self.preview_note)
+        right_layout.addWidget(preview_group, 1)
 
         self.export_button = QPushButton("2. Create processed voicebank copy →")
         self.export_button.setObjectName("primary")
         self.export_button.setMinimumHeight(54)
         self.export_button.setEnabled(False)
         self.export_button.clicked.connect(self.export_bank)
-        layout.addWidget(self.export_button)
+        left_layout.addWidget(self.export_button)
 
         self.progress = QProgressBar()
         self.progress.setRange(0, 100)
         self.progress.setValue(0)
-        layout.addWidget(self.progress)
+        left_layout.addWidget(self.progress)
 
-        footer = QHBoxLayout()
+        footer = QVBoxLayout()
         self.status_label = QLabel("Original voicebank remains untouched.")
         self.status_label.setObjectName("muted")
-        footer.addWidget(self.status_label, 1)
+        self.status_label.setWordWrap(True)
+        footer.addWidget(self.status_label)
         self.open_output_button = QPushButton("Open output folder")
         self.open_output_button.clicked.connect(self.open_output)
         footer.addWidget(self.open_output_button)
-        layout.addLayout(footer)
-
-        outer_layout.addWidget(self.scroll_area)
-        self.scroll_area.setWidget(scroll_content)
+        left_layout.addLayout(footer)
+        left_layout.addStretch(1)
 
         self.setStyleSheet("""
             QMainWindow, QWidget { background: #f3f2ee; color: #252927; font-size: 14px; }
