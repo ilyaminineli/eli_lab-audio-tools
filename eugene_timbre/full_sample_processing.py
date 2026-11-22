@@ -374,34 +374,58 @@ def process_full_sample_bank(
 
     for index, source in enumerate(wav_paths, start=1):
         relative = source.relative_to(root)
-        audio, sample_rate, metadata = read_wav(source)
-        processed, details = process_full_sample(
-            audio, sample_rate, relative, root, wet=wet, config=config
-        )
-        family_counts[details["family"]["family"]] += 1
-        for stage, stage_info in details["stages"].items():
-            if stage_info.get("applied"):
-                stage_counts[stage] += 1
-        if details["changed"]:
-            changed_wavs.append(relative)
+        try:
+            audio, sample_rate, metadata = read_wav(source)
+            processed, details = process_full_sample(
+                audio, sample_rate, relative, root, wet=wet, config=config
+            )
+            family = details["family"]
+            family_counts[family["family"]] += 1
+            for stage, stage_info in details["stages"].items():
+                if stage_info.get("applied"):
+                    stage_counts[stage] += 1
+            if details["changed"]:
+                changed_wavs.append(relative)
 
-        if not dry_run:
-            destination = output / relative
-            write_wav(destination, processed, sample_rate, metadata["subtype"])
+            if not dry_run:
+                destination = output / relative
+                write_wav(destination, processed, sample_rate, metadata["subtype"])
 
-        reports.append({
-            "source": relative.as_posix(),
-            "output": relative.as_posix(),
-            "sample_rate_hz": sample_rate,
-            "frames": int(audio.shape[0]),
-            "family": details["family"]["family"],
-            "group": details["family"]["group"],
-            "pitch": details["family"].get("pitch"),
-            "changed": details["changed"],
-            "full_sample_coverage_percent": 100.0,
-            "processing": details["stages"],
-            "status": "processed_changed" if details["changed"] else "processed_unchanged",
-        })
+            reports.append({
+                "source": relative.as_posix(),
+                "output": relative.as_posix(),
+                "sample_rate_hz": sample_rate,
+                "frames": int(audio.shape[0]),
+                "family": family["family"],
+                "group": family["group"],
+                "pitch": family.get("pitch"),
+                "changed": details["changed"],
+                "full_sample_coverage_percent": 100.0,
+                "processing": details["stages"],
+                "status": "processed_changed" if details["changed"] else "processed_unchanged",
+                "error": None,
+            })
+        except Exception as exc:
+            # A corrupt/unsupported WAV must not abort the rest of the bank.
+            # It is retained byte-for-byte in the mirrored output and recorded.
+            family = identify_family(relative, root)
+            family_counts[family["family"]] += 1
+            if not dry_run:
+                destination = output / relative
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, destination)
+            reports.append({
+                "source": relative.as_posix(),
+                "output": relative.as_posix(),
+                "family": family["family"],
+                "group": family["group"],
+                "pitch": family.get("pitch"),
+                "changed": False,
+                "full_sample_coverage_percent": 0.0,
+                "processing": {},
+                "status": "fallback_copy_error",
+                "error": str(exc),
+            })
         if progress:
             progress(index, len(wav_paths), relative.as_posix())
 
@@ -416,14 +440,19 @@ def process_full_sample_bank(
             relative = source.relative_to(root)
             if _sidecar_matches(relative, changed_wavs):
                 invalidated_sidecars.append(relative.as_posix())
+                stale_target = output / relative
+                if stale_target.exists():
+                    stale_target.unlink()
                 continue
             destination = output / relative
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, destination)
             copied_metadata += 1
 
-    output.mkdir(parents=True, exist_ok=True)
+    if not dry_run:
+        output.mkdir(parents=True, exist_ok=True)
     changed_count = sum(1 for item in reports if item["changed"])
+    fallback_count = sum(1 for item in reports if item["status"] == "fallback_copy_error")
     report = {
         "report_type": "eugene_re_full_sample_processing",
         "processing_version": "2.0",
@@ -433,11 +462,13 @@ def process_full_sample_bank(
         "wet": float(wet),
         "files_found": len(wav_paths),
         "files_written": 0 if dry_run else len(wav_paths),
+        "processing_failures": fallback_count,
         "summary": {
             "wav_files": len(wav_paths),
-            "processed_full_duration": len(wav_paths),
+            "processed_full_duration": len(wav_paths) - fallback_count,
             "changed": changed_count,
-            "unchanged_after_analysis": len(wav_paths) - changed_count,
+            "unchanged_after_analysis": len(wav_paths) - changed_count - fallback_count,
+            "fallback_copied": fallback_count,
             "sidecars_invalidated": len(invalidated_sidecars),
             "metadata_files_copied": copied_metadata,
         },
