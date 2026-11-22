@@ -48,12 +48,12 @@ def pitch_name(folder: Path | str) -> str | None:
 
 
 def discover_pitch_layers(root: Path | str) -> list[dict]:
-    """Find immediate child folders whose names contain a pitch token."""
+    """Find immediate pitch folders only; add-ons are inventoried separately."""
     root = Path(root).expanduser().resolve()
     if not root.is_dir():
         raise NotADirectoryError(root)
     found = []
-    for child in sorted(root.iterdir(), key=lambda p: p.name.casefold()):
+    for child in sorted(root.iterdir(), key=lambda p: _natural_sort_key(p.name)):
         if not child.is_dir():
             continue
         note = pitch_name(child)
@@ -73,6 +73,138 @@ def discover_pitch_layers(root: Path | str) -> list[dict]:
             "wav_count": sum(1 for p in root.rglob("*") if p.is_file() and p.suffix.casefold() == ".wav"),
         })
     return found
+
+
+
+def _natural_sort_key(value: str):
+    """Sort numbered voicebank folders in their displayed numeric order."""
+    return tuple(
+        int(part) if part.isdigit() else part.casefold()
+        for part in re.split(r"(\d+)", str(value))
+    )
+
+
+def _classify_bank_section(name: str) -> str:
+    """Classify Eugene:RE's top-level folders without confusing add-ons for pitches."""
+    pitch = pitch_name(name)
+    if pitch:
+        return "Pitch layer"
+
+    label = re.sub(r"^\s*\d+\s*\.\s*", "", name).strip().upper()
+    known = {
+        "SETUP": "Setup / tools",
+        "DOCS": "Documentation",
+        "ILLUSTRATIONS": "Artwork / illustrations",
+        "R ENGLISH": "R English subbank",
+        "CONSONANT RELEASES": "Consonant releases",
+        "BONUS PHONETIC EXTRAS": "Bonus phonetic extras",
+        "L": "L phonetic extension",
+        "V": "V phonetic extension",
+        "TH": "TH phonetic extension",
+    }
+    return known.get(label, "Other folder")
+
+
+def _inventory_node(path: Path, bank_root: Path, top_level: bool = False) -> dict:
+    """Build a recursive, read-only inventory node for a folder or file."""
+    if path.is_symlink():
+        return {
+            "name": path.name, "path": str(path), "type": "symlink",
+            "category": "Skipped link", "children": [],
+            "stats": {"folders": 0, "wav": 0, "frq": 0, "llsm": 0, "oto": 0, "other_files": 0},
+        }
+
+    if path.is_file():
+        name = path.name
+        suffix = path.suffix.casefold()
+        if suffix == ".wav":
+            file_type = "WAV sample"
+            key = "wav"
+        elif suffix == ".frq":
+            file_type = "FRQ analysis"
+            key = "frq"
+        elif suffix == ".llsm":
+            file_type = "LLSM analysis"
+            key = "llsm"
+        elif name.casefold() == "oto.ini":
+            file_type = "OTO map"
+            key = "oto"
+        else:
+            file_type = "File"
+            key = "other_files"
+        stats = {"folders": 0, "wav": 0, "frq": 0, "llsm": 0, "oto": 0, "other_files": 0}
+        stats[key] = 1
+        return {
+            "name": name, "path": str(path), "type": "file",
+            "category": file_type, "children": [], "stats": stats,
+        }
+
+    directories = sorted(
+        (item for item in path.iterdir() if item.is_dir() and not item.is_symlink()),
+        key=lambda item: _natural_sort_key(item.name),
+    )
+    files = sorted(
+        (item for item in path.iterdir() if item.is_file() or item.is_symlink()),
+        key=lambda item: _natural_sort_key(item.name),
+    )
+    children = [_inventory_node(item, bank_root) for item in directories]
+    children.extend(_inventory_node(item, bank_root) for item in files)
+
+    stats = {"folders": len(directories), "wav": 0, "frq": 0, "llsm": 0, "oto": 0, "other_files": 0}
+    for child in children:
+        for key in stats:
+            stats[key] += child["stats"].get(key, 0)
+
+    category = "Voicebank root" if path == bank_root else (
+        _classify_bank_section(path.name) if top_level else "Subfolder"
+    )
+    return {
+        "name": path.name, "path": str(path), "type": "directory",
+        "category": category, "children": children, "stats": stats,
+    }
+
+
+def inventory_voicebank(root: Path | str) -> dict:
+    """Index the complete voicebank hierarchy, including phonetic add-ons.
+
+    This is an inventory only. It does not apply a pitch EQ profile to extension
+    folders, English material, releases, or bonus events.
+    """
+    root = Path(root).expanduser().resolve()
+    if not root.is_dir():
+        raise NotADirectoryError(root)
+
+    children = []
+    for item in sorted(root.iterdir(), key=lambda p: _natural_sort_key(p.name)):
+        children.append(_inventory_node(item, root, top_level=item.is_dir()))
+
+    stats = {"folders": 0, "wav": 0, "frq": 0, "llsm": 0, "oto": 0, "other_files": 0}
+    for child in children:
+        stats["folders"] += child["stats"].get("folders", 0)
+        if child["type"] == "directory":
+            stats["folders"] += 1
+        for key in ("wav", "frq", "llsm", "oto", "other_files"):
+            stats[key] += child["stats"].get(key, 0)
+
+    pitch_layers = sum(1 for child in children if child["category"] == "Pitch layer")
+    addon_categories = {
+        "R English subbank", "Consonant releases", "Bonus phonetic extras",
+        "L phonetic extension", "V phonetic extension", "TH phonetic extension",
+    }
+    addons = sum(1 for child in children if child["category"] in addon_categories)
+    return {
+        "root_name": root.name,
+        "root_path": str(root),
+        "children": children,
+        "stats": stats,
+        "pitch_layer_count": pitch_layers,
+        "addon_folder_count": addons,
+        "notes": [
+            "Every directory and file is indexed recursively, including pitch layers, phonetic extensions, R English, releases, bonus events, setup tools, documentation and illustrations.",
+            "The inventory does not imply that non-pitch add-ons are ready for EQ processing.",
+            "Symbolic links are listed as skipped links rather than followed outside the voicebank.",
+        ],
+    }
 
 
 def default_profile(name: str = "neutral") -> dict:

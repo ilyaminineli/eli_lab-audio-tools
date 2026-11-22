@@ -127,4 +127,55 @@ def test_optional_studio_ui_module_is_valid_python_and_requires_explicit_selecti
     assert "if not selected and self.layer_list.currentItem()" not in text
     assert "def render_moresampler(self)" in text
     assert "self.alias_combo = QComboBox()" in text
-    assert "self.moresampler_edit = QLineEdit()" in text
+    assert "self.moresampler_edit = QLineEdit(" in text
+    assert "self.highpass_spin = QDoubleSpinBox()" in text
+    assert "self.preview_delta_label" in text
+    assert "self.detail_tabs = QTabWidget()" in text
+    assert "BANK STRUCTURE" in text
+    assert "NO FILTER CHANGE" in text
+
+
+def test_voicebank_inventory_preserves_pitch_and_addon_hierarchy(tmp_path):
+    bank = tmp_path / "EugeneRE"
+    pitch = bank / "4. F3"
+    addon = bank / "11. CONSONANT RELEASES"
+    bonus = bank / "12. BONUS PHONETIC EXTRAS"
+    english = bank / "10. R ENGLISH"
+    setup = bank / "1. SETUP" / "Resamplers"
+    _write_test_tone(pitch / "a_a.wav")
+    _write_test_tone(pitch / "nested" / "a_e_a.wav", frequency=1500.0)
+    _write_test_tone(addon / "ab -.wav", frequency=800.0)
+    _write_test_tone(bonus / "cough 1.wav", frequency=300.0)
+    _write_test_tone(english / "@a_@i_@u.wav", frequency=500.0)
+    setup.mkdir(parents=True)
+    (pitch / "oto.ini").write_text("a_a.wav=a,0,100,0,80,20\\n", encoding="utf-8")
+    (addon / "oto.ini").write_text("ab -.wav=ab -,0,100,0,80,20\\n", encoding="utf-8")
+    (pitch / "a_a_wav.frq").write_bytes(b"frq")
+    (pitch / "a_a.wav.llsm").write_bytes(b"llsm")
+
+    from eugene_timbre.pitch_studio import inventory_voicebank
+    report = inventory_voicebank(bank)
+
+    assert report["pitch_layer_count"] == 1
+    assert report["addon_folder_count"] == 3
+    assert report["stats"]["wav"] == 5
+    assert report["stats"]["frq"] == 1
+    assert report["stats"]["llsm"] == 1
+    assert report["stats"]["oto"] == 2
+
+    categories = {node["name"]: node["category"] for node in report["children"]}
+    assert categories["4. F3"] == "Pitch layer"
+    assert categories["10. R ENGLISH"] == "R English subbank"
+    assert categories["11. CONSONANT RELEASES"] == "Consonant releases"
+    assert categories["12. BONUS PHONETIC EXTRAS"] == "Bonus phonetic extras"
+    assert categories["1. SETUP"] == "Setup / tools"
+
+    pitch_node = next(node for node in report["children"] if node["name"] == "4. F3")
+    nested_node = next(node for node in pitch_node["children"] if node["name"] == "nested")
+    assert any(child["name"] == "a_e_a.wav" for child in nested_node["children"])
+
+
+def test_default_profile_is_explicitly_neutral():
+    profile = default_profile("F3")
+    assert profile["highpass_hz"] == 0.0
+    assert all(band["gain_db"] == 0.0 for band in profile["bands"])
