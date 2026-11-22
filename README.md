@@ -1,6 +1,12 @@
 # eli_lab-audio-tools
 
-Free ELI LAB audio utilities. The current project focuses on Eugene:RE timbre analysis and non-destructive restoration experiments.
+Free ELI LAB audio utilities. The primary Eugene:RE goal is resampler-aware voicebank preparation: preserve its individual vocal character, add life where the analysis supports it, and reduce artificiality in actual UTAU renders. Source-WAV EQ is only one possible stage; renderer analysis, pitch tracking, aperiodic components, OTO timing and phrase-level synthesis must be evaluated together.
+
+## Primary design goal: natural resampling
+
+The programme is not intended to make the dry source WAVs generically brighter or cleaner. It should prepare a separate voicebank copy that gives Moresampler, TIPS and Worldline-family renderers useful source material while preserving Eugene's harmonic character, breath/aperiodic texture, vowel resonance, articulation and time-varying expression.
+
+The existing pitch EQ recommendations are exploratory listening-test starting points, not validated naturalness corrections. Do not treat them as the final automatic restoration system. The resampler-aware design and the next analysis stages are documented in [docs/resampler-aware-naturalness-design.md](docs/resampler-aware-naturalness-design.md).
 
 ## Install (Windows PowerShell)
 
