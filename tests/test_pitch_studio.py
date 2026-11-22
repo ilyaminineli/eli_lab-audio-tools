@@ -3,6 +3,11 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
+from eugene_timbre.recommendations import (
+    moresampler_flag_templates,
+    recommend_eq_profile,
+    recommend_profiles,
+)
 from eugene_timbre.pitch_studio import (
     analyze_pitch_folder,
     default_profile,
@@ -179,3 +184,100 @@ def test_default_profile_is_explicitly_neutral():
     profile = default_profile("F3")
     assert profile["highpass_hz"] == 0.0
     assert all(band["gain_db"] == 0.0 for band in profile["bands"])
+
+
+
+def _mock_analysis(pitch="F3", *, centroid=2200.0, hnr=16.0, flatness=0.04, low=0.12, body=0.22, core=0.38, presence=0.20, air=0.08):
+    return {
+        "report_type": "eugene_pitch_layer_analysis",
+        "pitch": pitch,
+        "summary": {
+            "spectral_centroid_median_hz": centroid,
+            "harmonic_to_residual_median_db": hnr,
+            "spectral_flatness_median": flatness,
+            "relative_band_energy_median": {
+                "20_150_hz": low,
+                "150_500_hz": body,
+                "500_2000_hz": core,
+                "2000_5000_hz": presence,
+                "5000_10000_hz": air,
+            },
+        },
+        "spectral_envelope": {
+            "frequency_hz": np.geomspace(100.0, 10000.0, 72).tolist(),
+            "median_relative_db": np.zeros(72).tolist(),
+        },
+    }
+
+
+def test_analysis_generates_bounded_pitch_specific_eq_approaches():
+    analysis = _mock_analysis()
+    recommendations = recommend_profiles(analysis)
+
+    available = {item["key"]: item for item in recommendations if item["available"]}
+    assert {"neutral", "clarity", "warmth", "air", "soft"} <= set(available)
+    assert available["reference_match"]["available"] is False
+
+    for key in ("neutral", "clarity", "warmth", "air", "soft"):
+        profile = available[key]["profile"]
+        assert profile["generated_from_analysis"] is True
+        assert profile["highpass_hz"] == 0.0
+        assert len(profile["bands"]) == 5
+        assert all(abs(band["gain_db"]) <= 1.5 for band in profile["bands"])
+
+
+def test_clarity_and_air_templates_adapt_to_measured_spectrum():
+    darker = _mock_analysis(centroid=1400.0, presence=0.10, air=0.02)
+    brighter = _mock_analysis(centroid=3900.0, presence=0.42, air=0.24)
+
+    darker_clarity = recommend_eq_profile(darker, "clarity")
+    brighter_clarity = recommend_eq_profile(brighter, "clarity")
+    darker_air = recommend_eq_profile(darker, "air")
+    noisy_air = recommend_eq_profile(
+        _mock_analysis(centroid=2400.0, hnr=1.0, flatness=0.45, air=0.02),
+        "air",
+    )
+
+    clarity_gain = darker_clarity["bands"][3]["gain_db"]
+    bright_gain = brighter_clarity["bands"][3]["gain_db"]
+    air_gain = darker_air["bands"][4]["gain_db"]
+    noisy_air_gain = noisy_air["bands"][4]["gain_db"]
+
+    assert clarity_gain > bright_gain
+    assert air_gain > noisy_air_gain
+    assert clarity_gain <= 1.5 and air_gain <= 1.5
+
+
+def test_reference_match_recommendation_requires_and_uses_another_pitch():
+    source = _mock_analysis("B2")
+    reference = _mock_analysis("F3")
+    without_reference = {item["key"]: item for item in recommend_profiles(source)}
+    with_reference = {item["key"]: item for item in recommend_profiles(source, reference)}
+
+    assert without_reference["reference_match"]["available"] is False
+    assert with_reference["reference_match"]["available"] is True
+    assert with_reference["reference_match"]["profile"]["reference_pitch"] == "F3"
+    same_pitch = {item["key"]: item for item in recommend_profiles(source, source)}
+    assert same_pitch["reference_match"]["available"] is False
+
+
+def test_moresampler_renderer_templates_are_separate_from_source_eq():
+    templates = {item["key"]: item for item in moresampler_flag_templates()}
+    assert templates["neutral"]["flags"] == ""
+    assert templates["intimate"]["flags"] == "Mb+8Mt-4"
+    assert templates["projected"]["flags"] == "Mt+8ME+4"
+    assert templates["rough"]["flags"] == "MC+8MG+5"
+    assert "source-WAV" not in templates["intimate"]["description"].casefold()
+    assert templates["rough"]["caution"]
+
+
+def test_studio_ui_connects_analysis_to_explicit_profile_application():
+    source = Path(__file__).parents[1] / "eugene_timbre" / "pitch_studio_ui.py"
+    text = source.read_text(encoding="utf-8")
+    compile(text, str(source), "exec")
+    assert "self.profile_recommendations[name] = recommend_profiles(report)" in text
+    assert "def apply_recommended_current" in text
+    assert "def apply_recommended_checked" in text
+    assert "Apply to checked" in text
+    assert "moresampler_flag_templates()" in text
+    assert "A/B test selected Moresampler flags against neutral flags" in text
