@@ -263,7 +263,8 @@ def suggest_reference_match(
 def _oto_mask_for_file(path: Path, root: Path, sample_count: int, sample_rate: int) -> tuple[np.ndarray | None, str | None]:
     # Keep the legacy whole-bank router out of the normal pitch-only import path.
     from .processing_chain import build_oto_body_mask
-\n    oto_path = find_nearest_oto(path, root)
+
+    oto_path = find_nearest_oto(path, root)
     if oto_path is None:
         return None, "No oto.ini found for this sample."
     parsed = parse_oto(oto_path)
@@ -281,6 +282,18 @@ def _oto_mask_for_file(path: Path, root: Path, sample_count: int, sample_rate: i
     if not np.any(mask > 0):
         return None, "No usable stretchable OTO body region for this WAV."
     return mask, None
+
+
+def _profile_for_sample_rate(profile: TimbreProfile, sample_rate: int) -> TimbreProfile:
+    """Drop EQ bands that lie at or above a file's Nyquist frequency."""
+    nyquist = sample_rate / 2.0
+    return TimbreProfile(
+        name=profile.name,
+        description=profile.description,
+        highpass_hz=profile.highpass_hz if 0 < profile.highpass_hz < nyquist else 0.0,
+        highpass_slope=profile.highpass_slope,
+        bands=tuple(band for band in profile.bands if band.frequency_hz < nyquist),
+    )
 
 
 def process_pitch_folder(
@@ -317,6 +330,7 @@ def process_pitch_folder(
         try:
             audio, sample_rate, metadata = read_wav(path)
             output_audio = audio.copy()
+            effective_profile = _profile_for_sample_rate(profile, sample_rate)
             mask_coverage = 100.0
             status, reason = "unchanged", "Profile is neutral or produced no measurable sample change."
             if wet > 0:
@@ -358,6 +372,7 @@ def process_pitch_folder(
                 "status": status,
                 "reason": reason,
                 "mask_coverage_percent": mask_coverage,
+                "bands_applied": [band.frequency_hz for band in effective_profile.bands],
                 "before": before,
                 "after": after,
                 "peak_abs_difference": peak_difference,
@@ -418,13 +433,15 @@ def preview_sample(
     profile_spec: dict,
     wet: float = 1.0,
     protect_oto: bool = False,
+    source_root: Path | str | None = None,
 ) -> tuple[np.ndarray, int, str]:
     """Return processed audio for audition without writing to the source bank."""
     path = Path(path).expanduser().resolve()
     audio, sample_rate, _ = read_wav(path)
-    profile = _to_profile(profile_spec)
+    profile = _profile_for_sample_rate(_to_profile(profile_spec), sample_rate)
     if protect_oto:
-        mask, reason = _oto_mask_for_file(path, path.parent, len(audio), sample_rate)
+        oto_root = Path(source_root).expanduser().resolve() if source_root else path.parent
+        mask, reason = _oto_mask_for_file(path, oto_root, len(audio), sample_rate)
         if mask is None:
             raise ValueError(reason or "No usable OTO body window.")
         output = apply_profile_masked(audio, sample_rate, profile, mask, wet=wet)
