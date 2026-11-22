@@ -116,7 +116,7 @@ def compute_spectrogram_comparison(
         "difference_db": difference,
         "reference_dbfs": float(reference_db),
         "floor_db": float(floor_db),
-        "difference_range_db": [-6.0, 6.0],
+        "difference_range_db": [-3.0, 3.0],
         "duration_seconds": duration_seconds,
     }
 
