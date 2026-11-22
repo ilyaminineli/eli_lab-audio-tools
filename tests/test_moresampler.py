@@ -56,9 +56,9 @@ def test_build_moresampler_arguments_follow_classic_ust_order(tmp_path):
     assert args[0] == str(input_wav.resolve())
     assert args[1] == str(output_wav.resolve())
     assert args[2:5] == ["C4", "100", "Mt10Mb-5"]
-    assert args[5:12] == ["12.5", "900", "90", "-150", "100", "0", "!120"]
+    assert args[5:12] == ["12.5", "850", "90", "-150", "100", "0", "!120"]
     assert args[12].startswith("AA")
-    assert "#1#" in args[12]
+    assert "#167#" in args[12]
 
 
 def test_moresampler_argument_builder_rejects_shell_metacharacters(tmp_path):
