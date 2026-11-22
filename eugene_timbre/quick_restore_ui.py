@@ -112,7 +112,7 @@ class SpectrogramComparisonWidget(QWidget):
 
     @staticmethod
     def _difference_rgb(values):
-        delta = np.clip(values / 6.0, -1.0, 1.0)
+        delta = np.clip(values / 3.0, -1.0, 1.0)
         neutral = np.array([39, 43, 45], dtype=np.float32)
         positive = np.array([239, 135, 78], dtype=np.float32)
         negative = np.array([83, 153, 211], dtype=np.float32)
@@ -219,7 +219,7 @@ class SpectrogramComparisonWidget(QWidget):
         painter.drawText(
             margin_left, self.height() - 7,
             f'0.00 s  —  {data["duration_seconds"]:.2f} s     '
-            f'Frequency axis is logarithmic · A/B use a shared level reference · Difference range ±6 dB',
+            f'Frequency axis is logarithmic · A/B use a shared level reference · Difference display range ±3 dB',
         )
 
 
