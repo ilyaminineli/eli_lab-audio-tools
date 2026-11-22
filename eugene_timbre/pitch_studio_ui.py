@@ -428,6 +428,7 @@ class PitchStudioWindow(QMainWindow):
         self.reference_combo.currentIndexChanged.connect(self.refresh_recommendation_hint)
         match_row.addWidget(self.reference_combo, 1)
         profile_layout.addLayout(match_row)
+        self.approach_combo.currentIndexChanged.connect(self.refresh_recommendation_hint)
         profile_io_row = QHBoxLayout()
         reset_profile = QPushButton("Reset to neutral")
         reset_profile.clicked.connect(self.reset_profile)
@@ -523,6 +524,13 @@ class PitchStudioWindow(QMainWindow):
         self.moresampler_style_hint.setObjectName("muted")
         self.moresampler_style_hint.setWordWrap(True)
         moresampler_layout.addWidget(self.moresampler_style_hint, 4, 0, 1, 4)
+        self.refresh_moresampler_style_hint()
+
+        self.renderer_flags_compare_checkbox = QCheckBox(
+            "A/B test selected Moresampler flags against neutral flags (renderer-only comparison)"
+        )
+        self.renderer_flags_compare_checkbox.setChecked(False)
+        moresampler_layout.addWidget(self.renderer_flags_compare_checkbox, 5, 0, 1, 5)
 
         self.moresampler_hint = QLabel(
             "Select a pitch sample with a matching OTO alias. "
@@ -530,11 +538,11 @@ class PitchStudioWindow(QMainWindow):
         )
         self.moresampler_hint.setObjectName("muted")
         self.moresampler_hint.setWordWrap(True)
-        moresampler_layout.addWidget(self.moresampler_hint, 5, 0, 1, 4)
+        moresampler_layout.addWidget(self.moresampler_hint, 6, 0, 1, 4)
         self.moresampler_button = QPushButton("Render original + restored through Moresampler →")
         self.moresampler_button.setMinimumHeight(46)
         self.moresampler_button.clicked.connect(self.render_moresampler)
-        moresampler_layout.addWidget(self.moresampler_button, 5, 4)
+        moresampler_layout.addWidget(self.moresampler_button, 6, 4)
         more_page_layout.addWidget(moresampler_group)
         more_page_layout.addStretch(1)
         more_scroll.setWidget(more_page)
@@ -1248,8 +1256,12 @@ class PitchStudioWindow(QMainWindow):
             self.save_current_profile()
             profile = dict(self.profiles[layer["name"]])
             wet = self.wet_slider.value() / 100.0
-            if wet <= 0 or not self._profile_is_active(profile):
-                raise ValueError("The current profile is neutral (or Wet is 0%). Change an EQ gain/high-pass setting or use Suggest envelope match before running an A/B test.")
+            compare_renderer_flags = self.renderer_flags_compare_checkbox.isChecked()
+            if compare_renderer_flags:
+                if not flags:
+                    raise ValueError("Choose a non-neutral Moresampler style template or enter renderer flags first.")
+            elif wet <= 0 or not self._profile_is_active(profile):
+                raise ValueError("The current EQ profile is neutral (or Wet is 0%). Change an EQ gain/high-pass setting for a source-WAV A/B, or enable renderer-only flag comparison.")
             protect_oto = self.oto_checkbox.isChecked()
             executable = Path(executable_text).expanduser().resolve()
             target_note = self.target_note_spin.value()
@@ -1260,12 +1272,15 @@ class PitchStudioWindow(QMainWindow):
             return
 
         def task(progress):
-            progress(0, 2, f"{layer['pitch']}: preparing restored source")
-            restored_audio, sr, _ = preview_sample(
-                wav_path, profile, wet=wet, protect_oto=protect_oto,
-                source_root=Path(layer["path"]),
-            )
-            _, _, metadata = read_wav(wav_path)
+            progress(0, 2, f"{layer['pitch']}: preparing A/B source")
+            if compare_renderer_flags:
+                restored_audio, sr, metadata = read_wav(wav_path)
+            else:
+                restored_audio, sr, _ = preview_sample(
+                    wav_path, profile, wet=wet, protect_oto=protect_oto,
+                    source_root=Path(layer["path"]),
+                )
+                _, _, metadata = read_wav(wav_path)
             progress(1, 2, f"{layer['pitch']}: rendering through Moresampler")
             report = render_moresampler_ab(
                 source_wav=wav_path,
@@ -1282,6 +1297,7 @@ class PitchStudioWindow(QMainWindow):
                 duration_ms=duration_ms,
                 velocity=100,
                 flags=flags,
+                original_flags="" if compare_renderer_flags else None,
                 volume=100,
                 modulation=0,
                 tempo=120.0,
@@ -1295,7 +1311,11 @@ class PitchStudioWindow(QMainWindow):
             QMessageBox.information(
                 self,
                 "Moresampler comparison complete",
-                "Both versions were rendered with the same OTO timing, note, duration and flags.\n\n"
+                (
+                    "Renderer-only comparison: A used neutral flags and B used the selected Moresampler flags.\n\n"
+                    if compare_renderer_flags else
+                    "Both versions were rendered with the same OTO timing, note, duration and flags.\n\n"
+                )
                 f"Original: {report['outputs']['original']}\n"
                 f"Restored: {report['outputs']['restored']}\n\n"
                 f"Output: {output_folder}\n\n"
