@@ -125,3 +125,6 @@ def test_optional_studio_ui_module_is_valid_python_and_requires_explicit_selecti
     assert "def select_all_layers" in text
     assert "def clear_layer_selection" in text
     assert "if not selected and self.layer_list.currentItem()" not in text
+    assert "def render_moresampler(self)" in text
+    assert "self.alias_combo = QComboBox()" in text
+    assert "self.moresampler_edit = QLineEdit()" in text
