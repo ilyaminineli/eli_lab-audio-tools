@@ -48,6 +48,8 @@ For changed WAVs, associated stale .frq, .llsm, .mrq and .pmk analysis maps are 
 
 The output is a complete mirrored bank, not just a folder of changed WAVs. Back up the original before replacing it. Review processing_report.json to see which processing stages were applied to each WAV.
 
+The full processing logic and per-stage thresholds are documented in [docs/full-sample-processing-v2.md](docs/full-sample-processing-v2.md).
+
 The former multi-panel editing interface remains available as:
 
 ```powershell
