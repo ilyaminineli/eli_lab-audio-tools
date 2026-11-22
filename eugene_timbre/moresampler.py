@@ -154,76 +154,6 @@ def _analyse_render(path: Path) -> dict[str, Any]:
     return {"basic": basic, "timbre": timbre}
 
 
-def _run_one(
-    executable: Path,
-    input_source: Path,
-    output_wav: Path,
-    oto: OtoEntry,
-    *,
-    sample_rate: int,
-    reference_f0_hz: float,
-    target_note: int,
-    duration_ms: float,
-    velocity: int,
-    flags: str,
-    volume: int,
-    modulation: int,
-    tempo: float,
-    timeout_seconds: float,
-) -> dict:
-    with tempfile.TemporaryDirectory(prefix="moresampler_phone_") as temp:
-        stage = Path(temp) / "pitch"
-        stage.mkdir(parents=True)
-        staged_input = stage / input_source.name
-        # Source input is copied exactly; the processed sample is encoded with
-        # the original WAV subtype immediately before this function is called.
-        shutil.copy2(input_source, staged_input)
-        (stage / "moreconfig.txt").write_text(
-            _moreconfig(sample_rate, reference_f0_hz), encoding="utf-8"
-        )
-        staged_output = stage / "rendered.wav"
-        args = build_moresampler_arguments(
-            staged_input, staged_output, oto,
-            target_note=target_note,
-            duration_ms=duration_ms,
-            velocity=velocity,
-            flags=flags,
-            volume=volume,
-            modulation=modulation,
-            tempo=tempo,
-        )
-        try:
-            completed = subprocess.run(
-                [str(executable), *args],
-                cwd=str(executable.parent),
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-                errors="replace",
-                timeout=timeout_seconds,
-                check=False,
-            )
-        except subprocess.TimeoutExpired as exc:
-            raise TimeoutError(
-                f"Moresampler exceeded the {timeout_seconds:g}s timeout for {input_source.name}."
-            ) from exc
-        if not staged_output.is_file() or staged_output.stat().st_size <= 44:
-            stdout = (completed.stdout or "")[-2500:]
-            stderr = (completed.stderr or "")[-2500:]
-            raise RuntimeError(
-                f"Moresampler did not create an output WAV (exit code {completed.returncode}).\n"
-                f"STDOUT:\n{stdout}\nSTDERR:\n{stderr}"
-            )
-        output_wav.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(staged_output, output_wav)
-        return {
-            "return_code": completed.returncode,
-            "stdout": (completed.stdout or "")[-2500:],
-            "stderr": (completed.stderr or "")[-2500:],
-            "render_metrics": _analyse_render(output_wav),
-        }
-
-
 def render_moresampler_ab(
     source_wav: Path | str,
     restored_audio: np.ndarray,
@@ -259,7 +189,7 @@ def render_moresampler_ab(
         bank_root = Path(source_bank_root).expanduser().resolve()
         if output_root == bank_root or bank_root in output_root.parents or output_root in bank_root.parents:
             raise ValueError("Moresampler A/B output must be outside the source voicebank.")
-    original, original_sr, metadata = read_wav(source_wav)
+    original, original_sr, _ = read_wav(source_wav)
     processed = np.asarray(restored_audio, dtype=np.float32)
     if sample_rate != original_sr or processed.shape != original.shape:
         raise ValueError("Restored audio must have the same sample rate, frame count and channel layout as the source.")
@@ -276,52 +206,27 @@ def render_moresampler_ab(
     original_render = destination / "original_moresampler.wav"
     restored_render = destination / "restored_moresampler.wav"
 
-    with tempfile.TemporaryDirectory(prefix="eugene_moresampler_ab_") as temp:
-        temp_root = Path(temp)
-        original_dir = temp_root / "original" / pitch_layer
-        restored_dir = temp_root / "restored" / pitch_layer
-        original_dir.mkdir(parents=True)
-        restored_dir.mkdir(parents=True)
-        original_input = original_dir / source_wav.name
-        restored_input = restored_dir / source_wav.name
-        shutil.copy2(source_wav, original_input)
-        sf.write(str(restored_input), processed, sample_rate, subtype=subtype)
-
-        config_text = _moreconfig(sample_rate, reference_f0_hz)
-        (original_dir / "moreconfig.txt").write_text(config_text, encoding="utf-8")
-        (restored_dir / "moreconfig.txt").write_text(config_text, encoding="utf-8")
-
-        args_original = build_moresampler_arguments(
-            original_input, original_render, oto, target_note=target_note,
-            duration_ms=duration_ms, velocity=velocity, flags=flags,
-            volume=volume, modulation=modulation, tempo=tempo,
-        )
-        args_restored = build_moresampler_arguments(
-            restored_input, restored_render, oto, target_note=target_note,
-            duration_ms=duration_ms, velocity=velocity, flags=flags,
-            volume=volume, modulation=modulation, tempo=tempo,
-        )
-        for label, args, dest in (
-            ("original", args_original, original_render),
-            ("restored", args_restored, restored_render),
-        ):
-            # Run sequentially so a single Moresampler installation is not
-            # asked to write shared global config/state concurrently.
-            with tempfile.TemporaryDirectory(prefix=f"moresampler_{label}_") as stage_temp:
-                staged_dir = Path(stage_temp) / pitch_layer
-                staged_dir.mkdir(parents=True)
-                input_path = staged_dir / source_wav.name
-                if label == "original":
-                    shutil.copy2(source_wav, input_path)
-                else:
-                    sf.write(str(input_path), processed, sample_rate, subtype=subtype)
-                (staged_dir / "moreconfig.txt").write_text(config_text, encoding="utf-8")
-                staged_output = staged_dir / "rendered.wav"
-                args = build_moresampler_arguments(
-                    input_path, staged_output, oto, target_note=target_note,
-                    duration_ms=duration_ms, velocity=velocity, flags=flags,
-                    volume=volume, modulation=modulation, tempo=tempo,
-                )
+    run_details = {}
+    config_text = _moreconfig(sample_rate, reference_f0_hz)
+    for label, dest in (("original", original_render), ("restored", restored_render)):
+        # Run sequentially so a single Moresampler installation is not asked
+        # to write shared global config/state concurrently.
+        with tempfile.TemporaryDirectory(prefix=f"moresampler_{label}_") as stage_temp:
+            staged_dir = Path(stage_temp) / "pitch"
+            staged_dir.mkdir(parents=True)
+            input_path = staged_dir / "sample.wav"
+            if label == "original":
+                shutil.copy2(source_wav, input_path)
+            else:
+                sf.write(str(input_path), processed, sample_rate, subtype=subtype)
+            (staged_dir / "moreconfig.txt").write_text(config_text, encoding="utf-8")
+            staged_output = staged_dir / "rendered.wav"
+            args = build_moresampler_arguments(
+                input_path, staged_output, oto, target_note=target_note,
+                duration_ms=duration_ms, velocity=velocity, flags=flags,
+                volume=volume, modulation=modulation, tempo=tempo,
+            )
+            try:
                 completed = subprocess.run(
                     [str(executable), *args],
                     cwd=str(executable.parent),
@@ -332,13 +237,22 @@ def render_moresampler_ab(
                     timeout=timeout_seconds,
                     check=False,
                 )
-                if not staged_output.is_file() or staged_output.stat().st_size <= 44:
-                    raise RuntimeError(
-                        f"Moresampler failed to render the {label} sample "
-                        f"(exit code {completed.returncode}).\n"
-                        f"{(completed.stdout or '')[-2500:]}\n{(completed.stderr or '')[-2500:]}"
-                    )
-                shutil.copy2(staged_output, dest)
+            except subprocess.TimeoutExpired as exc:
+                raise TimeoutError(
+                    f"Moresampler exceeded the {timeout_seconds:g}s timeout for the {label} sample."
+                ) from exc
+            if not staged_output.is_file() or staged_output.stat().st_size <= 44:
+                raise RuntimeError(
+                    f"Moresampler failed to render the {label} sample "
+                    f"(exit code {completed.returncode}).\n"
+                    f"{(completed.stdout or '')[-2500:]}\n{(completed.stderr or '')[-2500:]}"
+                )
+            shutil.copy2(staged_output, dest)
+            run_details[label] = {
+                "return_code": completed.returncode,
+                "stdout_tail": (completed.stdout or "")[-2500:],
+                "stderr_tail": (completed.stderr or "")[-2500:],
+            }
 
     original_metrics = _analyse_render(original_render)
     restored_metrics = _analyse_render(restored_render)
@@ -346,6 +260,8 @@ def render_moresampler_ab(
         "report_type": "moresampler_phone_ab",
         "created_utc": datetime.now(timezone.utc).isoformat(),
         "resampler": str(executable),
+        "output_folder": str(destination),
+        "execution": run_details,
         "source_wav": str(source_wav),
         "pitch_layer": pitch_layer,
         "oto": {
