@@ -329,9 +329,15 @@ def _sidecar_matches(relative: Path, wav_paths: list[Path]) -> bool:
     if suffix not in ANALYSIS_SIDE_CAR_SUFFIXES:
         return False
     sidecar_stem = relative.name.casefold()
-    for wav_rel in wav_paths:
-        if relative.parent != wav_rel.parent:
-            continue
+    changed_in_same_folder = [
+        wav_rel for wav_rel in wav_paths
+        if relative.parent == wav_rel.parent
+    ]
+    # Moresampler may keep a folder-level desc.mrq pitch map rather than
+    # one sidecar per sample. Invalidate it if any WAV in that folder changed.
+    if suffix == ".mrq" and sidecar_stem == "desc.mrq" and changed_in_same_folder:
+        return True
+    for wav_rel in changed_in_same_folder:
         candidates = {
             (wav_rel.name + suffix).casefold(),
             (wav_rel.stem + suffix).casefold(),
