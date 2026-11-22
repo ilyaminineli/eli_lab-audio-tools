@@ -46,22 +46,25 @@ def test_analyze_pitch_folder_reports_pitch_and_spectral_data(tmp_path):
     assert report["summary"]["relative_band_energy_median"]["150_500_hz"] > 0.5
 
 
-def test_reference_match_is_bounded_and_moves_toward_reference():
+def test_reference_match_uses_spectral_envelopes_and_is_bounded():
+    frequencies = np.geomspace(100.0, 10000.0, 72)
+    source_curve = np.zeros(72)
+    source_curve[(frequencies >= 100) & (frequencies <= 160)] = 2.0
+    source_curve[(frequencies >= 2200) & (frequencies <= 4200)] = -4.0
+    reference_curve = np.zeros(72)
     source = {
         "pitch": "B2",
-        "summary": {"relative_band_energy_median": {
-            "20_150_hz": 0.2, "150_500_hz": 0.2,
-            "500_2000_hz": 0.2, "2000_5000_hz": 0.05,
-            "5000_10000_hz": 0.1,
-        }},
+        "spectral_envelope": {
+            "frequency_hz": frequencies.tolist(),
+            "median_relative_db": source_curve.tolist(),
+        },
     }
     reference = {
         "pitch": "F3",
-        "summary": {"relative_band_energy_median": {
-            "20_150_hz": 0.1, "150_500_hz": 0.1,
-            "500_2000_hz": 0.1, "2000_5000_hz": 0.2,
-            "5000_10000_hz": 0.1,
-        }},
+        "spectral_envelope": {
+            "frequency_hz": frequencies.tolist(),
+            "median_relative_db": reference_curve.tolist(),
+        },
     }
 
     suggestion = suggest_reference_match(source, reference, strength=0.6, max_gain_db=2.5)
@@ -71,6 +74,7 @@ def test_reference_match_is_bounded_and_moves_toward_reference():
     assert gains[3] > 0
     assert all(abs(gain) <= 2.5 for gain in gains)
     assert suggestion["reference_pitch"] == "F3"
+    assert suggestion["match_method"] == "cepstral_spectral_envelope"
 
 
 def test_process_pitch_folder_changes_only_selected_layer_and_copies_metadata(tmp_path):
