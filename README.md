@@ -94,6 +94,25 @@ Workflow:
 6. Select a sample and audition the original and processed preview at the chosen wet blend.
 7. Export checked pitch folders to a separate output root. The source bank is never modified. Non-WAV files, including `oto.ini`, are copied byte-for-byte.
 
+### Moresampler phone A/B testing
+
+The studio can render one selected WAV/OTO alias through a local `moresampler.exe`:
+
+1. Select the Moresampler executable.
+2. Choose the WAV and matching OTO alias.
+3. The target note is initially suggested from the measured sample F0; adjust it when testing a different destination note.
+4. Set the requested phone duration and, optionally, Moresampler flags.
+5. Click **Render original + restored through Moresampler**.
+
+Both variants use the same classic UTAU resampler arguments: note name, velocity, flags, OTO offset, duration, consonant, cutoff, volume, modulation, tempo and a constant-pitch curve. The test stages each input in a separate temporary folder and creates a per-folder `moreconfig.txt`; it does not add temporary analysis/cache files to the source voicebank. The per-test configuration enables resampler compatibility, uses the source sample rate, and sets Moresampler's F0-analysis bounds to 0.6×–1.7× the measured sample F0.
+
+Outputs are written beneath `moresampler_ab/<pitch>/<sample>/<note>_<duration>ms_<timestamp>/`:
+- `original_moresampler.wav`
+- `restored_moresampler.wav`
+- `moresampler_ab_report.json`
+
+This is a **single phone/alias render**, not a full UST phrase or wavtool render. It is useful for checking whether a restoration survives Moresampler's own source analysis and resynthesis, but it cannot yet evaluate cross-phoneme transitions, note-to-note continuity or full-song phrasing. Listen to both WAVs at matched loudness; the report's spectral metrics are diagnostics, not intelligibility or naturalness scores.
+
 **OTO protection is optional.** When enabled, the studio uses the matching OTO entries to protect fixed regions and skips files without a usable stretchable body region. When disabled, the selected pitch-folder WAVs are processed as complete recordings. This mode deliberately has no whole-file 5% coverage threshold and does not run phonetic alias classification across unrelated folders.
 
 Every processed pitch folder receives a `pitch_restoration_report.json` with before/after loudness, spectral centroid, band-energy changes, peak sample difference, changed-sample fraction and per-file status. A file marked changed has a measurable sample delta; this does not prove that it sounds more natural.
