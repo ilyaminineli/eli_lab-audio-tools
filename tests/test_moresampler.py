@@ -4,6 +4,7 @@ from eugene_timbre.moresampler import (
     build_moresampler_arguments,
     encode_int12_curve,
     midi_note_name,
+    _moreconfig,
 )
 from eugene_timbre.oto_analysis import OtoEntry
 
@@ -68,3 +69,12 @@ def test_moresampler_argument_builder_rejects_shell_metacharacters(tmp_path):
         build_moresampler_arguments(
             tmp_path / "input.wav", tmp_path / "output.wav", _oto(), flags='Mt10 & del *'
         )
+
+
+def test_moresampler_local_config_isolated_and_uses_measured_f0():
+    config = _moreconfig(44100, 174.0)
+    assert "resampler-compatibility on" in config
+    assert "output-sampling-rate 44100" in config
+    assert "analysis-f0-range-from-path off" in config
+    assert "analysis-f0-min 104.400" in config
+    assert "analysis-f0-max 295.800" in config
