@@ -116,15 +116,15 @@ These profiles remain listening-test starting points, not automatic de-synthesis
 Dependencies: NumPy, SciPy and SoundFile. No cloud service, subscription or AI inference is required.
 
 
-## Eugene:RE Pitch Restoration Studio
+## Eugene:RE Advanced Pitch Restoration Studio (legacy interface)
 
-The pitch-folder-first workflow is the recommended place to begin new restoration work. The studio now indexes the complete voicebank hierarchy first, including pitch folders, L/V/TH extensions, R English, consonant releases, bonus phonetic extras, setup tools, documentation, illustrations, and root-level files. The BANK STRUCTURE tree displays all folders and file names plus WAV/FRQ/LLSM/OTO counts. Only the actual pitch layers (for example, B2, F3 or G4) are currently enabled for this pitch-specific EQ export; add-on folders are inventoried separately and are not silently processed with a pitch EQ.
+This is the legacy multi-panel editor for manual pitch-layer analysis and Moresampler phone-level A/B tests. The recommended simple interface is the **Quick Restore** whole-sample scan → waveform preview → export workflow described above. The studio now indexes the complete voicebank hierarchy first, including pitch folders, L/V/TH extensions, R English, consonant releases, bonus phonetic extras, setup tools, documentation, illustrations, and root-level files. The BANK STRUCTURE tree displays all folders and file names plus WAV/FRQ/LLSM/OTO counts. Only the actual pitch layers (for example, B2, F3 or G4) are currently enabled for this pitch-specific EQ export; add-on folders are inventoried separately and are not silently processed with a pitch EQ.
 
 Install the optional graphical interface on Windows:
 
 ```powershell
 pip install -e ".[ui]"
-eugene-timbre studio
+eugene-timbre studio-advanced
 ```
 
 You can also launch it with `eugene-timbre-ui`. The UI requires PySide6; the core CLI and DSP do not.
@@ -170,7 +170,7 @@ Every processed pitch folder receives a `pitch_restoration_report.json` with bef
 
 The envelope-match suggestion is only a starting point: it approximates a measured cepstral-envelope difference with five broad EQ bands. It does not infer the ideal vocal-tract envelope, separate individual formants, or guarantee greater naturalness. Choose the target resampler, render identical short phrases, loudness-match the renders, and listen for vowel identity, consonant intelligibility, transitions, and artifacts before adopting a profile.
 
-## Legacy automatic whole-bank processing chain (experimental v1)
+## Legacy OTO-aware processing chain (experimental v1; not used by Quick Restore)
 
 The analyser also includes a conservative auto-routing stage for pitch layers, consonant releases, L/V/TH extensions, R English, bonus phonetic events and unknown/root-level files.
 
