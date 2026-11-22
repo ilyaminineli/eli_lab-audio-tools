@@ -6,6 +6,7 @@ from eugene_timbre.moresampler import (
     midi_note_name,
     _moreconfig,
     _prepare_moresampler_runtime,
+    resolve_moresampler_ab_flags,
 )
 from eugene_timbre.oto_analysis import OtoEntry
 
@@ -126,3 +127,27 @@ def test_moresampler_runtime_isolated_global_config_preserves_installation(tmp_p
     assert "dump-log-file off" in isolated_config
     assert "analysis-f0-min" not in isolated_config
     assert report["copied_dlls"] == ["vcomp140.dll"]
+
+
+
+def test_moresampler_ab_flag_profiles_can_be_compared_to_neutral():
+    source_eq_ab = resolve_moresampler_ab_flags("Mt+8Mb+4")
+    assert source_eq_ab == {
+        "original": "Mt+8Mb+4",
+        "restored": "Mt+8Mb+4",
+    }
+
+    renderer_ab = resolve_moresampler_ab_flags("Mt+8ME+4", original_flags="")
+    assert renderer_ab == {
+        "original": "",
+        "restored": "Mt+8ME+4",
+    }
+
+
+def test_moresampler_ab_flags_reject_unsafe_values_for_both_variants():
+    import pytest
+
+    with pytest.raises(ValueError):
+        resolve_moresampler_ab_flags("Mt+8", original_flags="Mt+8;del")
+    with pytest.raises(ValueError):
+        resolve_moresampler_ab_flags("bad flags")
