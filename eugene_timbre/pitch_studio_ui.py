@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import math
 import sys
 import tempfile
 from pathlib import Path
@@ -21,6 +22,8 @@ from PySide6.QtWidgets import (
 )
 
 from .io import read_wav
+from .moresampler import render_moresampler_ab
+from .oto_analysis import OtoEntry, find_nearest_oto, match_entries, parse_oto
 from .pitch_studio import (
     analyze_pitch_folder, default_profile, discover_pitch_layers,
     pitch_name, preview_sample, process_pitch_folder, suggest_reference_match,
@@ -115,7 +118,7 @@ class PitchStudioWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Eugene:RE — Pitch Restoration Studio")
-        self.resize(1240, 820)
+        self.resize(1360, 980)
         self.layers: list[dict] = []
         self.profiles: dict[str, dict] = {}
         self.analyses: dict[str, dict] = {}
@@ -282,6 +285,7 @@ class PitchStudioWindow(QMainWindow):
         preview_group = QGroupBox("AUDITION  /  CURRENT SAMPLE")
         preview_layout = QGridLayout(preview_group)
         self.sample_combo = QComboBox()
+        self.sample_combo.currentIndexChanged.connect(self._refresh_oto_aliases)
         preview_layout.addWidget(QLabel("Sample"), 0, 0)
         preview_layout.addWidget(self.sample_combo, 0, 1, 1, 3)
         self.original_button = QPushButton("Play original")
@@ -291,6 +295,43 @@ class PitchStudioWindow(QMainWindow):
         preview_layout.addWidget(self.original_button, 1, 0, 1, 2)
         preview_layout.addWidget(self.processed_button, 1, 2, 1, 2)
         right_layout.addWidget(preview_group)
+
+        moresampler_group = QGroupBox("MORESAMPLER  /  OTO PHONE A/B RENDER")
+        moresampler_layout = QGridLayout(moresampler_group)
+        self.moresampler_edit = QLineEdit()
+        self.moresampler_edit.setPlaceholderText("Path to moresampler.exe…")
+        moresampler_browse = QPushButton("Browse…")
+        moresampler_browse.clicked.connect(self.choose_moresampler)
+        moresampler_layout.addWidget(QLabel("Executable"), 0, 0)
+        moresampler_layout.addWidget(self.moresampler_edit, 0, 1, 1, 3)
+        moresampler_layout.addWidget(moresampler_browse, 0, 4)
+        self.alias_combo = QComboBox()
+        self.alias_combo.setMinimumWidth(240)
+        moresampler_layout.addWidget(QLabel("OTO alias"), 1, 0)
+        moresampler_layout.addWidget(self.alias_combo, 1, 1, 1, 2)
+        self.target_note_spin = QSpinBox()
+        self.target_note_spin.setRange(24, 96)
+        self.target_note_spin.setValue(60)
+        moresampler_layout.addWidget(QLabel("Target MIDI note"), 1, 3)
+        moresampler_layout.addWidget(self.target_note_spin, 1, 4)
+        self.render_duration_spin = QSpinBox()
+        self.render_duration_spin.setRange(100, 5000)
+        self.render_duration_spin.setSingleStep(50)
+        self.render_duration_spin.setValue(800)
+        self.render_flags_edit = QLineEdit()
+        self.render_flags_edit.setPlaceholderText("Optional Moresampler flags, e.g. Mt10Mb-5")
+        moresampler_layout.addWidget(QLabel("Duration (ms)"), 2, 0)
+        moresampler_layout.addWidget(self.render_duration_spin, 2, 1)
+        moresampler_layout.addWidget(QLabel("Flags"), 2, 2)
+        moresampler_layout.addWidget(self.render_flags_edit, 2, 3, 1, 2)
+        self.moresampler_hint = QLabel("Analyse the pitch layer and select a WAV with a matching OTO alias.")
+        self.moresampler_hint.setObjectName("muted")
+        self.moresampler_hint.setWordWrap(True)
+        moresampler_layout.addWidget(self.moresampler_hint, 3, 0, 1, 4)
+        self.moresampler_button = QPushButton("Render original + restored through Moresampler →")
+        self.moresampler_button.clicked.connect(self.render_moresampler)
+        moresampler_layout.addWidget(self.moresampler_button, 3, 4)
+        right_layout.addWidget(moresampler_group)
 
         controls = QHBoxLayout()
         controls.addWidget(QLabel("Wet blend"))
@@ -342,6 +383,13 @@ class PitchStudioWindow(QMainWindow):
         if path:
             self.root_edit.setText(path)
             self.scan_layers()
+
+    def choose_moresampler(self):
+        path, _ = QFileDialog.getOpenFileName(
+            self, "Select Moresampler executable", "", "Moresampler executable (moresampler*.exe)"
+        )
+        if path:
+            self.moresampler_edit.setText(path)
 
     def choose_output(self):
         path = QFileDialog.getExistingDirectory(self, "Select separate output folder")
@@ -449,6 +497,47 @@ class PitchStudioWindow(QMainWindow):
         for sample in samples:
             self.sample_combo.addItem(sample.relative_to(folder).as_posix(), str(sample))
 
+    def _refresh_oto_aliases(self, *_):
+        self.alias_combo.clear()
+        layer = self.current_layer()
+        if not layer or self.sample_combo.currentIndex() < 0:
+            self.moresampler_button.setEnabled(False)
+            return
+        wav_path = Path(self.sample_combo.currentData())
+        try:
+            oto_path = find_nearest_oto(wav_path, Path(layer["path"]))
+            if oto_path is None:
+                raise FileNotFoundError("No oto.ini found in this pitch folder.")
+            parsed = parse_oto(oto_path)
+            try:
+                relative = wav_path.relative_to(oto_path.parent).as_posix()
+            except ValueError:
+                relative = wav_path.name
+            entries = match_entries(parsed.index(), relative, wav_path.name)
+            for entry in entries:
+                self.alias_combo.addItem(f"{entry.alias}  ·  line {entry.line_number}", entry)
+            self.moresampler_button.setEnabled(bool(entries))
+            self.moresampler_hint.setText(
+                f"{len(entries)} OTO alias(es) available from {oto_path.name}. "
+                "Moresampler will receive the selected alias's timing values."
+                if entries else "No matching OTO alias was found for this WAV."
+            )
+            self._suggest_target_note(layer, wav_path)
+        except Exception as exc:
+            self.moresampler_button.setEnabled(False)
+            self.moresampler_hint.setText(str(exc))
+
+    def _suggest_target_note(self, layer: dict, wav_path: Path):
+        analysis = self.analyses.get(layer["name"])
+        if not analysis:
+            return
+        relative = wav_path.relative_to(Path(layer["path"])).as_posix()
+        row = next((item for item in analysis.get("files", []) if item.get("file") == relative), None)
+        f0 = row.get("f0_median_hz") if row else analysis.get("summary", {}).get("f0_median_hz")
+        if isinstance(f0, (int, float)) and f0 > 0:
+            midi_note = int(round(69 + 12 * math.log2(float(f0) / 440.0)))
+            self.target_note_spin.setValue(max(24, min(96, midi_note)))
+
     def _show_analysis(self, name: str):
         analysis = self.analyses.get(name)
         if not analysis:
@@ -464,9 +553,11 @@ class PitchStudioWindow(QMainWindow):
             f'{analysis["failed_count"]} failed'
         )
         self.envelope_plot.set_data(analysis["spectral_envelope"])
+        if self.current_layer() and self.sample_combo.currentIndex() >= 0:
+            self._suggest_target_note(self.current_layer(), Path(self.sample_combo.currentData()))
 
     def _set_busy(self, busy: bool):
-        for widget in (self.analyse_button, self.process_button):
+        for widget in (self.analyse_button, self.process_button, self.moresampler_button):
             widget.setDisabled(busy)
         self.progress.setValue(0)
         self.status_label.setText("Working…" if busy else "Ready.")
@@ -620,6 +711,104 @@ class PitchStudioWindow(QMainWindow):
             self.status_label.setText(("Processed preview: " if processed else "Original preview: ") + path.name)
         except Exception as exc:
             QMessageBox.warning(self, "Preview unavailable", str(exc))
+
+    def render_moresampler(self):
+        layer = self.current_layer()
+        if not layer or self.sample_combo.currentIndex() < 0:
+            QMessageBox.information(self, "Select a sample", "Choose a pitch layer and a sample first.")
+            return
+        executable_text = self.moresampler_edit.text().strip()
+        if not executable_text:
+            QMessageBox.information(self, "Choose Moresampler", "Select your moresampler.exe first.")
+            return
+        oto = self.alias_combo.currentData()
+        if not isinstance(oto, OtoEntry):
+            QMessageBox.information(self, "No OTO alias", "Choose a sample with a matching OTO alias.")
+            return
+        output_text = self.output_edit.text().strip()
+        if not output_text:
+            QMessageBox.information(self, "Choose output", "Select a separate output directory first.")
+            return
+        layer_analysis = self.analyses.get(layer["name"])
+        if not layer_analysis:
+            QMessageBox.information(self, "Analyse first", "Run Analyse checked for this pitch layer before Moresampler testing.")
+            return
+        wav_path = Path(self.sample_combo.currentData()).resolve()
+        relative = wav_path.relative_to(Path(layer["path"])).as_posix()
+        sample_analysis = next(
+            (item for item in layer_analysis.get("files", []) if item.get("file") == relative),
+            None,
+        )
+        reference_f0 = (
+            sample_analysis.get("f0_median_hz") if sample_analysis
+            else layer_analysis.get("summary", {}).get("f0_median_hz")
+        )
+        if not isinstance(reference_f0, (int, float)) or reference_f0 <= 0:
+            QMessageBox.warning(self, "No measured F0", "This pitch layer has no usable median F0 for Moresampler analysis.")
+            return
+
+        try:
+            output_root = Path(output_text).expanduser().resolve()
+            source_root = Path(self.root_edit.text()).expanduser().resolve()
+            if output_root == source_root or source_root in output_root.parents or output_root in source_root.parents:
+                raise ValueError("Moresampler test output must be outside the source voicebank.")
+            self.save_current_profile()
+            profile = dict(self.profiles[layer["name"]])
+            wet = self.wet_slider.value() / 100.0
+            protect_oto = self.oto_checkbox.isChecked()
+            executable = Path(executable_text).expanduser().resolve()
+            target_note = self.target_note_spin.value()
+            duration_ms = float(self.render_duration_spin.value())
+            flags = self.render_flags_edit.text().strip()
+        except Exception as exc:
+            QMessageBox.warning(self, "Invalid render settings", str(exc))
+            return
+
+        def task(progress):
+            progress(0, 2, f"{layer['pitch']}: preparing restored source")
+            restored_audio, sr, _ = preview_sample(
+                wav_path, profile, wet=wet, protect_oto=protect_oto,
+                source_root=Path(layer["path"]),
+            )
+            _, _, metadata = read_wav(wav_path)
+            progress(1, 2, f"{layer['pitch']}: rendering through Moresampler")
+            report = render_moresampler_ab(
+                source_wav=wav_path,
+                restored_audio=restored_audio,
+                sample_rate=sr,
+                subtype=metadata["subtype"],
+                oto=oto,
+                executable=executable,
+                output_root=output_root,
+                source_bank_root=source_root,
+                pitch_layer=layer["name"],
+                reference_f0_hz=float(reference_f0),
+                target_note=target_note,
+                duration_ms=duration_ms,
+                velocity=100,
+                flags=flags,
+                volume=100,
+                modulation=0,
+                tempo=120.0,
+            )
+            progress(2, 2, "Moresampler A/B render complete")
+            return report
+
+        def complete(report):
+            output_folder = Path(report["output_folder"])
+            self.status_label.setText(f"Moresampler A/B render saved: {output_folder}")
+            QMessageBox.information(
+                self,
+                "Moresampler comparison complete",
+                "Both versions were rendered with the same OTO timing, note, duration and flags.\n\n"
+                f"Original: {report['outputs']['original']}\n"
+                f"Restored: {report['outputs']['restored']}\n\n"
+                f"Output: {output_folder}\n\n"
+                "Listen to the two rendered phone samples. The report's spectral measurements are diagnostics, not a naturalness score.",
+            )
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(output_folder.resolve())))
+
+        self._start_worker(task, complete)
 
     def process_checked(self):
         selected = self.checked_layers()
