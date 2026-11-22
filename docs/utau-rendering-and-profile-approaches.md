@@ -63,7 +63,25 @@ The starter presets intentionally use small values. These are audition ideas, no
 
 Reference: [Moresampler readme — MEF and growling flags](https://github.com/hungrierr/Moresampler/blob/main/readme.txt).
 
-### D. Final phrase / mix processing
+### D. Moresampler analysis and synthesis configuration
+
+These settings live in `moreconfig.txt`, not in the source-WAV EQ and not in the OTO file. They influence how Moresampler analyses the sample or performs synthesis.
+
+| Setting | Documented behaviour | Practical caution |
+|---|---|---|
+| `analysis-noise-reduction` | Reduces noise during LLSM analysis; the documentation says it works better with longer recordings. | Compare on/off for noisy samples, but do not assume it is desirable for breathy or textured samples. |
+| `analysis-anti-distortion` | Attempts to correct analysis inaccuracies caused by noise distortion or low volume/quantization. | The readme warns it may slightly blur speech. Use it as a diagnostic A/B, not a universal default. |
+| `analysis-biased-f0-estimation` | Emphasizes voicing probability; can reduce voiced-as-unvoiced false negatives but increases false positives. | Described as experimental and potentially harmful to clean/smooth speech; avoid enabling it blindly. |
+| `analysis-suppress-subharmonics` | Removes subharmonics during analysis. | The readme suggests it may help screamy voices but slightly degrades breathy voices. |
+| `synthesis-duration-extension-method` | Selects `stretch`, `loop`, or `auto` for extending the duration of a speech segment. | This is important for held vowels and long notes; judge it on identical phrases, not a short isolated phone only. |
+| `synthesis-utau-style-normalization` | Adaptive segment gain; `full` adjusts voiced and unvoiced parts, `voiced` adjusts only voiced parts, and `off` disables it. | This is per-segment gain management, not a conventional compressor or tonal EQ. |
+| `synthesis-loudness-preservation` | Attempts to retain perceived loudness after modification. | Compare loudness-matched renders; do not mistake a louder render for a better timbre. |
+
+The official readme documents these switches and explicitly warns about trade-offs for anti-distortion, biased F0 estimation and subharmonic suppression. The current UI does not edit these global/per-bank config options yet; it safely copies the installed Moresampler runtime/config into an isolated temporary directory for A/B renders and keeps the installed configuration unchanged. This configuration layer is a logical next addition after the source-EQ and renderer-flag templates have been auditioned.
+
+Reference: [Moresampler readme — analysis and synthesis options](https://github.com/hungrierr/Moresampler/blob/main/readme.txt).
+
+### E. Final phrase / mix processing
 
 Compression, de-essing, saturation, stereo placement, delay and reverb are normally best judged on the assembled phrase or song, not indiscriminately baked into every source-bank WAV. A reverberated or compressed source bank can make UTAU's pitch/time processing harder to control and can be especially problematic when the same sample is reused in multiple phonetic contexts.
 
