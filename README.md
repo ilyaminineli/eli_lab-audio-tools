@@ -19,7 +19,7 @@ pip install -e .
 
 ## Quick Restore — recommended workflow
 
-Launch the simple interface:
+Launch the simple whole-sample interface:
 
 ```powershell
 pip install -e ".[ui]"
@@ -28,17 +28,27 @@ eugene-timbre studio
 
 1. Point **Input bank** at the existing Eugene:RE folder. The supplied path is prefilled.
 2. Point **Output copy** at a separate folder. The supplied path is prefilled.
-3. Click **Scan bank and prepare preview**. The app scans the WAV inventory and OTO-safe regions, then selects a representative pitch-layer sample.
-4. Listen to **Play original** and **Play processed preview**. The preview uses the exact same OTO-aware routing/profile logic as export.
-5. Click **Create processed voicebank copy**. The app exports the full directory tree to the output folder, retaining filenames, folder layout, OTO metadata and unchanged samples. The source bank is never modified.
+3. Click **Scan bank and prepare preview**. Every WAV is analysed using a full-duration processing route; a representative sample is selected automatically.
+4. The preview shows the original waveform and processed waveform side by side, plus a difference waveform below. Listen to both versions.
+5. Click **Create processed voicebank copy**. Every WAV is processed across its complete duration and written into a mirrored output bank. OTO timing no longer gates whether a WAV is included.
 
-The first automatic recipe is deliberately conservative and is still an experimental baseline:
-- B2: small +0.6 dB body/presence lift around 1.45 kHz, only in eligible OTO stretchable regions.
-- F3: small +0.3 dB lift around 1.45 kHz, only in eligible OTO stretchable regions.
-- G4, L/V/TH, R English, consonant releases, bonus phonetic extras and root material are copied unchanged until a suitable, tested recipe exists.
-- Samples with duplicate/unknown OTO aliases, timing warnings or insufficient safe body coverage are copied unchanged and listed in `processing_report.json`.
+The first automatic whole-sample chain includes:
+- DC-offset correction for each sample/channel.
+- Conditional 22 Hz subsonic rumble reduction.
+- Conditional narrow 50/60 Hz mains-hum removal.
+- Pitch-layer-specific low-Q EQ, plus a small adaptive upper-mid presence lift when measured energy is very low.
+- Transient-aware EQ blending, reducing tonal processing around sharp attacks.
+- Peak safety to prevent output clipping.
 
-The output is a complete mirrored bank, not just a folder of changed WAVs. Back up the original before replacing it. Review `processing_report.json` to see exactly which files changed and which were copied unchanged.
+The current tonal profile remains deliberately conservative: B2 and F3 use the existing small presence corrections; other phonetic families receive cleanup but no generic vowel EQ. Every WAV is still written to the output bank, including consonant releases, L/V/TH, R English, bonus events and root-level recordings. If a WAV cannot be decoded or processed, it is copied byte-for-byte and recorded as a fallback instead of aborting the whole bank.
+
+For changed WAVs, associated stale .frq, .llsm, .mrq and .pmk analysis maps are omitted from the output copy so the relevant resampler can regenerate them. Original sidecars remain untouched in the source bank. oto.ini and other non-WAV metadata are copied byte-for-byte.
+
+**Important limitation:** the uploaded real Akane reference clip is not yet a complete phoneme-aligned reference set. The present automatic chain does not claim to reconstruct missing harmonics or recover true vowel formants from that clip. Reference-guided spectral-envelope recovery and more advanced dynamic resonance control remain separate stages to validate against matched phonemes and actual resampler renders.
+
+The output is a complete mirrored bank, not just a folder of changed WAVs. Back up the original before replacing it. Review processing_report.json to see which processing stages were applied to each WAV.
+
+The full processing logic and per-stage thresholds are documented in [docs/full-sample-processing-v2.md](docs/full-sample-processing-v2.md).
 
 The former multi-panel editing interface remains available as:
 
@@ -46,7 +56,7 @@ The former multi-panel editing interface remains available as:
 eugene-timbre studio-advanced
 ```
 
-The executable shortcut `eugene-timbre-ui` launches Quick Restore.
+The executable shortcut eugene-timbre-ui launches Quick Restore.
 
 ## Main analysis command: one JSON per selected pitch layer
 
@@ -108,15 +118,15 @@ These profiles remain listening-test starting points, not automatic de-synthesis
 Dependencies: NumPy, SciPy and SoundFile. No cloud service, subscription or AI inference is required.
 
 
-## Eugene:RE Pitch Restoration Studio
+## Eugene:RE Advanced Pitch Restoration Studio (legacy interface)
 
-The pitch-folder-first workflow is the recommended place to begin new restoration work. The studio now indexes the complete voicebank hierarchy first, including pitch folders, L/V/TH extensions, R English, consonant releases, bonus phonetic extras, setup tools, documentation, illustrations, and root-level files. The BANK STRUCTURE tree displays all folders and file names plus WAV/FRQ/LLSM/OTO counts. Only the actual pitch layers (for example, B2, F3 or G4) are currently enabled for this pitch-specific EQ export; add-on folders are inventoried separately and are not silently processed with a pitch EQ.
+This is the legacy multi-panel editor for manual pitch-layer analysis and Moresampler phone-level A/B tests. The recommended simple interface is the **Quick Restore** whole-sample scan → waveform preview → export workflow described above. The studio now indexes the complete voicebank hierarchy first, including pitch folders, L/V/TH extensions, R English, consonant releases, bonus phonetic extras, setup tools, documentation, illustrations, and root-level files. The BANK STRUCTURE tree displays all folders and file names plus WAV/FRQ/LLSM/OTO counts. Only the actual pitch layers (for example, B2, F3 or G4) are currently enabled for this pitch-specific EQ export; add-on folders are inventoried separately and are not silently processed with a pitch EQ.
 
 Install the optional graphical interface on Windows:
 
 ```powershell
 pip install -e ".[ui]"
-eugene-timbre studio
+eugene-timbre studio-advanced
 ```
 
 You can also launch it with `eugene-timbre-ui`. The UI requires PySide6; the core CLI and DSP do not.
@@ -162,7 +172,7 @@ Every processed pitch folder receives a `pitch_restoration_report.json` with bef
 
 The envelope-match suggestion is only a starting point: it approximates a measured cepstral-envelope difference with five broad EQ bands. It does not infer the ideal vocal-tract envelope, separate individual formants, or guarantee greater naturalness. Choose the target resampler, render identical short phrases, loudness-match the renders, and listen for vowel identity, consonant intelligibility, transitions, and artifacts before adopting a profile.
 
-## Legacy automatic whole-bank processing chain (experimental v1)
+## Legacy OTO-aware processing chain (experimental v1; not used by Quick Restore)
 
 The analyser also includes a conservative auto-routing stage for pitch layers, consonant releases, L/V/TH extensions, R English, bonus phonetic events and unknown/root-level files.
 
