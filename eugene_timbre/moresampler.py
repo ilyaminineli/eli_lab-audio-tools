@@ -48,25 +48,21 @@ def encode_int12_curve(values: list[int]) -> str:
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[(unsigned >> 6) & 0x3F]
             + "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[unsigned & 0x3F]
         )
-    if not encoded:
-        return ""
     result = []
-    last = encoded[0]
+    last = ""
     repeats = 0
-    for item in encoded[1:]:
-        if item == last:
+    for item in encoded:
+        if last == item:
             repeats += 1
         elif repeats == 0:
-            result.append(last)
-            last = item
+            result.append(item)
         else:
-            result.extend((f"#{repeats}#", item))
+            result.append(f"#{repeats}#")
             repeats = 0
-            last = item
+            result.append(item)
+        last = item
     if repeats:
-        result.extend((last, f"#{repeats}#"))
-    else:
-        result.append(last)
+        result.append(f"#{repeats}#")
     return "".join(result)
 
 
