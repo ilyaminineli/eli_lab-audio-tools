@@ -1256,6 +1256,7 @@ class PitchStudioWindow(QMainWindow):
             self.save_current_profile()
             profile = dict(self.profiles[layer["name"]])
             wet = self.wet_slider.value() / 100.0
+            flags = self.render_flags_edit.text().strip()
             compare_renderer_flags = self.renderer_flags_compare_checkbox.isChecked()
             if compare_renderer_flags:
                 if not flags:
@@ -1266,7 +1267,6 @@ class PitchStudioWindow(QMainWindow):
             executable = Path(executable_text).expanduser().resolve()
             target_note = self.target_note_spin.value()
             duration_ms = float(self.render_duration_spin.value())
-            flags = self.render_flags_edit.text().strip()
         except Exception as exc:
             QMessageBox.warning(self, "Invalid render settings", str(exc))
             return
