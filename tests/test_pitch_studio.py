@@ -116,6 +116,12 @@ def test_neutral_profile_copies_wav_without_reencoding(tmp_path):
     assert restored.read_bytes() == original_bytes
 
 
-def test_optional_studio_ui_module_is_valid_python():
+def test_optional_studio_ui_module_is_valid_python_and_requires_explicit_selection():
     source = Path(__file__).parents[1] / "eugene_timbre" / "pitch_studio_ui.py"
-    compile(source.read_text(encoding="utf-8"), str(source), "exec")
+    text = source.read_text(encoding="utf-8")
+    compile(text, str(source), "exec")
+    assert "item.setCheckState(Qt.CheckState.Unchecked)" in text
+    assert "def select_current_layer" in text
+    assert "def select_all_layers" in text
+    assert "def clear_layer_selection" in text
+    assert "if not selected and self.layer_list.currentItem()" not in text
