@@ -336,9 +336,9 @@ def process_pitch_folder(
                             progress(index, len(wavs), path.name)
                         continue
                     mask_coverage = float(mask.mean() * 100.0)
-                    output_audio = apply_profile_masked(audio, sample_rate, profile, mask, wet=wet)
+                    output_audio = apply_profile_masked(audio, sample_rate, effective_profile, mask, wet=wet)
                 else:
-                    output_audio = apply_profile(audio, sample_rate, profile, wet=wet)
+                    output_audio = apply_profile(audio, sample_rate, effective_profile, wet=wet)
             difference = np.asarray(output_audio, dtype=np.float64) - np.asarray(audio, dtype=np.float64)
             peak_difference = float(np.max(np.abs(difference))) if difference.size else 0.0
             changed_fraction = float(np.mean(np.abs(difference) > 1e-7)) if difference.size else 0.0
