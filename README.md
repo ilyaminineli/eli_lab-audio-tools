@@ -90,7 +90,7 @@ Workflow:
 2. Check only the pitch folders you want to analyse or process.
 3. Select a layer and run **Analyse checked**. The report includes median F0, spectral centroid, harmonic/residual proxy, relative band energy and a median cepstral spectral envelope.
 4. Set that pitch's five-band EQ profile. Each pitch stores its own settings.
-5. Optionally choose an analysed reference pitch and generate a bounded tonal-balance suggestion. This moves broad-band energy toward the reference; it is not a formant correction or a naturalness score.
+5. Optionally choose an analysed reference pitch and generate a bounded five-band EQ suggestion from the difference between the measured cepstral spectral envelopes. If either envelope is unavailable, it falls back to broad relative-band-energy matching. This is an approximation, not a formant model or a naturalness score.
 6. Select a sample and audition the original and processed preview at the chosen wet blend.
 7. Export checked pitch folders to a separate output root. The source bank is never modified. Non-WAV files, including `oto.ini`, are copied byte-for-byte.
 
@@ -98,7 +98,7 @@ Workflow:
 
 Every processed pitch folder receives a `pitch_restoration_report.json` with before/after loudness, spectral centroid, band-energy changes, peak sample difference, changed-sample fraction and per-file status. A file marked changed has a measurable sample delta; this does not prove that it sounds more natural.
 
-The broad-band matching suggestion is only a starting point. It cannot infer the ideal vocal-tract envelope from the recording alone. Choose the target resampler, render identical short phrases, loudness-match the renders, and listen for vowel identity, consonant intelligibility, transitions, and artifacts before adopting a profile.
+The envelope-match suggestion is only a starting point: it approximates a measured cepstral-envelope difference with five broad EQ bands. It does not infer the ideal vocal-tract envelope, separate individual formants, or guarantee greater naturalness. Choose the target resampler, render identical short phrases, loudness-match the renders, and listen for vowel identity, consonant intelligibility, transitions, and artifacts before adopting a profile.
 
 ## Legacy automatic whole-bank processing chain (experimental v1)
 
