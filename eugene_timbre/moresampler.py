@@ -130,19 +130,83 @@ def build_moresampler_arguments(
     ]
 
 
-def _moreconfig(sample_rate: int, reference_f0_hz: float) -> str:
+def _moreconfig(reference_f0_hz: float, source_config: Path | None = None) -> str:
+    """Build per-sample analysis settings, preserving compatible voicebank options."""
     if not np.isfinite(reference_f0_hz) or reference_f0_hz <= 0:
         raise ValueError("A valid measured reference F0 is required for Moresampler analysis.")
-    # Moresampler's voicebank configuration supports explicit per-folder F0
-    # bounds. The 0.6x–1.7x range follows Kanru Hua's voicebank-author tutorial.
-    return (
-        "resampler-compatibility on\n"
-        f"output-sampling-rate {int(sample_rate)}\n"
-        "output-bit-depth 16\n"
-        "analysis-f0-range-from-path off\n"
-        f"analysis-f0-min {reference_f0_hz * 0.6:.3f}\n"
-        f"analysis-f0-max {reference_f0_hz * 1.7:.3f}\n"
-    )
+    lines = []
+    if source_config is not None and source_config.is_file():
+        for raw in source_config.read_text(encoding="utf-8", errors="replace").splitlines():
+            stripped = raw.strip()
+            if not stripped:
+                continue
+            if stripped.startswith("#"):
+                lines.append(raw)
+                continue
+            if " " not in stripped:
+                continue
+            key = stripped.split(None, 1)[0].lstrip("*").casefold()
+            if key in {"analysis-f0-range-from-path", "analysis-f0-min", "analysis-f0-max"}:
+                continue
+            if key.startswith("analysis-") or key.startswith("synthesis-") or key == "load-frq":
+                lines.append(raw)
+    lines.extend([
+        "analysis-f0-range-from-path off",
+        f"analysis-f0-min {reference_f0_hz * 0.6:.3f}",
+        f"analysis-f0-max {reference_f0_hz * 1.7:.3f}",
+    ])
+    return "\n".join(lines) + "\n"
+
+
+def _prepare_moresampler_runtime(
+    executable: Path,
+    runtime_dir: Path,
+    sample_rate: int,
+) -> tuple[Path, dict]:
+    """Copy Moresampler and its DLLs, without editing installed config files."""
+    runtime_dir.mkdir(parents=True, exist_ok=True)
+    isolated_exe = runtime_dir / executable.name
+    shutil.copy2(executable, isolated_exe)
+    copied_dlls = []
+    for dll in executable.parent.glob("*.dll"):
+        shutil.copy2(dll, runtime_dir / dll.name)
+        copied_dlls.append(dll.name)
+
+    original_global_config = executable.parent / "moreconfig.txt"
+    preserved_lines = []
+    if original_global_config.is_file():
+        for raw in original_global_config.read_text(encoding="utf-8", errors="replace").splitlines():
+            stripped = raw.strip()
+            if not stripped or stripped.startswith("#"):
+                preserved_lines.append(raw)
+                continue
+            key = stripped.split(None, 1)[0].lstrip("*").casefold()
+            if key in {
+                "resampler-compatibility", "output-sampling-rate",
+                "output-bit-depth", "dump-log-file",
+                "analysis-f0-range-from-path", "analysis-f0-min", "analysis-f0-max",
+            }:
+                continue
+            preserved_lines.append(raw)
+    preserved_lines.extend([
+        "resampler-compatibility on",
+        f"output-sampling-rate {int(sample_rate)}",
+        "output-bit-depth 16",
+        "dump-log-file off",
+    ])
+    isolated_config = runtime_dir / "moreconfig.txt"
+    isolated_config.write_text("\n".join(preserved_lines) + "\n", encoding="utf-8")
+    return isolated_exe, {
+        "original_global_config_found": original_global_config.is_file(),
+        "isolated_global_config": isolated_config.name,
+        "copied_dlls": copied_dlls,
+        "global_settings": {
+            "resampler-compatibility": "on",
+            "output-sampling-rate": int(sample_rate),
+            "output-bit-depth": 16,
+            "dump-log-file": "off",
+        },
+    }
 
 
 def _analyse_render(path: Path) -> dict[str, Any]:
@@ -207,12 +271,16 @@ def render_moresampler_ab(
     restored_render = destination / "restored_moresampler.wav"
 
     run_details = {}
-    config_text = _moreconfig(sample_rate, reference_f0_hz)
-    for label, dest in (("original", original_render), ("restored", restored_render)):
-        # Run sequentially so a single Moresampler installation is not asked
-        # to write shared global config/state concurrently.
-        with tempfile.TemporaryDirectory(prefix=f"moresampler_{label}_") as stage_temp:
-            staged_dir = Path(stage_temp) / "pitch"
+    with tempfile.TemporaryDirectory(prefix="eugene_moresampler_ab_") as temp:
+        workspace = Path(temp)
+        isolated_exe, runtime_report = _prepare_moresampler_runtime(
+            executable, workspace / "moresampler_runtime", sample_rate
+        )
+        config_text = _moreconfig(reference_f0_hz, source_wav.parent / "moreconfig.txt")
+        for label, dest in (("original", original_render), ("restored", restored_render)):
+            # Each variant gets its own analysis directory to force fresh,
+            # independent analysis of that exact WAV.
+            staged_dir = workspace / label / "pitch"
             staged_dir.mkdir(parents=True)
             input_path = staged_dir / "sample.wav"
             if label == "original":
@@ -228,8 +296,8 @@ def render_moresampler_ab(
             )
             try:
                 completed = subprocess.run(
-                    [str(executable), *args],
-                    cwd=str(executable.parent),
+                    [str(isolated_exe), *args],
+                    cwd=str(isolated_exe.parent),
                     capture_output=True,
                     text=True,
                     encoding="utf-8",
@@ -262,6 +330,7 @@ def render_moresampler_ab(
         "resampler": str(executable),
         "output_folder": str(destination),
         "execution": run_details,
+        "isolated_runtime": runtime_report,
         "source_wav": str(source_wav),
         "pitch_layer": pitch_layer,
         "oto": {
@@ -285,7 +354,7 @@ def render_moresampler_ab(
             "sample_rate_hz": int(sample_rate),
             "pitch_curve": "constant pitch; zero-cent deviation at five-tick intervals",
             "analysis_f0_range_hz": [round(reference_f0_hz * 0.6, 3), round(reference_f0_hz * 1.7, 3)],
-            "moreconfig": config_text,
+            "voicebank_analysis_config": config_text,
         },
         "outputs": {
             "original": original_render.name,
