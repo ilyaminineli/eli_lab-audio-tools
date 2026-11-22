@@ -46,6 +46,7 @@ def compute_spectrogram_comparison(
 
     a = to_mono(original)
     b = to_mono(processed)
+    duration_seconds = float(a.size / sample_rate)
     if a.shape != b.shape:
         raise ValueError("Original and processed audio must have matching lengths.")
     if sample_rate <= 2 * min_frequency_hz:
@@ -69,6 +70,13 @@ def compute_spectrogram_comparison(
         b, fs=sample_rate, window="hann", nperseg=length,
         noverlap=overlap, boundary="zeros", padded=True,
     )
+
+    # scipy's padded boundary frames can have centres just beyond the last
+    # audio sample. Drop those frames so the display timeline ends at the WAV.
+    time_valid = times <= (duration_seconds + 1e-9)
+    times = times[time_valid]
+    spectrum_a = spectrum_a[:, time_valid]
+    spectrum_b = spectrum_b[:, time_valid]
 
     max_frequency = min(float(max_frequency_hz), sample_rate / 2.0)
     valid = (frequencies >= min_frequency_hz) & (frequencies <= max_frequency)
@@ -109,7 +117,7 @@ def compute_spectrogram_comparison(
         "reference_dbfs": float(reference_db),
         "floor_db": float(floor_db),
         "difference_range_db": [-6.0, 6.0],
-        "duration_seconds": float(a.size / sample_rate),
+        "duration_seconds": duration_seconds,
     }
 
 
