@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Callable
 
 import numpy as np
+from scipy.ndimage import gaussian_filter1d
 
 from .analysis import analyze_audio
 from .dsp import PeakingBand, TimbreProfile, apply_profile, apply_profile_masked, describe_profile
@@ -220,41 +221,89 @@ def suggest_reference_match(
     strength: float = 0.6,
     max_gain_db: float = 2.5,
 ) -> dict:
-    """Suggest broad balance corrections to move one layer toward a reference.
+    """Approximate a measured spectral-envelope difference with five EQ bands.
 
-    This matches median octave-ish energy bands, not vocal-tract formants. It is
-    intentionally bounded and must be auditioned before it is used.
+    The cepstral envelopes are compared on a common logarithmic frequency grid.
+    The resulting five-band EQ is intentionally bounded and is not a formant
+    model or a prediction of naturalness.
     """
     if not 0.0 <= strength <= 1.0:
         raise ValueError("strength must be between 0 and 1.")
     if not 0.0 < max_gain_db <= 6.0:
         raise ValueError("max_gain_db must be in (0, 6].")
-    source = source_analysis.get("summary", {}).get("relative_band_energy_median", {})
-    reference = reference_analysis.get("summary", {}).get("relative_band_energy_median", {})
-    bands = []
-    for key, centre in zip(BAND_KEYS, BAND_CENTRES_HZ):
-        current = source.get(key)
-        target = reference.get(key)
-        gain = 0.0
-        if (
-            isinstance(current, (int, float)) and isinstance(target, (int, float))
-            and current > 1e-8 and target > 1e-8
-        ):
-            gain = 10.0 * np.log10(target / current) * strength
+
+    source_env = source_analysis.get("spectral_envelope", {})
+    reference_env = reference_analysis.get("spectral_envelope", {})
+    source_freq = np.asarray(source_env.get("frequency_hz", []), dtype=float)
+    source_db = np.asarray(source_env.get("median_relative_db", []), dtype=float)
+    reference_freq = np.asarray(reference_env.get("frequency_hz", []), dtype=float)
+    reference_db = np.asarray(reference_env.get("median_relative_db", []), dtype=float)
+
+    match_method = "cepstral_spectral_envelope"
+    delta_curve = None
+    common_grid = None
+    if (
+        source_freq.size >= 2 and source_freq.size == source_db.size
+        and reference_freq.size >= 2 and reference_freq.size == reference_db.size
+        and np.all(np.diff(source_freq) > 0) and np.all(np.diff(reference_freq) > 0)
+        and np.all(np.isfinite(source_db)) and np.all(np.isfinite(reference_db))
+    ):
+        low = max(float(source_freq[0]), float(reference_freq[0]), 80.0)
+        high = min(float(source_freq[-1]), float(reference_freq[-1]), 10000.0)
+        if high > low:
+            common_grid = np.geomspace(low, high, 256)
+            src = np.interp(np.log10(common_grid), np.log10(source_freq), source_db)
+            ref = np.interp(np.log10(common_grid), np.log10(reference_freq), reference_db)
+            # Smooth small local peaks so the recommendation is broad EQ, not notch fitting.
+            delta_curve = gaussian_filter1d(ref - src, sigma=4.0, mode="nearest")
+        else:
+            match_method = "relative_band_energy_fallback"
+    else:
+        match_method = "relative_band_energy_fallback"
+
+    if delta_curve is None:
+        source = source_analysis.get("summary", {}).get("relative_band_energy_median", {})
+        reference = reference_analysis.get("summary", {}).get("relative_band_energy_median", {})
+        for key, centre in zip(BAND_KEYS, BAND_CENTRES_HZ):
+            current = source.get(key)
+            target = reference.get(key)
+            gain = 0.0
+            if (
+                isinstance(current, (int, float)) and isinstance(target, (int, float))
+                and current > 1e-8 and target > 1e-8
+            ):
+                gain = float(np.clip(10.0 * np.log10(target / current) * strength, -max_gain_db, max_gain_db))
+            bands.append({
+                "name": key.replace("_hz", "").replace("_", "–") + " Hz",
+                "frequency_hz": centre,
+                "gain_db": round(gain, 2),
+                "q": 0.7,
+            })
+    else:
+        for key, centre in zip(BAND_KEYS, BAND_CENTRES_HZ):
+            lower = max(float(common_grid[0]), centre / 1.4)
+            upper = min(float(common_grid[-1]), centre * 1.4)
+            region = (common_grid >= lower) & (common_grid <= upper)
+            if np.any(region):
+                gain = float(np.median(delta_curve[region])) * strength
+            else:
+                gain = float(np.interp(np.log10(centre), np.log10(common_grid), delta_curve)) * strength
             gain = float(np.clip(gain, -max_gain_db, max_gain_db))
-        bands.append({
-            "name": key.replace("_hz", "").replace("_", "–") + " Hz",
-            "frequency_hz": centre,
-            "gain_db": round(gain, 2),
-            "q": 0.7,
-        })
+            bands.append({
+                "name": key.replace("_hz", "").replace("_", "–") + " Hz",
+                "frequency_hz": centre,
+                "gain_db": round(gain, 2),
+                "q": 0.7,
+            })
+
     return {
         "name": f"match-{source_analysis.get('pitch', 'pitch')}-to-{reference_analysis.get('pitch', 'reference')}",
-        "description": "Bounded broad-band balance suggestion. Not a formant or naturalness correction.",
+        "description": "Bounded five-band approximation of the measured spectral-envelope difference; audition before processing.",
         "highpass_hz": 0.0,
         "highpass_slope": 2,
         "bands": bands,
         "reference_pitch": reference_analysis.get("pitch"),
+        "match_method": match_method,
         "match_strength": strength,
         "max_gain_db": max_gain_db,
     }
@@ -444,6 +493,7 @@ def process_pitch_folder(
             "Only this selected pitch folder was processed.",
             "Non-WAV metadata, including oto.ini, was copied byte-for-byte.",
             "Sample deltas are measured after writing and re-reading the exported WAV.",
+            "Reference-match profiles approximate cepstral envelope differences using five broad EQ bands.",
             "Spectral measurements are diagnostics, not a naturalness score.",
             "Compare matched resampler renders at matched loudness before adopting the profile.",
         ],
