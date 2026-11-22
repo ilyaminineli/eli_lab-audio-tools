@@ -214,9 +214,10 @@ def test_analysis_generates_bounded_pitch_specific_eq_approaches():
     analysis = _mock_analysis()
     recommendations = recommend_profiles(analysis)
 
-    available = {item["key"]: item for item in recommendations if item["available"]}
+    by_key = {item["key"]: item for item in recommendations}
+    available = {key: item for key, item in by_key.items() if item["available"]}
     assert {"neutral", "clarity", "warmth", "air", "soft"} <= set(available)
-    assert available["reference_match"]["available"] is False
+    assert by_key["reference_match"]["available"] is False
 
     for key in ("neutral", "clarity", "warmth", "air", "soft"):
         profile = available[key]["profile"]
