@@ -12,13 +12,13 @@ from typing import Callable
 
 import numpy as np
 import soundfile as sf
-from PySide6.QtCore import QThread, Signal, Qt, QUrl, QTimer
+from PySide6.QtCore import QThread, Signal, Qt, QUrl, QTimer, QRectF
 from PySide6.QtGui import QDesktopServices, QColor, QPainter, QPainterPath, QPen
 from PySide6.QtMultimedia import QAudioOutput, QMediaPlayer
 from PySide6.QtWidgets import (
     QApplication, QFileDialog, QGridLayout, QGroupBox, QHBoxLayout,
     QLabel, QLineEdit, QMainWindow, QMessageBox, QComboBox, QPushButton,
-    QProgressBar, QVBoxLayout, QWidget, QSizePolicy, QRectF,
+    QProgressBar, QVBoxLayout, QWidget, QSizePolicy,
 )
 
 from .full_sample_processing import process_full_sample_bank
@@ -339,7 +339,7 @@ class QuickRestoreWindow(QMainWindow):
 
         def task(progress):
             report = process_full_sample_bank(
-                root, root.parent / (root.name + "_preflight_unused"),
+                root, root.parent / (root.name + "_preflight"),
                 wet=DEFAULT_WET, dry_run=True, progress=progress,
             )
             candidates = list(report["files"])
@@ -451,16 +451,16 @@ class QuickRestoreWindow(QMainWindow):
             QMessageBox.warning(self, "Unsafe output", "Choose an output folder completely separate from the source voicebank.")
             return
         summary = self.scan_report["summary"]
-        expected = summary["ready"]
+        expected = summary["wav_files"]
         answer = QMessageBox.question(
             self, "Create processed voicebank copy",
-            f"Create a replacement-ready copy of the complete bank?\n\n"
-            f"WAVs found: {self.scan_report['files_found']}\n"
-            f"Eligible for current processing: {expected}\n"
-            f"Will remain unchanged / require review: "
-            f"{summary['partial'] + summary['manual_review'] + summary['bypassed']}\n\n"
+            f"Run the full-sample processing chain on every WAV and mirror the complete bank?\n\n"
+            f"WAVs to process: {expected}\n"
+            f"Expected measurable changes: {summary['changed']}\n"
+            f"Files with no detected correction: {summary['unchanged_after_analysis']}\n\n"
             f"Output: {output}\n\n"
-            "The original voicebank will not be modified. Existing files in the output folder with matching names will be overwritten.",
+            "No OTO mask restricts the sample duration. Cleanup stages are applied when detected; tonal EQ is family-aware. "
+            "The original bank will not be modified.",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No,
         )
