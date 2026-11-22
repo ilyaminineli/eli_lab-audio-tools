@@ -88,8 +88,8 @@ References:
 TIPS is a separate third-party resampler. Its frequency-map sidecar is `.pmk`, not Moresampler's `.mrq` or the built-in resampler's `.frq`. Public documentation located for TIPS is limited: community listings describe it as working well with soft voicebanks, while another UTAU reference notes that it can bring out background noise and may suit lower voices. These are qualitative reports, not an algorithm specification.
 
 Therefore:
-- Preserve and inventory `.pmk` files.
-- Do not convert, overwrite or regenerate them as a side effect of WAV EQ.
+- Inventory `.pmk` files and keep the originals available for comparison.
+- Do not convert, overwrite or silently reuse a `.pmk` file after its source WAV has been modified; the prepared bank needs a TIPS-generated map for the prepared WAV.
 - Test TIPS with and without the relevant `.pmk` map when building the comparison set.
 - Do not assume Moresampler flags or settings transfer to TIPS.
 
@@ -156,7 +156,7 @@ Keep these stages separate and report them separately:
 
 1. **Source diagnosis:** read-only per-sample/per-alias acoustic and OTO analysis. This establishes the baseline and does not edit the bank.
 2. **Source preparation:** optional, conservative EQ or source correction on a separate copy. It must be per pitch and, when evidence requires it, per phoneme/alias class. Its purpose is to improve the renderer's input analysis and reconstruction, not simply to make the dry WAV brighter.
-3. **Engine analysis metadata:** renderer-specific FRQ/PMK/MRQ/LLSM and configuration. Preserve original metadata; store new maps and settings in a separate output copy and make the engine/version explicit.
+3. **Engine analysis metadata:** renderer-specific FRQ/PMK/MRQ/LLSM and configuration. Preserve the original maps as source-bank reference material, but never assume they remain valid after a WAV changes. The prepared output must be given fresh engine-specific analysis maps (FRQ for the appropriate classic engines, PMK for TIPS, MRQ/LLSM for Moresampler) or have stale maps removed from the active rendering path until the engine regenerates them. Record the engine/version and regeneration state.
 4. **Renderer configuration:** Moresampler `moreconfig.txt`, Moresampler flags, TIPS-compatible options, or WORLDLINE-R expressions. These are engine controls, not source EQ.
 5. **Phrase rendering:** render the same UST/USTX phrase through the target engine. This is where pitch shifting, duration extension, OTO timing and inter-phoneme transitions can be judged.
 6. **Final mix:** optional DAW effects after the phrase exists. Reverb, delay, bus compression and mastering should not be indiscriminately baked into every voicebank WAV.
