@@ -314,7 +314,9 @@ def test_quick_restore_ui_module_compiles_and_is_the_default_cli_studio():
     assert "from .quick_restore import DEFAULT_WET, prepare_preview" in ui_text
     assert "class SpectrogramComparisonWidget" in ui_text
     assert "SPECTRAL DIFFERENCE" in ui_text
-    assert "QScrollArea" in ui_text
+    assert "left_panel" in ui_text
+    assert "right_panel" in ui_text
+    assert "SPECTROGRAM COMPARISON" in ui_text
     assert "process_full_sample_bank" in ui_text
 
     cli_path = Path(__file__).parents[1] / "eugene_timbre" / "cli.py"
