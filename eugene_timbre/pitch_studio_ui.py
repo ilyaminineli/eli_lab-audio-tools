@@ -563,7 +563,7 @@ class PitchStudioWindow(QMainWindow):
             QCheckBox { spacing: 8px; }
             QSlider::groove:horizontal { height: 7px; background: #d7d4cc; border-radius: 3px; }
             QSlider::handle:horizontal { background: #29312e; width: 17px; margin: -6px 0; border-radius: 8px; }
-        """))
+        """)
 
         if Path(self.root_edit.text()).expanduser().is_dir():
             self.scan_layers()
