@@ -13,12 +13,12 @@ from typing import Callable
 import numpy as np
 import soundfile as sf
 from PySide6.QtCore import QThread, Signal, Qt, QUrl, QTimer, QRectF
-from PySide6.QtGui import QDesktopServices, QColor, QPainter, QPainterPath, QPen
+from PySide6.QtGui import QDesktopServices, QColor, QPainter, QPen, QImage
 from PySide6.QtMultimedia import QAudioOutput, QMediaPlayer
 from PySide6.QtWidgets import (
     QApplication, QFileDialog, QGridLayout, QGroupBox, QHBoxLayout,
     QLabel, QLineEdit, QMainWindow, QMessageBox, QComboBox, QPushButton,
-    QProgressBar, QVBoxLayout, QWidget, QSizePolicy,
+    QProgressBar, QVBoxLayout, QWidget, QSizePolicy, QScrollArea, QFrame,
 )
 
 from .full_sample_processing import process_full_sample_bank
@@ -48,101 +48,178 @@ class Worker(QThread):
             self.failed.emit(str(exc))
 
 
-class WaveformComparisonWidget(QWidget):
-    """Original and processed waveforms side by side, with a difference track."""
+class SpectrogramComparisonWidget(QWidget):
+    """Aligned log-frequency spectrograms with a signed spectral-difference view."""
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.original = np.zeros(0, dtype=np.float32)
-        self.processed = np.zeros(0, dtype=np.float32)
-        self.sample_rate = 0
-        self.setMinimumHeight(250)
-        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.spectrogram = None
+        self._image_cache = {}
+        self.setMinimumHeight(440)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.MinimumExpanding)
 
-    @staticmethod
-    def _mono(audio: np.ndarray) -> np.ndarray:
-        data = np.asarray(audio, dtype=np.float32)
-        return np.mean(data, axis=1) if data.ndim == 2 else data
-
-    def set_waveforms(self, original, processed, sample_rate: int):
-        self.original = self._mono(original).copy()
-        self.processed = self._mono(processed).copy()
-        self.sample_rate = int(sample_rate)
+    def set_spectrogram(self, data: dict):
+        self.spectrogram = data
+        self._image_cache.clear()
         self.update()
 
     @staticmethod
-    def _draw_waveform(painter, signal, rect, color, scale):
-        if signal.size == 0 or rect.width() < 2 or rect.height() < 4:
-            return
-        width = max(2, int(rect.width()))
-        block = max(1, int(np.ceil(signal.size / width)))
-        count = int(np.ceil(signal.size / block))
-        clipped = signal[:count * block]
-        padded_size = count * block
-        if clipped.size < padded_size:
-            clipped = np.pad(clipped, (0, padded_size - clipped.size))
-        chunks = clipped.reshape(count, block)
-        low = np.min(chunks, axis=1)
-        high = np.max(chunks, axis=1)
-        mid = rect.center().y()
-        half = rect.height() * 0.44
-        painter.setPen(QPen(QColor("#e4e0d7"), 1))
-        painter.drawLine(int(rect.left()), int(mid), int(rect.right()), int(mid))
-        painter.setPen(QPen(QColor(color), 1))
-        for index, (minimum, maximum) in enumerate(zip(low, high)):
-            x = rect.left() + index
-            y1 = mid - float(maximum) / max(scale, 1e-8) * half
-            y2 = mid - float(minimum) / max(scale, 1e-8) * half
-            painter.drawLine(int(x), int(y1), int(x), int(y2))
+    def _resample_matrix(matrix, frequencies, width: int, height: int):
+        source = np.asarray(matrix, dtype=np.float32)
+        freq = np.asarray(frequencies, dtype=np.float64)
+        width = max(2, int(width))
+        height = max(2, int(height))
+        if source.ndim != 2 or source.shape[0] != freq.size:
+            raise ValueError("Spectrogram matrix and frequency axis do not match.")
+
+        fmin = max(float(freq[0]), 1.0)
+        fmax = max(float(freq[-1]), fmin * 1.01)
+        target_frequency = np.geomspace(fmin, fmax, height)
+        log_frequency = np.log(np.maximum(freq, 1.0))
+        target_log_frequency = np.log(target_frequency)
+        frequency_resampled = np.empty((height, source.shape[1]), dtype=np.float32)
+        for column in range(source.shape[1]):
+            frequency_resampled[:, column] = np.interp(
+                target_log_frequency, log_frequency, source[:, column]
+            )
+        frequency_resampled = frequency_resampled[::-1, :]
+
+        target_time = np.linspace(0, source.shape[1] - 1, width)
+        output = np.empty((height, width), dtype=np.float32)
+        source_time = np.arange(source.shape[1], dtype=np.float64)
+        for row in range(height):
+            output[row, :] = np.interp(
+                target_time, source_time, frequency_resampled[row, :]
+            )
+        return output
+
+    @staticmethod
+    def _spectrogram_rgb(values):
+        level = np.clip((values + 75.0) / 75.0, 0.0, 1.0)
+        # Dark navy -> muted teal -> warm ivory, fixed scale shared by A and B.
+        stops = np.array([0.0, 0.42, 0.76, 1.0], dtype=np.float32)
+        palette = np.array([
+            [14, 20, 29],
+            [43, 78, 91],
+            [129, 126, 105],
+            [247, 226, 184],
+        ], dtype=np.float32)
+        channels = [
+            np.interp(level, stops, palette[:, channel])
+            for channel in range(3)
+        ]
+        return np.stack(channels, axis=-1).astype(np.uint8)
+
+    @staticmethod
+    def _difference_rgb(values):
+        delta = np.clip(values / 6.0, -1.0, 1.0)
+        neutral = np.array([39, 43, 45], dtype=np.float32)
+        positive = np.array([239, 135, 78], dtype=np.float32)
+        negative = np.array([83, 153, 211], dtype=np.float32)
+        rgb = np.empty((*delta.shape, 3), dtype=np.float32)
+        pos = np.maximum(delta, 0.0)[..., None]
+        neg = np.maximum(-delta, 0.0)[..., None]
+        rgb[:] = neutral
+        rgb = rgb * (1.0 - pos) + positive * pos
+        rgb = rgb * (1.0 - neg) + negative * neg
+        return np.clip(rgb, 0, 255).astype(np.uint8)
+
+    @staticmethod
+    def _to_image(rgb: np.ndarray) -> QImage:
+        pixels = np.ascontiguousarray(rgb, dtype=np.uint8)
+        height, width, _ = pixels.shape
+        return QImage(
+            pixels.data, width, height, width * 3,
+            QImage.Format.Format_RGB888,
+        ).copy()
+
+    def _make_image(self, key: str, matrix, frequencies, width: int, height: int):
+        cache_key = (key, int(width), int(height))
+        cached = self._image_cache.get(cache_key)
+        if cached is not None:
+            return cached
+        values = self._resample_matrix(matrix, frequencies, width, height)
+        rgb = self._difference_rgb(values) if key == "difference" else self._spectrogram_rgb(values)
+        image = self._to_image(rgb)
+        self._image_cache[cache_key] = image
+        return image
+
+    @staticmethod
+    def _draw_frequency_axis(painter, rect):
+        painter.setPen(QPen(QColor("#d5d2c9"), 1))
+        for frequency, label in ((100.0, "100 Hz"), (1000.0, "1 kHz"), (10000.0, "10 kHz")):
+            fraction = np.log10(frequency / 70.0) / np.log10(12000.0 / 70.0)
+            y = rect.bottom() - fraction * rect.height()
+            painter.drawLine(int(rect.left()), int(y), int(rect.left() + 5), int(y))
+            painter.setPen(QColor("#73766f"))
+            painter.drawText(int(rect.left() - 48), int(y + 4), label)
+            painter.setPen(QPen(QColor("#d5d2c9"), 1))
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         painter.fillRect(self.rect(), QColor("#fbfaf7"))
-        if self.original.size == 0 or self.processed.size == 0:
+        if not self.spectrogram:
             painter.setPen(QColor("#777a74"))
-            painter.drawText(self.rect(), Qt.AlignmentFlag.AlignCenter, "Select a WAV sample to display the waveform comparison.")
+            painter.drawText(
+                self.rect(), Qt.AlignmentFlag.AlignCenter,
+                "Select a WAV sample to display its spectrogram comparison.",
+            )
             return
 
-        width, height = self.width(), self.height()
-        margin = 16
-        label_h = 20
-        gap = 14
-        panel_w = (width - margin * 2 - gap) / 2
-        panel_h = max(56, int((height - 90) * 0.48))
-        top = 27
-        rect_a = QRectF(margin, top, panel_w, panel_h)
-        rect_b = QRectF(margin + panel_w + gap, top, panel_w, panel_h)
-        painter.setPen(QColor("#4b514d"))
-        painter.drawText(int(rect_a.left()), 17, "ORIGINAL")
-        painter.drawText(int(rect_b.left()), 17, "PROCESSED")
-        painter.setPen(QPen(QColor("#e7e4dd"), 1))
+        data = self.spectrogram
+        margin_left, margin_right, gap = 58, 16, 18
+        content_width = max(120, self.width() - margin_left - margin_right)
+        panel_width = max(50, int((content_width - gap) / 2))
+        top = 30
+        panel_height = max(100, int((self.height() - 150) * 0.43))
+        rect_a = QRectF(margin_left, top, panel_width, panel_height)
+        rect_b = QRectF(margin_left + panel_width + gap, top, panel_width, panel_height)
+
+        painter.setPen(QColor("#343a37"))
+        painter.drawText(int(rect_a.left()), 19, "ORIGINAL  ·  RELATIVE LEVEL")
+        painter.drawText(int(rect_b.left()), 19, "PROCESSED  ·  SAME dB SCALE")
+        painter.drawImage(
+            rect_a,
+            self._make_image(
+                "original", data["original_db"], data["frequencies_hz"],
+                int(rect_a.width()), int(rect_a.height()),
+            ),
+        )
+        painter.drawImage(
+            rect_b,
+            self._make_image(
+                "processed", data["processed_db"], data["frequencies_hz"],
+                int(rect_b.width()), int(rect_b.height()),
+            ),
+        )
+        painter.setPen(QPen(QColor("#d5d2c9"), 1))
         painter.drawRect(rect_a)
         painter.drawRect(rect_b)
+        self._draw_frequency_axis(painter, rect_a)
 
-        shared_peak = max(
-            float(np.max(np.abs(self.original))),
-            float(np.max(np.abs(self.processed))),
-            1e-4,
-        )
-        self._draw_waveform(painter, self.original, rect_a, "#59645e", shared_peak)
-        self._draw_waveform(painter, self.processed, rect_b, "#e7795b", shared_peak)
-
-        difference = self.processed - self.original
-        diff_top = top + panel_h + 34
-        diff_h = max(48, height - diff_top - 24)
-        diff_rect = QRectF(margin, diff_top, width - margin * 2, diff_h)
-        diff_peak = max(float(np.max(np.abs(difference))), 1e-5)
-        painter.setPen(QColor("#4b514d"))
-        painter.drawText(int(diff_rect.left()), int(diff_top - 8), f"DIFFERENCE  ·  peak {diff_peak:.5f}")
-        painter.setPen(QPen(QColor("#e7e4dd"), 1))
-        painter.drawRect(diff_rect)
-        self._draw_waveform(painter, difference, diff_rect, "#7b68a6", diff_peak)
-        duration = self.original.size / max(1, self.sample_rate)
-        painter.setPen(QColor("#777a74"))
+        diff_top = top + panel_height + 54
+        diff_height = max(72, self.height() - diff_top - 34)
+        diff_rect = QRectF(margin_left, diff_top, content_width, diff_height)
+        painter.setPen(QColor("#343a37"))
         painter.drawText(
-            margin, height - 4,
-            f"0.00 s    —    {duration:.2f} s  ·  same time scale; waveform amplitudes normalised together",
+            int(diff_rect.left()), int(diff_top - 10),
+            "SPECTRAL DIFFERENCE  ·  PROCESSED − ORIGINAL  ·  BLUE = LESS / ORANGE = MORE",
+        )
+        painter.drawImage(
+            diff_rect,
+            self._make_image(
+                "difference", data["difference_db"], data["frequencies_hz"],
+                int(diff_rect.width()), int(diff_rect.height()),
+            ),
+        )
+        painter.setPen(QPen(QColor("#d5d2c9"), 1))
+        painter.drawRect(diff_rect)
+        self._draw_frequency_axis(painter, diff_rect)
+        painter.setPen(QColor("#73766f"))
+        painter.drawText(
+            margin_left, self.height() - 7,
+            f'0.00 s  —  {data["duration_seconds"]:.2f} s     '
+            f'Frequency axis is logarithmic · A/B use a shared level reference · Difference range ±6 dB',
         )
 
 
@@ -150,8 +227,8 @@ class QuickRestoreWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Eugene:RE — Full-Sample Voicebank Restore")
-        self.resize(1180, 900)
-        self.setMinimumSize(940, 760)
+        self.resize(1180, 860)
+        self.setMinimumSize(820, 620)
 
         self.scan_report: dict | None = None
         self.preview_data: dict | None = None
@@ -165,7 +242,15 @@ class QuickRestoreWindow(QMainWindow):
 
         central = QWidget()
         self.setCentralWidget(central)
-        layout = QVBoxLayout(central)
+        outer_layout = QVBoxLayout(central)
+        outer_layout.setContentsMargins(0, 0, 0, 0)
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setFrameShape(QFrame.Shape.NoFrame)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        scroll_content = QWidget()
+        layout = QVBoxLayout(scroll_content)
         layout.setContentsMargins(24, 20, 24, 20)
         layout.setSpacing(14)
 
@@ -209,18 +294,22 @@ class QuickRestoreWindow(QMainWindow):
         summary_layout.addWidget(self.summary_label)
         self.sample_combo = QComboBox()
         self.sample_combo.setMinimumHeight(38)
+        self.sample_combo.setMinimumContentsLength(30)
+        self.sample_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
         self.sample_combo.currentIndexChanged.connect(self.change_preview_sample)
         summary_layout.addWidget(QLabel("Preview sample"))
         summary_layout.addWidget(self.sample_combo)
-        self.waveform_view = WaveformComparisonWidget()
-        summary_layout.addWidget(self.waveform_view, 1)
+        self.spectrogram_view = SpectrogramComparisonWidget()
+        summary_layout.addWidget(self.spectrogram_view, 1)
         self.preview_note = QLabel(
-            "Original and processed waveform views will appear here, with a difference track below."
+            "Original and processed log-frequency sonograms will appear here, with a spectral-difference view below."
         )
         self.preview_note.setWordWrap(True)
         self.preview_note.setObjectName("muted")
+        self.preview_note.setMinimumHeight(54)
         summary_layout.addWidget(self.preview_note)
-        layout.addWidget(self.summary_group, 1)
+        self.summary_group.setMinimumHeight(590)
+        layout.addWidget(self.summary_group)
 
         audition = QHBoxLayout()
         self.play_original_button = QPushButton("Play original")
@@ -255,6 +344,9 @@ class QuickRestoreWindow(QMainWindow):
         self.open_output_button.clicked.connect(self.open_output)
         footer.addWidget(self.open_output_button)
         layout.addLayout(footer)
+
+        outer_layout.addWidget(self.scroll_area)
+        self.scroll_area.setWidget(scroll_content)
 
         self.setStyleSheet("""
             QMainWindow, QWidget { background: #f3f2ee; color: #252927; font-size: 14px; }
@@ -391,9 +483,7 @@ class QuickRestoreWindow(QMainWindow):
         self._start_worker(task, complete)
 
     def _show_preview_result(self, preview: dict):
-        self.waveform_view.set_waveforms(
-            preview["original"], preview["processed"], preview["sample_rate"]
-        )
+        self.spectrogram_view.set_spectrogram(preview["spectrogram"])
         stages = preview["processing"]["stages"]
         active = [
             name.replace("_", " ")
