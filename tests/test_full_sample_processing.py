@@ -102,6 +102,7 @@ def test_every_wav_is_full_sample_processed_without_oto_gating_and_bank_is_mirro
     (root / "6. B2" / "vowel.wav.llsm").write_bytes(b"llsm")
     (root / "6. B2" / "vowel.wav.mrq").write_bytes(b"mrq")
     (root / "6. B2" / "vowel.wav.pmk").write_bytes(b"pmk")
+    (root / "6. B2" / "desc.mrq").write_bytes(b"folder-level mrq")
     (root / "voicebank.ini").write_bytes(b"metadata")
 
     report = process_full_sample_bank(root, output, wet=1.0)
@@ -121,11 +122,13 @@ def test_every_wav_is_full_sample_processed_without_oto_gating_and_bank_is_mirro
     assert not (output / "6. B2" / "vowel.wav.llsm").exists()
     assert not (output / "6. B2" / "vowel.wav.mrq").exists()
     assert not (output / "6. B2" / "vowel.wav.pmk").exists()
+    assert not (output / "6. B2" / "desc.mrq").exists()
     assert {
         "6. B2/vowel.wav.frq",
         "6. B2/vowel.wav.llsm",
         "6. B2/vowel.wav.mrq",
         "6. B2/vowel.wav.pmk",
+        "6. B2/desc.mrq",
     }.issubset(set(report["invalidated_analysis_sidecars"]))
 
     # The original input remains untouched.
