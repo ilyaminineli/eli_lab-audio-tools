@@ -36,6 +36,21 @@ def midi_note_name(note: int) -> str:
     return f"{NOTE_NAMES[int(note) % 12]}{int(note) // 12 - 1}"
 
 
+def resolve_moresampler_ab_flags(flags: str, original_flags: str | None = None) -> dict[str, str]:
+    """Return the renderer flags used for the original and restored A/B variants.
+
+    With original_flags omitted, both renders use the same flags (source-EQ A/B).
+    Pass an empty original_flags string to compare a selected style against the
+    neutral Moresampler renderer (renderer-only A/B).
+    """
+    if not isinstance(flags, str) or not SAFE_FLAGS.fullmatch(flags):
+        raise ValueError("Restored Moresampler flags contain unsupported characters.")
+    baseline = flags if original_flags is None else original_flags
+    if not isinstance(baseline, str) or not SAFE_FLAGS.fullmatch(baseline):
+        raise ValueError("Original Moresampler flags contain unsupported characters.")
+    return {"original": baseline, "restored": flags}
+
+
 def encode_int12_curve(values: list[int]) -> str:
     """Encode pitch deviations using OpenUtau's Base64EncodeInt12 + RLE format."""
     encoded = []
@@ -274,14 +289,9 @@ def render_moresampler_ab(
     # With original_flags=None, retain the classic source-EQ A/B behaviour:
     # both variants use identical flags. Supplying "" for original_flags
     # creates an isolated renderer-flag A/B against Moresampler's neutral flags.
-    original_render_flags = flags if original_flags is None else original_flags
-    restored_render_flags = flags
-    for label, variant_flags in (
-        ("original", original_render_flags),
-        ("restored", restored_render_flags),
-    ):
-        if not SAFE_FLAGS.fullmatch(variant_flags):
-            raise ValueError(f"Unsafe Moresampler flags for {label} render.")
+    flag_map = resolve_moresampler_ab_flags(flags, original_flags)
+    original_render_flags = flag_map["original"]
+    restored_render_flags = flag_map["restored"]
     run_details = {}
     with tempfile.TemporaryDirectory(prefix="eugene_moresampler_ab_") as temp:
         workspace = Path(temp)
