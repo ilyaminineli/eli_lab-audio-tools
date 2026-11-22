@@ -1368,19 +1368,19 @@ class PitchStudioWindow(QMainWindow):
         def complete(report):
             output_folder = Path(report["output_folder"])
             self.status_label.setText(f"Moresampler A/B render saved: {output_folder}")
-            QMessageBox.information(
-                self,
-                "Moresampler comparison complete",
-                (
-                    "Renderer-only comparison: A used neutral flags and B used the selected Moresampler flags.\n\n"
-                    if compare_renderer_flags else
-                    "Both versions were rendered with the same OTO timing, note, duration and flags.\n\n"
-                )
-                f"Original: {report['outputs']['original']}\n"
-                f"Restored: {report['outputs']['restored']}\n\n"
-                f"Output: {output_folder}\n\n"
-                "Listen to the two rendered phone samples. The report's spectral measurements are diagnostics, not a naturalness score.",
+            comparison_kind = (
+                "Renderer-only comparison: A used neutral flags and B used the selected Moresampler flags.\n\n"
+                if compare_renderer_flags else
+                "Source-EQ comparison: both versions used identical Moresampler flags.\n\n"
             )
+            message = (
+                comparison_kind
+                + f"Original: {report['outputs']['original']}\n"
+                + f"Restored: {report['outputs']['restored']}\n\n"
+                + f"Output: {output_folder}\n\n"
+                + "Listen to the two rendered phone samples. The report's spectral measurements are diagnostics, not a naturalness score."
+            )
+            QMessageBox.information(self, "Moresampler comparison complete", message)
             QDesktopServices.openUrl(QUrl.fromLocalFile(str(output_folder.resolve())))
 
         self._start_worker(task, complete)
