@@ -89,12 +89,18 @@ Workflow:
 1. The default paths are prefilled for the supplied Eugene:RE setup. Choose the voicebank root if it differs, then click **Scan whole bank**. The scanner indexes every folder and file recursively and shows the hierarchy in **BANK STRUCTURE**. WAV, FRQ, LLSM and `oto.ini` counts are included.
 2. Nothing is preselected for export. Use **Select current**, check individual folders, or explicitly use **Select all** when intended.
 3. Select a pitch layer and run **Analyse checked**. The report includes median F0, spectral centroid, harmonic/residual proxy, relative band energy and a median cepstral spectral envelope.
-4. Set that pitch's five-band EQ profile and optional high-pass filter. The graph overlays the measured spectral envelope and the current EQ response; a status line explicitly reports whether processing is neutral or active. Each pitch stores its own settings.
+4. After analysis, the studio automatically generates four conservative source-EQ starting points for each pitch layer: **Clarity / presence**, **Warm / body**, **Air / detail**, and **Soft / dark**, plus a neutral control. Their gains are informed by that layer's measured centroid, relative-band energy, H/R proxy and spectral flatness. They are bounded to ±1.5 dB and keep high-pass OFF; they are listening-test suggestions, not an objective correction.
+5. Choose an approach and click **Apply to current** or **Apply to checked** to load the resulting pitch-specific gains into the visible EQ controls. **Generate + process checked using selected approach** runs that recommendation and exports the checked pitch folders in one confirmed action. Alternatively, audition first and use **Process checked pitch folders** after manual tuning. The source bank is never modified.
+6. The graph overlays the measured spectral envelope and live EQ response. The preview reports the measured peak delta, changed-sample fraction and delta RMS. A neutral profile (all gains at 0 dB, high-pass OFF) makes no audible or numerical change.
+7. Optionally choose another analysed pitch as a reference and use **Match reference pitch**. This compares the measured cepstral envelopes and fits a bounded five-band approximation; it is not a formant model or naturalness score.
+8. Save/load profiles as JSON. Each pitch layer keeps its own separate profile.
 5. Optionally choose an analysed reference pitch and generate a bounded five-band EQ suggestion from the difference between the measured cepstral spectral envelopes. If either envelope is unavailable, it falls back to broad relative-band-energy matching. This is an approximation, not a formant model or a naturalness score.
 6. Select a sample and audition the original and processed preview at the chosen wet blend. The preview reports the measured peak delta, changed-sample fraction and delta RMS. A neutral profile (all gains at 0 dB, high-pass OFF) makes no audible or numerical change, so the app warns before export or Moresampler A/B.
-7. Export checked pitch folders to a separate output root. The source bank is never modified. Non-WAV files, including `oto.ini`, are copied byte-for-byte.
+9. Exported pitch folders are written to a separate output root. The source bank is never modified. Non-WAV files, including `oto.ini`, FRQ and LLSM data, are copied byte-for-byte.
 
 ### Moresampler phone A/B testing
+
+Source-WAV EQ and Moresampler renderer flags are separate controls. The **Moresampler style template** dropdown provides small starter flag sets (Intimate/breathier, Tense/projected, Open vowels, Formant emphasis, Drier, Rough/growl). These flags change Moresampler's synthesis model; they do not rewrite the source WAV. Enable **A/B test selected Moresampler flags against neutral flags** to compare the chosen flag set with the same original sample rendered using no flags.
 
 The studio can render one selected WAV/OTO alias through a local `moresampler.exe`:
 
@@ -151,3 +157,10 @@ The UI starts with these editable defaults:
 - Moresampler: `C:/Users/photo/OneDrive/Документы/UtauV/Data/Resamplers/moresampler.exe`
 
 The app scans automatically on launch only when the default input folder exists on the computer. The initial pitch EQ remains neutral; use **Suggest envelope match** or adjust the visible bands/high-pass controls to create an explicit filter profile. The OTO body mask is OFF by default and is clearly described in the processing status.
+
+
+## UTAU rendering and restoration design
+
+See [docs/utau-rendering-and-profile-approaches.md](docs/utau-rendering-and-profile-approaches.md) for the documented phonemizer → resampler → wavtool pipeline, OTO timing, Moresampler's analysis/synthesis settings and flags, and the boundaries between source EQ, renderer behaviour and final phrase mixing.
+
+The current studio's automatic recommendations are deliberately conservative. It does not guess a universal ideal vocal tone, retune OTO entries, or apply reverb/compression to the voicebank. Renderer flags are only meaningful when the selected resampler supports them. Compare identical phrases at matched loudness before adopting a recipe.
