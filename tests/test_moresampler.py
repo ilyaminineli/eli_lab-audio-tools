@@ -5,6 +5,7 @@ from eugene_timbre.moresampler import (
     encode_int12_curve,
     midi_note_name,
     _moreconfig,
+    _prepare_moresampler_runtime,
 )
 from eugene_timbre.oto_analysis import OtoEntry
 
@@ -71,10 +72,57 @@ def test_moresampler_argument_builder_rejects_shell_metacharacters(tmp_path):
         )
 
 
-def test_moresampler_local_config_isolated_and_uses_measured_f0():
-    config = _moreconfig(44100, 174.0)
-    assert "resampler-compatibility on" in config
-    assert "output-sampling-rate 44100" in config
+def test_moresampler_voicebank_config_uses_measured_f0_only(tmp_path):
+    voicebank_config = tmp_path / "moreconfig.txt"
+    voicebank_config.write_text(
+        "analysis-noise-reduction on\\n"
+        "analysis-f0-min 70.0\\n"
+        "analysis-f0-max 800.0\\n"
+        "output-sampling-rate 22050\\n"
+        "resampler-compatibility off\\n"
+        "synthesis-duration-extension-method loop\\n",
+        encoding="utf-8",
+    )
+
+    config = _moreconfig(174.0, voicebank_config)
+
+    assert "analysis-noise-reduction on" in config
+    assert "synthesis-duration-extension-method loop" in config
     assert "analysis-f0-range-from-path off" in config
     assert "analysis-f0-min 104.400" in config
     assert "analysis-f0-max 295.800" in config
+    assert "output-sampling-rate" not in config
+    assert "resampler-compatibility" not in config
+
+
+def test_moresampler_runtime_isolated_global_config_preserves_installation(tmp_path):
+    executable = tmp_path / "moresampler.exe"
+    executable.write_bytes(b"mock-executable")
+    dll = tmp_path / "vcomp140.dll"
+    dll.write_bytes(b"mock-dll")
+    global_config = tmp_path / "moreconfig.txt"
+    original = (
+        "# installed Moresampler config\\n"
+        "synthesis-utau-style-normalization full\\n"
+        "analysis-f0-min 60.0\\n"
+        "output-sampling-rate 22050\\n"
+        "resampler-compatibility off\\n"
+        "dump-log-file C:/logs/moresampler.log\\n"
+    )
+    global_config.write_text(original, encoding="utf-8")
+
+    isolated_exe, report = _prepare_moresampler_runtime(
+        executable, tmp_path / "runtime", 44100
+    )
+
+    isolated_config = (isolated_exe.parent / "moreconfig.txt").read_text(encoding="utf-8")
+    assert isolated_exe.is_file()
+    assert (isolated_exe.parent / dll.name).read_bytes() == dll.read_bytes()
+    assert global_config.read_text(encoding="utf-8") == original
+    assert "synthesis-utau-style-normalization full" in isolated_config
+    assert "resampler-compatibility on" in isolated_config
+    assert "output-sampling-rate 44100" in isolated_config
+    assert "output-bit-depth 16" in isolated_config
+    assert "dump-log-file off" in isolated_config
+    assert "analysis-f0-min" not in isolated_config
+    assert report["copied_dlls"] == ["vcomp140.dll"]
