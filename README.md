@@ -29,7 +29,7 @@ eugene-timbre studio
 1. Point **Input bank** at the existing Eugene:RE folder. The supplied path is prefilled.
 2. Point **Output copy** at a separate folder. The supplied path is prefilled.
 3. Click **Scan bank and prepare preview**. Every WAV is analysed using a full-duration processing route; a representative sample is selected automatically.
-4. The preview shows the original waveform and processed waveform side by side, plus a difference waveform below. Listen to both versions.
+4. The preview shows original and processed log-frequency sonograms side by side on the same dB scale, plus a signed spectral-difference sonogram below (blue = less energy, orange = more). Listen to both versions.
 5. Click **Create processed voicebank copy**. Every WAV is processed across its complete duration and written into a mirrored output bank. OTO timing no longer gates whether a WAV is included.
 
 The first automatic whole-sample chain includes:

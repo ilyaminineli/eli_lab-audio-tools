@@ -186,3 +186,56 @@ def test_dry_run_does_not_create_output_directory(tmp_path):
     assert report["dry_run"] is True
     assert report["files_found"] == 1
     assert not output.exists()
+
+
+
+def test_spectrogram_comparison_uses_shared_scale_and_shows_boost_direction():
+    from eugene_timbre.quick_restore import compute_spectrogram_comparison
+
+    sr = 44100
+    duration = 0.9
+    t = np.arange(int(sr * duration), dtype=np.float64) / sr
+    original = (
+        0.18 * np.sin(2 * np.pi * 220.0 * t)
+        + 0.025 * np.sin(2 * np.pi * 1800.0 * t)
+    ).astype(np.float32)
+    processed = (
+        0.18 * np.sin(2 * np.pi * 220.0 * t)
+        + 0.05 * np.sin(2 * np.pi * 1800.0 * t)
+    ).astype(np.float32)
+
+    data = compute_spectrogram_comparison(original, processed, sr)
+
+    assert data["original_db"].shape == data["processed_db"].shape
+    assert data["difference_db"].shape == data["original_db"].shape
+    assert data["frequencies_hz"][0] >= 70
+    assert data["frequencies_hz"][-1] <= 12000
+    assert data["times_seconds"][-1] <= duration
+    assert float(np.max(data["difference_db"])) > 1.0
+    assert float(np.min(data["difference_db"])) >= -6.0
+    assert float(np.max(data["difference_db"])) <= 6.0
+    assert data["difference_range_db"] == [-3.0, 3.0]
+
+
+def test_identical_spectrogram_inputs_have_zero_difference():
+    from eugene_timbre.quick_restore import compute_spectrogram_comparison
+
+    sr = 44100
+    t = np.arange(sr // 2, dtype=np.float64) / sr
+    audio = (0.2 * np.sin(2 * np.pi * 330 * t)).astype(np.float32)
+
+    data = compute_spectrogram_comparison(audio, audio.copy(), sr)
+
+    assert np.allclose(data["difference_db"], 0.0)
+
+
+
+def test_silent_audio_sonogram_uses_floor_and_zero_difference():
+    from eugene_timbre.quick_restore import compute_spectrogram_comparison
+
+    silence = np.zeros(44100 // 2, dtype=np.float32)
+    data = compute_spectrogram_comparison(silence, silence.copy(), 44100)
+
+    assert np.all(data["original_db"] == data["floor_db"])
+    assert np.all(data["processed_db"] == data["floor_db"])
+    assert np.allclose(data["difference_db"], 0.0)
