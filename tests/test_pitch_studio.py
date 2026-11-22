@@ -110,3 +110,8 @@ def test_neutral_profile_copies_wav_without_reencoding(tmp_path):
     restored = output_root / "5. G4" / "sample.wav"
     assert report["summary"]["unchanged"] == 1
     assert restored.read_bytes() == original_bytes
+
+
+def test_optional_studio_ui_module_is_valid_python():
+    source = Path(__file__).parents[1] / "eugene_timbre" / "pitch_studio_ui.py"
+    compile(source.read_text(encoding="utf-8"), str(source), "exec")
