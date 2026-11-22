@@ -87,7 +87,7 @@ You can also launch it with `eugene-timbre-ui`. The UI requires PySide6; the cor
 Workflow:
 
 1. Choose the voicebank root. The scanner lists immediate subfolders containing a pitch token, such as `6. B2`, `4. F3` and `5. G4`.
-2. Check only the pitch folders you want to analyse or process.
+2. Nothing is preselected for export. Use **Select current**, check individual folders, or explicitly use **Select all** when intended.
 3. Select a layer and run **Analyse checked**. The report includes median F0, spectral centroid, harmonic/residual proxy, relative band energy and a median cepstral spectral envelope.
 4. Set that pitch's five-band EQ profile. Each pitch stores its own settings.
 5. Optionally choose an analysed reference pitch and generate a bounded five-band EQ suggestion from the difference between the measured cepstral spectral envelopes. If either envelope is unavailable, it falls back to broad relative-band-energy matching. This is an approximation, not a formant model or a naturalness score.
