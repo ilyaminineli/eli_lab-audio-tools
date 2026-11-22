@@ -213,7 +213,8 @@ def test_quick_restore_neutral_pitch_layer_preview_is_transparent(tmp_path: Path
     assert preview["processing"]["full_sample_coverage_percent"] == 100.0
     assert preview["processing"]["family"]["pitch"] == "G4"
     assert preview["processing"]["stages"]["dc_offset"]["applied"] is False
-    assert preview["same_audio"] is True
+    assert preview["processing"]["stages"]["spectral_eq"]["adaptive_presence_band"] is not None
+    assert preview["same_audio"] is False
 
 
 def test_quick_restore_ui_module_compiles_and_is_the_default_cli_studio():
