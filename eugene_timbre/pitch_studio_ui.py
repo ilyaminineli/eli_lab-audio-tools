@@ -169,6 +169,17 @@ class PitchStudioWindow(QMainWindow):
         self.layer_list = QListWidget()
         self.layer_list.currentItemChanged.connect(self.current_layer_changed)
         layer_layout.addWidget(self.layer_list, 1)
+        selection_buttons = QHBoxLayout()
+        select_current = QPushButton("Select current")
+        select_current.clicked.connect(self.select_current_layer)
+        select_all = QPushButton("Select all")
+        select_all.clicked.connect(self.select_all_layers)
+        clear_selection = QPushButton("Clear")
+        clear_selection.clicked.connect(self.clear_layer_selection)
+        selection_buttons.addWidget(select_current)
+        selection_buttons.addWidget(select_all)
+        selection_buttons.addWidget(clear_selection)
+        layer_layout.addLayout(selection_buttons)
         left_layout.addWidget(layer_group, 1)
 
         output_group = QGroupBox("OUTPUT")
@@ -355,7 +366,7 @@ class PitchStudioWindow(QMainWindow):
             item = QListWidgetItem(f'{layer["name"]}   ·   {layer["wav_count"]} WAV')
             item.setData(Qt.ItemDataRole.UserRole, layer)
             item.setFlags(item.flags() | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
-            item.setCheckState(Qt.CheckState.Checked)
+            item.setCheckState(Qt.CheckState.Unchecked)
             self.layer_list.addItem(item)
         self.status_label.setText(f"{len(layers)} pitch layer(s) found.")
         if layers:
@@ -367,14 +378,25 @@ class PitchStudioWindow(QMainWindow):
             self.current_title.setText("No pitch folders detected")
             self.metrics_label.setText("Expected folder names containing a pitch token, e.g. '6. B2', '4. F3', '5. G4'.")
 
+    def select_current_layer(self):
+        item = self.layer_list.currentItem()
+        if item:
+            item.setCheckState(Qt.CheckState.Checked)
+
+    def select_all_layers(self):
+        for index in range(self.layer_list.count()):
+            self.layer_list.item(index).setCheckState(Qt.CheckState.Checked)
+
+    def clear_layer_selection(self):
+        for index in range(self.layer_list.count()):
+            self.layer_list.item(index).setCheckState(Qt.CheckState.Unchecked)
+
     def checked_layers(self) -> list[dict]:
         selected = []
         for index in range(self.layer_list.count()):
             item = self.layer_list.item(index)
             if item.checkState() == Qt.CheckState.Checked:
                 selected.append(item.data(Qt.ItemDataRole.UserRole))
-        if not selected and self.layer_list.currentItem():
-            selected.append(self.layer_list.currentItem().data(Qt.ItemDataRole.UserRole))
         return selected
 
     def current_layer(self) -> dict | None:
