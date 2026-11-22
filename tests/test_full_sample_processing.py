@@ -214,6 +214,7 @@ def test_spectrogram_comparison_uses_shared_scale_and_shows_boost_direction():
     assert float(np.max(data["difference_db"])) > 1.0
     assert float(np.min(data["difference_db"])) >= -6.0
     assert float(np.max(data["difference_db"])) <= 6.0
+    assert data["difference_range_db"] == [-3.0, 3.0]
 
 
 def test_identical_spectrogram_inputs_have_zero_difference():
