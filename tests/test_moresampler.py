@@ -75,12 +75,12 @@ def test_moresampler_argument_builder_rejects_shell_metacharacters(tmp_path):
 def test_moresampler_voicebank_config_uses_measured_f0_only(tmp_path):
     voicebank_config = tmp_path / "moreconfig.txt"
     voicebank_config.write_text(
-        "analysis-noise-reduction on\\n"
-        "analysis-f0-min 70.0\\n"
-        "analysis-f0-max 800.0\\n"
-        "output-sampling-rate 22050\\n"
-        "resampler-compatibility off\\n"
-        "synthesis-duration-extension-method loop\\n",
+        "analysis-noise-reduction on\n"
+        "analysis-f0-min 70.0\n"
+        "analysis-f0-max 800.0\n"
+        "output-sampling-rate 22050\n"
+        "resampler-compatibility off\n"
+        "synthesis-duration-extension-method loop\n",
         encoding="utf-8",
     )
 
@@ -102,12 +102,12 @@ def test_moresampler_runtime_isolated_global_config_preserves_installation(tmp_p
     dll.write_bytes(b"mock-dll")
     global_config = tmp_path / "moreconfig.txt"
     original = (
-        "# installed Moresampler config\\n"
-        "synthesis-utau-style-normalization full\\n"
-        "analysis-f0-min 60.0\\n"
-        "output-sampling-rate 22050\\n"
-        "resampler-compatibility off\\n"
-        "dump-log-file C:/logs/moresampler.log\\n"
+        "# installed Moresampler config\n"
+        "synthesis-utau-style-normalization full\n"
+        "analysis-f0-min 60.0\n"
+        "output-sampling-rate 22050\n"
+        "resampler-compatibility off\n"
+        "dump-log-file C:/logs/moresampler.log\n"
     )
     global_config.write_text(original, encoding="utf-8")
 
