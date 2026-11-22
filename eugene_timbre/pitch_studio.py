@@ -242,6 +242,7 @@ def suggest_reference_match(
     match_method = "cepstral_spectral_envelope"
     delta_curve = None
     common_grid = None
+    bands = []
     if (
         source_freq.size >= 2 and source_freq.size == source_db.size
         and reference_freq.size >= 2 and reference_freq.size == reference_db.size
@@ -485,7 +486,13 @@ def process_pitch_folder(
         "output_folder": str(destination),
         "pitch": pitch_name(source),
         "wet": float(wet),
-        "profile": describe_profile(profile),
+        "profile": {
+            **describe_profile(profile),
+            "reference_pitch": profile_spec.get("reference_pitch"),
+            "match_method": profile_spec.get("match_method"),
+            "match_strength": profile_spec.get("match_strength"),
+            "max_gain_db": profile_spec.get("max_gain_db"),
+        },
         "protect_oto_fixed_regions": bool(protect_oto),
         "summary": {"files_found": len(wavs), **counts},
         "files": reports,
