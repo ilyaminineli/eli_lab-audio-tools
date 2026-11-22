@@ -18,7 +18,8 @@ from PySide6.QtWidgets import (
     QFormLayout, QFrame, QGridLayout, QGroupBox, QHBoxLayout, QLabel,
     QLineEdit, QListWidget, QListWidgetItem, QMainWindow, QMessageBox,
     QProgressBar, QPushButton, QSlider, QSpinBox, QSplitter, QTableWidget,
-    QTableWidgetItem, QVBoxLayout, QWidget,
+    QTableWidgetItem, QVBoxLayout, QWidget, QTabWidget, QTreeWidget,
+    QTreeWidgetItem, QScrollArea, QSizePolicy,
 )
 
 from .io import read_wav
@@ -27,6 +28,7 @@ from .oto_analysis import OtoEntry, find_nearest_oto, match_entries, parse_oto
 from .pitch_studio import (
     analyze_pitch_folder, default_profile, discover_pitch_layers,
     pitch_name, preview_sample, process_pitch_folder, suggest_reference_match,
+    inventory_voicebank,
 )
 
 
@@ -50,14 +52,16 @@ class TaskWorker(QThread):
 
 
 class EnvelopePlot(QWidget):
-    """Small dependency-free spectral-envelope plot."""
     def __init__(self, parent=None):
         super().__init__(parent)
         self.frequencies: list[float] = []
         self.values: list[float] = []
         self.low: list[float] = []
         self.high: list[float] = []
-        self.setMinimumHeight(190)
+        self.profile: dict = {}
+        self.wet = 1.0
+        self.setMinimumHeight(260)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
     def set_data(self, envelope: dict | None):
         envelope = envelope or {}
@@ -67,58 +71,116 @@ class EnvelopePlot(QWidget):
         self.high = list(envelope.get("p90_relative_db", []))
         self.update()
 
+    def set_profile(self, profile: dict | None, wet: float = 1.0):
+        self.profile = dict(profile or {})
+        self.wet = float(np.clip(wet, 0.0, 1.0))
+        self.update()
+
+    @staticmethod
+    def _profile_curve(profile: dict, frequencies: np.ndarray) -> np.ndarray:
+        """Calculate the plotted biquad/Butterworth response from current controls."""
+        response = np.zeros_like(frequencies, dtype=np.float64)
+        highpass = float(profile.get("highpass_hz", 0.0) or 0.0)
+        order = int(profile.get("highpass_slope", 2) or 2)
+        if highpass > 0:
+            safe_f = np.maximum(frequencies, 1.0)
+            response += -10.0 * np.log10(1.0 + (highpass / safe_f) ** (2 * order))
+        sample_rate = 44100.0
+        for band in profile.get("bands", []):
+            centre = float(band.get("frequency_hz", 0.0) or 0.0)
+            gain = float(band.get("gain_db", 0.0) or 0.0)
+            q = float(band.get("q", 0.7) or 0.7)
+            if centre <= 0 or abs(gain) < 1e-9 or centre >= sample_rate / 2:
+                continue
+            w0 = 2.0 * np.pi * centre / sample_rate
+            alpha = np.sin(w0) / (2.0 * q)
+            cosine = np.cos(w0)
+            amplitude = 10.0 ** (gain / 40.0)
+            b0, b1, b2 = 1 + alpha * amplitude, -2 * cosine, 1 - alpha * amplitude
+            a0, a1, a2 = 1 + alpha / amplitude, -2 * cosine, 1 - alpha / amplitude
+            omega = 2.0 * np.pi * frequencies / sample_rate
+            z1 = np.exp(-1j * omega)
+            z2 = z1 * z1
+            numerator = b0 + b1 * z1 + b2 * z2
+            denominator = a0 + a1 * z1 + a2 * z2
+            response += 20.0 * np.log10(np.maximum(np.abs(numerator / denominator), 1e-9))
+        return response
+
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         painter.fillRect(self.rect(), QColor("#fbfaf7"))
-        left, right, top, bottom = 52, self.width() - 18, 14, self.height() - 30
+        left, right, top, bottom = 62, self.width() - 22, 24, self.height() - 42
         if right <= left or bottom <= top:
             return
+
+        def x_for(hz):
+            return left + (np.log10(max(float(hz), 100.0)) - 2.0) / 2.0 * (right - left)
+
+        def y_for(db):
+            value = float(np.clip(db, -12.0, 12.0))
+            return bottom - (value + 12.0) / 24.0 * (bottom - top)
+
         painter.setPen(QPen(QColor("#e5e2db"), 1))
         for db in (-12, -6, 0, 6, 12):
-            y = bottom - (db + 12) / 24 * (bottom - top)
+            y = y_for(db)
             painter.drawLine(left, int(y), right, int(y))
             painter.setPen(QColor("#77746d"))
-            painter.drawText(6, int(y + 4), f"{db:+d} dB")
+            painter.drawText(7, int(y + 4), f"{db:+d} dB")
             painter.setPen(QPen(QColor("#e5e2db"), 1))
         painter.setPen(QColor("#77746d"))
         for hz in (100, 300, 1000, 3000, 10000):
-            x = left + (np.log10(hz) - 2.0) / 2.0 * (right - left)
-            painter.drawText(int(x - 18), self.height() - 8, f"{hz:g}")
+            x = x_for(hz)
+            painter.drawText(int(x - 18), self.height() - 9, f"{hz:g}")
             painter.setPen(QPen(QColor("#eeeae3"), 1))
             painter.drawLine(int(x), top, int(x), bottom)
             painter.setPen(QColor("#77746d"))
-        if len(self.frequencies) < 2 or len(self.values) != len(self.frequencies):
-            painter.drawText(left + 12, top + 22, "Analyse a pitch layer to inspect its median spectral envelope.")
-            return
 
-        def point(index, value):
-            x = left + (np.log10(max(self.frequencies[index], 100.0)) - 2.0) / 2.0 * (right - left)
-            y = bottom - (float(np.clip(value, -12, 12)) + 12) / 24 * (bottom - top)
-            return int(x), int(y)
+        if len(self.frequencies) >= 2 and len(self.values) == len(self.frequencies):
+            def envelope_point(index, value):
+                return int(x_for(self.frequencies[index])), int(y_for(value))
 
-        if len(self.low) == len(self.frequencies) and len(self.high) == len(self.frequencies):
-            area = QPainterPath()
-            area.moveTo(*point(0, self.high[0]))
+            if len(self.low) == len(self.frequencies) and len(self.high) == len(self.frequencies):
+                area = QPainterPath()
+                area.moveTo(*envelope_point(0, self.high[0]))
+                for i in range(1, len(self.frequencies)):
+                    area.lineTo(*envelope_point(i, self.high[i]))
+                for i in range(len(self.frequencies) - 1, -1, -1):
+                    area.lineTo(*envelope_point(i, self.low[i]))
+                area.closeSubpath()
+                painter.fillPath(area, QColor(100, 110, 116, 28))
+            line = QPainterPath()
+            line.moveTo(*envelope_point(0, self.values[0]))
             for i in range(1, len(self.frequencies)):
-                area.lineTo(*point(i, self.high[i]))
-            for i in range(len(self.frequencies) - 1, -1, -1):
-                area.lineTo(*point(i, self.low[i]))
-            area.closeSubpath()
-            painter.fillPath(area, QColor(100, 110, 116, 30))
-        line = QPainterPath()
-        line.moveTo(*point(0, self.values[0]))
-        for i in range(1, len(self.frequencies)):
-            line.lineTo(*point(i, self.values[i]))
-        painter.setPen(QPen(QColor("#252927"), 2))
-        painter.drawPath(line)
+                line.lineTo(*envelope_point(i, self.values[i]))
+            painter.setPen(QPen(QColor("#252927"), 2))
+            painter.drawPath(line)
+        else:
+            painter.setPen(QColor("#77746d"))
+            painter.drawText(left + 12, top + 28, "Analyse a pitch layer to see its measured spectral envelope.")
+
+        frequencies = np.geomspace(100.0, 10000.0, 144)
+        response = self._profile_curve(self.profile, frequencies) * self.wet
+        profile_line = QPainterPath()
+        profile_line.moveTo(int(x_for(frequencies[0])), int(y_for(response[0])))
+        for index in range(1, len(frequencies)):
+            profile_line.lineTo(int(x_for(frequencies[index])), int(y_for(response[index])))
+        painter.setPen(QPen(QColor("#e7795b"), 3))
+        painter.drawPath(profile_line)
+
+        painter.setPen(QColor("#252927"))
+        painter.drawText(left + 4, 15, "MEDIAN SPECTRAL ENVELOPE")
+        painter.setPen(QColor("#e7795b"))
+        painter.drawText(right - 176, 15, "CURRENT EQ RESPONSE")
 
 
 class PitchStudioWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Eugene:RE — Pitch Restoration Studio")
-        self.resize(1360, 980)
+        self.resize(1480, 1040)
+        self.setMinimumSize(1200, 820)
+        self.inventory: dict | None = None
         self.layers: list[dict] = []
         self.profiles: dict[str, dict] = {}
         self.analyses: dict[str, dict] = {}
@@ -152,21 +214,29 @@ class PitchStudioWindow(QMainWindow):
         left = QWidget()
         left_layout = QVBoxLayout(left)
         left_layout.setContentsMargins(0, 0, 12, 0)
-        bank_group = QGroupBox("VOICEBANK")
+        left_layout.setSpacing(10)
+
+        bank_group = QGroupBox("VOICEBANK ROOT")
         bank_layout = QVBoxLayout(bank_group)
-        self.root_edit = QLineEdit()
-        self.root_edit.setPlaceholderText("Choose the voicebank root or a pitch folder…")
+        self.root_edit = QLineEdit(
+            "C:/Users/photo/OneDrive/Документы/UtauV/Data/Singers/EugeneRE"
+        )
+        self.root_edit.setPlaceholderText("Choose the voicebank root…")
         bank_layout.addWidget(self.root_edit)
         root_buttons = QHBoxLayout()
         browse = QPushButton("Browse…")
         browse.clicked.connect(self.choose_root)
-        scan = QPushButton("Scan pitch folders")
+        scan = QPushButton("Scan whole bank")
         scan.clicked.connect(self.scan_layers)
         root_buttons.addWidget(browse)
         root_buttons.addWidget(scan)
         bank_layout.addLayout(root_buttons)
         left_layout.addWidget(bank_group)
 
+        self.left_tabs = QTabWidget()
+        pitch_page = QWidget()
+        pitch_page_layout = QVBoxLayout(pitch_page)
+        pitch_page_layout.setContentsMargins(7, 8, 7, 7)
         layer_group = QGroupBox("PITCH LAYERS  /  checked = process")
         layer_layout = QVBoxLayout(layer_group)
         self.layer_list = QListWidget()
@@ -183,11 +253,29 @@ class PitchStudioWindow(QMainWindow):
         selection_buttons.addWidget(select_all)
         selection_buttons.addWidget(clear_selection)
         layer_layout.addLayout(selection_buttons)
-        left_layout.addWidget(layer_group, 1)
+        pitch_page_layout.addWidget(layer_group, 1)
+        self.left_tabs.addTab(pitch_page, "PITCH LAYERS")
+
+        bank_page = QWidget()
+        bank_page_layout = QVBoxLayout(bank_page)
+        bank_page_layout.setContentsMargins(7, 8, 7, 7)
+        self.inventory_summary_label = QLabel("Run Scan whole bank to index all folders and files.")
+        self.inventory_summary_label.setObjectName("muted")
+        self.inventory_summary_label.setWordWrap(True)
+        bank_page_layout.addWidget(self.inventory_summary_label)
+        self.bank_tree = QTreeWidget()
+        self.bank_tree.setHeaderLabels(["VOICEBANK HIERARCHY", "TYPE / CONTENT"])
+        self.bank_tree.setColumnWidth(0, 240)
+        self.bank_tree.setAlternatingRowColors(True)
+        self.bank_tree.setUniformRowHeights(True)
+        self.bank_tree.setExpandsOnDoubleClick(True)
+        bank_page_layout.addWidget(self.bank_tree, 1)
+        self.left_tabs.addTab(bank_page, "BANK STRUCTURE")
+        left_layout.addWidget(self.left_tabs, 1)
 
         output_group = QGroupBox("OUTPUT")
         output_layout = QVBoxLayout(output_group)
-        self.output_edit = QLineEdit()
+        self.output_edit = QLineEdit("C:/EugeneRE_Restoration")
         self.output_edit.setPlaceholderText("Separate output directory…")
         output_layout.addWidget(self.output_edit)
         output_buttons = QHBoxLayout()
@@ -203,7 +291,8 @@ class PitchStudioWindow(QMainWindow):
 
         right = QWidget()
         right_layout = QVBoxLayout(right)
-        right_layout.setContentsMargins(12, 0, 0, 0)
+        right_layout.setContentsMargins(8, 0, 0, 0)
+        right_layout.setSpacing(9)
         current_header = QHBoxLayout()
         self.current_title = QLabel("No pitch selected")
         self.current_title.setObjectName("sectionTitle")
@@ -219,22 +308,65 @@ class PitchStudioWindow(QMainWindow):
         self.metrics_label.setWordWrap(True)
         right_layout.addWidget(self.metrics_label)
 
-        envelope_group = QGroupBox("MEDIAN SPECTRAL ENVELOPE  /  ANALYSED SAMPLES")
+        self.detail_tabs = QTabWidget()
+        right_layout.addWidget(self.detail_tabs, 1)
+
+        tone_scroll = QScrollArea()
+        tone_scroll.setWidgetResizable(True)
+        tone_page = QWidget()
+        tone_layout = QVBoxLayout(tone_page)
+        tone_layout.setContentsMargins(8, 8, 8, 8)
+        tone_layout.setSpacing(10)
+
+        envelope_group = QGroupBox("MEASURED ENVELOPE + LIVE EQ RESPONSE")
         envelope_layout = QVBoxLayout(envelope_group)
         self.envelope_plot = EnvelopePlot()
-        envelope_layout.addWidget(self.envelope_plot)
-        right_layout.addWidget(envelope_group)
+        envelope_layout.addWidget(self.envelope_plot, 1)
+        tone_layout.addWidget(envelope_group, 2)
 
-        profile_group = QGroupBox("PITCH-SPECIFIC TONE PROFILE")
+        profile_group = QGroupBox("PITCH-SPECIFIC FILTER / EQ")
         profile_layout = QVBoxLayout(profile_group)
-        hint = QLabel("Adjust each pitch independently. Zero gain means no change; use preview before processing.")
+        hint = QLabel(
+            "The graph's orange line is the current filter response. "
+            "The black line is the analysed median spectral envelope."
+        )
         hint.setObjectName("muted")
+        hint.setWordWrap(True)
         profile_layout.addWidget(hint)
+        self.profile_state_label = QLabel("NEUTRAL — no EQ or high-pass filter is active.")
+        self.profile_state_label.setObjectName("profileState")
+        self.profile_state_label.setWordWrap(True)
+        profile_layout.addWidget(self.profile_state_label)
+
+        filter_row = QHBoxLayout()
+        filter_row.addWidget(QLabel("High-pass (Hz)"))
+        self.highpass_spin = QDoubleSpinBox()
+        self.highpass_spin.setRange(0, 3000)
+        self.highpass_spin.setDecimals(0)
+        self.highpass_spin.setSingleStep(10)
+        self.highpass_spin.setValue(0)
+        self.highpass_spin.setSpecialValueText("OFF")
+        filter_row.addWidget(self.highpass_spin)
+        filter_row.addWidget(QLabel("Slope"))
+        self.highpass_slope_combo = QComboBox()
+        self.highpass_slope_combo.addItems(["12 dB/oct", "24 dB/oct", "36 dB/oct"])
+        filter_row.addWidget(self.highpass_slope_combo)
+        filter_row.addStretch()
+        self.highpass_spin.valueChanged.connect(self.save_current_profile)
+        self.highpass_slope_combo.currentIndexChanged.connect(self.save_current_profile)
+        profile_layout.addLayout(filter_row)
+
         self.eq_table = QTableWidget(5, 4)
         self.eq_table.setHorizontalHeaderLabels(["Band", "Centre (Hz)", "Gain (dB)", "Q"])
         self.eq_table.verticalHeader().setVisible(False)
-        self.eq_table.horizontalHeader().setStretchLastSection(True)
-        self.eq_table.setMaximumHeight(220)
+        self.eq_table.horizontalHeader().setStretchLastSection(False)
+        self.eq_table.setMinimumHeight(260)
+        self.eq_table.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.eq_table.verticalHeader().setDefaultSectionSize(40)
+        self.eq_table.setColumnWidth(0, 170)
+        self.eq_table.setColumnWidth(1, 150)
+        self.eq_table.setColumnWidth(2, 140)
+        self.eq_table.setColumnWidth(3, 110)
         self.band_controls = []
         for row, default in enumerate(default_profile()["bands"]):
             name = QTableWidgetItem(default["name"])
@@ -245,7 +377,7 @@ class PitchStudioWindow(QMainWindow):
             frequency.setDecimals(0)
             frequency.setValue(default["frequency_hz"])
             gain = QDoubleSpinBox()
-            gain.setRange(-6.0, 6.0)
+            gain.setRange(-12.0, 12.0)
             gain.setDecimals(1)
             gain.setSingleStep(0.1)
             gain.setValue(0.0)
@@ -272,19 +404,23 @@ class PitchStudioWindow(QMainWindow):
         match_row.addWidget(self.match_button)
         profile_layout.addLayout(match_row)
         profile_io_row = QHBoxLayout()
+        reset_profile = QPushButton("Reset to neutral")
+        reset_profile.clicked.connect(self.reset_profile)
         load_profiles = QPushButton("Load profiles…")
         load_profiles.clicked.connect(self.load_profiles)
         save_profiles = QPushButton("Save profiles…")
         save_profiles.clicked.connect(self.save_profiles)
+        profile_io_row.addWidget(reset_profile)
         profile_io_row.addWidget(load_profiles)
         profile_io_row.addWidget(save_profiles)
         profile_io_row.addStretch()
         profile_layout.addLayout(profile_io_row)
-        right_layout.addWidget(profile_group)
+        tone_layout.addWidget(profile_group, 2)
 
-        preview_group = QGroupBox("AUDITION  /  CURRENT SAMPLE")
+        preview_group = QGroupBox("AUDITION / CURRENT SAMPLE")
         preview_layout = QGridLayout(preview_group)
         self.sample_combo = QComboBox()
+        self.sample_combo.setMinimumHeight(38)
         self.sample_combo.currentIndexChanged.connect(self._refresh_oto_aliases)
         preview_layout.addWidget(QLabel("Sample"), 0, 0)
         preview_layout.addWidget(self.sample_combo, 0, 1, 1, 3)
@@ -294,11 +430,28 @@ class PitchStudioWindow(QMainWindow):
         self.processed_button.clicked.connect(lambda: self.play_preview(processed=True))
         preview_layout.addWidget(self.original_button, 1, 0, 1, 2)
         preview_layout.addWidget(self.processed_button, 1, 2, 1, 2)
-        right_layout.addWidget(preview_group)
+        self.preview_delta_label = QLabel("Choose a sample and preview it to measure the actual sample delta.")
+        self.preview_delta_label.setObjectName("muted")
+        self.preview_delta_label.setWordWrap(True)
+        preview_layout.addWidget(self.preview_delta_label, 2, 0, 1, 4)
+        tone_layout.addWidget(preview_group)
+        tone_layout.addStretch(1)
+        tone_scroll.setWidget(tone_page)
+        self.detail_tabs.addTab(tone_scroll, "ANALYSIS + EQ")
 
-        moresampler_group = QGroupBox("MORESAMPLER  /  OTO PHONE A/B RENDER")
+        more_scroll = QScrollArea()
+        more_scroll.setWidgetResizable(True)
+        more_page = QWidget()
+        more_page_layout = QVBoxLayout(more_page)
+        more_page_layout.setContentsMargins(8, 8, 8, 8)
+        more_page_layout.setSpacing(12)
+        moresampler_group = QGroupBox("MORESAMPLER / OTO PHONE A/B RENDER")
         moresampler_layout = QGridLayout(moresampler_group)
-        self.moresampler_edit = QLineEdit()
+        moresampler_layout.setHorizontalSpacing(12)
+        moresampler_layout.setVerticalSpacing(12)
+        self.moresampler_edit = QLineEdit(
+            "C:/Users/photo/OneDrive/Документы/UtauV/Data/Resamplers/moresampler.exe"
+        )
         self.moresampler_edit.setPlaceholderText("Path to moresampler.exe…")
         moresampler_browse = QPushButton("Browse…")
         moresampler_browse.clicked.connect(self.choose_moresampler)
@@ -306,32 +459,43 @@ class PitchStudioWindow(QMainWindow):
         moresampler_layout.addWidget(self.moresampler_edit, 0, 1, 1, 3)
         moresampler_layout.addWidget(moresampler_browse, 0, 4)
         self.alias_combo = QComboBox()
-        self.alias_combo.setMinimumWidth(240)
+        self.alias_combo.setMinimumWidth(280)
+        self.alias_combo.setMinimumHeight(38)
         moresampler_layout.addWidget(QLabel("OTO alias"), 1, 0)
         moresampler_layout.addWidget(self.alias_combo, 1, 1, 1, 2)
         self.target_note_spin = QSpinBox()
         self.target_note_spin.setRange(24, 96)
         self.target_note_spin.setValue(60)
+        self.target_note_spin.setMinimumHeight(38)
         moresampler_layout.addWidget(QLabel("Target MIDI note"), 1, 3)
         moresampler_layout.addWidget(self.target_note_spin, 1, 4)
         self.render_duration_spin = QSpinBox()
         self.render_duration_spin.setRange(100, 5000)
         self.render_duration_spin.setSingleStep(50)
         self.render_duration_spin.setValue(800)
+        self.render_duration_spin.setMinimumHeight(38)
         self.render_flags_edit = QLineEdit()
         self.render_flags_edit.setPlaceholderText("Optional Moresampler flags, e.g. Mt10Mb-5")
+        self.render_flags_edit.setMinimumHeight(38)
         moresampler_layout.addWidget(QLabel("Duration (ms)"), 2, 0)
         moresampler_layout.addWidget(self.render_duration_spin, 2, 1)
         moresampler_layout.addWidget(QLabel("Flags"), 2, 2)
         moresampler_layout.addWidget(self.render_flags_edit, 2, 3, 1, 2)
-        self.moresampler_hint = QLabel("Analyse the pitch layer and select a WAV with a matching OTO alias.")
+        self.moresampler_hint = QLabel(
+            "Select a pitch sample with a matching OTO alias. "
+            "The phone-level A/B render does not yet render a complete UST phrase."
+        )
         self.moresampler_hint.setObjectName("muted")
         self.moresampler_hint.setWordWrap(True)
         moresampler_layout.addWidget(self.moresampler_hint, 3, 0, 1, 4)
         self.moresampler_button = QPushButton("Render original + restored through Moresampler →")
+        self.moresampler_button.setMinimumHeight(46)
         self.moresampler_button.clicked.connect(self.render_moresampler)
         moresampler_layout.addWidget(self.moresampler_button, 3, 4)
-        right_layout.addWidget(moresampler_group)
+        more_page_layout.addWidget(moresampler_group)
+        more_page_layout.addStretch(1)
+        more_scroll.setWidget(more_page)
+        self.detail_tabs.addTab(more_scroll, "MORESAMPLER A/B")
 
         controls = QHBoxLayout()
         controls.addWidget(QLabel("Wet blend"))
@@ -340,15 +504,26 @@ class PitchStudioWindow(QMainWindow):
         self.wet_slider.setValue(100)
         self.wet_value = QLabel("100%")
         self.wet_slider.valueChanged.connect(lambda value: self.wet_value.setText(f"{value}%"))
+        self.wet_slider.valueChanged.connect(self.update_processing_state)
         controls.addWidget(self.wet_slider, 1)
         controls.addWidget(self.wet_value)
-        self.oto_checkbox = QCheckBox("Protect fixed OTO regions (skip unmatched samples)")
+        self.oto_checkbox = QCheckBox("Apply EQ only inside OTO stretchable body regions")
         self.oto_checkbox.setChecked(False)
+        self.oto_checkbox.toggled.connect(self.update_processing_state)
         controls.addWidget(self.oto_checkbox)
         right_layout.addLayout(controls)
 
+        self.processing_state_label = QLabel(
+            "NO FILTER CHANGE — all EQ gains are 0 dB and high-pass is OFF. "
+            "No mask is active; the full sample is passed through."
+        )
+        self.processing_state_label.setObjectName("processingState")
+        self.processing_state_label.setWordWrap(True)
+        right_layout.addWidget(self.processing_state_label)
+
         self.process_button = QPushButton("Process checked pitch folders →")
         self.process_button.setObjectName("primary")
+        self.process_button.setMinimumHeight(48)
         self.process_button.clicked.connect(self.process_checked)
         right_layout.addWidget(self.process_button)
 
@@ -357,26 +532,41 @@ class PitchStudioWindow(QMainWindow):
         self.progress.setValue(0)
         right_layout.addWidget(self.progress)
         splitter.addWidget(right)
-        splitter.setSizes([310, 900])
+        splitter.setSizes([365, 1040])
 
         self.setStyleSheet("""
-            QMainWindow, QWidget { background: #f3f2ee; color: #252927; font-size: 13px; }
-            #pageTitle { font-size: 15px; font-weight: 700; letter-spacing: 2px; }
-            #sectionTitle { font-size: 19px; font-weight: 600; }
+            QMainWindow, QWidget { background: #f3f2ee; color: #252927; font-size: 14px; }
+            #pageTitle { font-size: 16px; font-weight: 700; letter-spacing: 2px; }
+            #sectionTitle { font-size: 20px; font-weight: 600; }
             #muted { color: #777a74; }
-            QGroupBox { border: 1px solid #d9d7d0; border-radius: 5px; margin-top: 10px; padding: 10px; font-weight: 600; }
-            QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 5px; }
-            QLineEdit, QListWidget, QComboBox, QDoubleSpinBox, QTableWidget { background: #fbfaf7; border: 1px solid #d8d6cf; border-radius: 3px; padding: 5px; }
-            QPushButton { background: #e8e6df; border: 1px solid #d1cfc7; border-radius: 3px; padding: 7px 11px; }
+            #profileState { font-size: 14px; font-weight: 700; color: #b45135; padding: 5px 2px; }
+            #processingState { font-size: 13px; color: #39433e; padding: 5px 2px; }
+            QGroupBox { border: 1px solid #d9d7d0; border-radius: 6px; margin-top: 12px; padding: 12px; font-weight: 600; }
+            QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 6px; }
+            QLineEdit, QListWidget, QComboBox, QDoubleSpinBox, QSpinBox, QTableWidget, QTreeWidget {
+                background: #fbfaf7; border: 1px solid #d8d6cf; border-radius: 4px; padding: 6px;
+            }
+            QLineEdit, QComboBox, QDoubleSpinBox, QSpinBox { min-height: 28px; }
+            QTreeWidget::item { min-height: 25px; }
+            QTreeWidget::item:selected, QListWidget::item:selected { background: #e5e1d8; color: #252927; }
+            QPushButton { background: #e8e6df; border: 1px solid #d1cfc7; border-radius: 4px; padding: 9px 13px; min-height: 28px; }
             QPushButton:hover { background: #dedcd4; }
             QPushButton:disabled { color: #a5a39c; }
-            QPushButton#primary { background: #29312e; color: #faf9f5; border: 1px solid #29312e; font-weight: 600; padding: 10px; }
+            QPushButton#primary { background: #29312e; color: #faf9f5; border: 1px solid #29312e; font-weight: 700; padding: 12px; }
             QPushButton#primary:hover { background: #414b46; }
-            QHeaderView::section { background: #eceae4; padding: 5px; border: 0; }
-            QProgressBar { border: 1px solid #d8d6cf; border-radius: 3px; text-align: center; background: #fbfaf7; height: 12px; }
+            QHeaderView::section { background: #eceae4; padding: 8px; border: 0; }
+            QTabWidget::pane { border: 1px solid #d9d7d0; background: #f3f2ee; }
+            QTabBar::tab { background: #e8e6df; padding: 10px 16px; margin-right: 3px; border: 1px solid #d1cfc7; }
+            QTabBar::tab:selected { background: #fbfaf7; }
+            QProgressBar { border: 1px solid #d8d6cf; border-radius: 4px; text-align: center; background: #fbfaf7; height: 16px; }
             QProgressBar::chunk { background: #59645e; }
-            QCheckBox { spacing: 7px; }
-        """)
+            QCheckBox { spacing: 8px; }
+            QSlider::groove:horizontal { height: 7px; background: #d7d4cc; border-radius: 3px; }
+            QSlider::handle:horizontal { background: #29312e; width: 17px; margin: -6px 0; border-radius: 8px; }
+        """))
+
+        if Path(self.root_edit.text()).expanduser().is_dir():
+            self.scan_layers()
 
     def choose_root(self):
         path = QFileDialog.getExistingDirectory(self, "Select voicebank or pitch folder")
@@ -403,28 +593,94 @@ class PitchStudioWindow(QMainWindow):
 
     def scan_layers(self):
         try:
-            layers = discover_pitch_layers(self.root_edit.text())
+            root = Path(self.root_edit.text()).expanduser().resolve()
+            inventory = inventory_voicebank(root)
+            layers = discover_pitch_layers(root)
         except Exception as exc:
-            QMessageBox.warning(self, "Cannot scan folder", str(exc))
+            QMessageBox.warning(self, "Cannot scan voicebank", str(exc))
             return
+        self.inventory = inventory
         self.layers = layers
         self.layer_list.clear()
-        self.profiles = {item["name"]: self.profiles.get(item["name"], default_profile(item["pitch"])) for item in layers}
-        for index, layer in enumerate(layers):
-            item = QListWidgetItem(f'{layer["name"]}   ·   {layer["wav_count"]} WAV')
+        self.bank_tree.clear()
+        self.profiles = {
+            item["name"]: self.profiles.get(item["name"], default_profile(item["pitch"]))
+            for item in layers
+        }
+        for layer in layers:
+            item = QListWidgetItem(
+                f'{layer["name"]}   ·   {layer["wav_count"]} WAV samples'
+            )
             item.setData(Qt.ItemDataRole.UserRole, layer)
-            item.setFlags(item.flags() | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
+            item.setFlags(
+                item.flags() | Qt.ItemFlag.ItemIsUserCheckable
+                | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled
+            )
             item.setCheckState(Qt.CheckState.Unchecked)
             self.layer_list.addItem(item)
-        self.status_label.setText(f"{len(layers)} pitch layer(s) found.")
+
+        stats = inventory["stats"]
+        self.inventory_summary_label.setText(
+            f'{inventory["root_name"]}  ·  {stats["folders"]} folders  ·  '
+            f'{stats["wav"]} WAV  ·  {stats["frq"]} FRQ  ·  {stats["llsm"]} LLSM  ·  '
+            f'{stats["oto"]} oto.ini  ·  {inventory["pitch_layer_count"]} pitch layers  ·  '
+            f'{inventory["addon_folder_count"]} add-on folders'
+        )
+        root_item = QTreeWidgetItem([
+            inventory["root_name"],
+            f'{stats["folders"]} folders / {stats["wav"]} WAV / {stats["oto"]} OTO',
+        ])
+        root_item.setToolTip(0, inventory["root_path"])
+        self.bank_tree.addTopLevelItem(root_item)
+
+        def append_nodes(parent_item, nodes, depth=0):
+            for node in nodes:
+                counts = node["stats"]
+                if node["type"] == "directory":
+                    details = (
+                        f'{counts["wav"]} WAV · {counts["frq"]} FRQ · '
+                        f'{counts["llsm"]} LLSM · {counts["oto"]} OTO'
+                    )
+                    label = node["name"]
+                    if depth == 0:
+                        label = f'{label}  [{node["category"]}]'
+                    child_item = QTreeWidgetItem([label, details])
+                    child_item.setToolTip(0, node["path"])
+                    child_item.setData(0, Qt.ItemDataRole.UserRole, node)
+                    parent_item.addChild(child_item)
+                    append_nodes(child_item, node["children"], depth + 1)
+                else:
+                    child_item = QTreeWidgetItem([node["name"], node["category"]])
+                    child_item.setToolTip(0, node["path"])
+                    child_item.setData(0, Qt.ItemDataRole.UserRole, node)
+                    parent_item.addChild(child_item)
+
+        append_nodes(root_item, inventory["children"])
+        root_item.setExpanded(True)
+        for index in range(root_item.childCount()):
+            child = root_item.child(index)
+            node = child.data(0, Qt.ItemDataRole.UserRole)
+            if node and node["category"] in {
+                "Pitch layer", "R English subbank", "Consonant releases",
+                "Bonus phonetic extras", "L phonetic extension",
+                "V phonetic extension", "TH phonetic extension",
+            }:
+                child.setExpanded(False)
+
+        self.status_label.setText(
+            f'Scanned {stats["wav"]} WAVs across {stats["folders"]} folders; '
+            f'{len(layers)} pitch layers ready for pitch-only processing.'
+        )
+        self.reference_combo.clear()
+        self.reference_combo.addItem("Select reference after analysis…")
+        self.reference_combo.addItems([item["pitch"] for item in layers])
         if layers:
             self.layer_list.setCurrentRow(0)
-            self.reference_combo.clear()
-            self.reference_combo.addItem("Select reference after analysis…")
-            self.reference_combo.addItems([item["pitch"] for item in layers])
         else:
             self.current_title.setText("No pitch folders detected")
-            self.metrics_label.setText("Expected folder names containing a pitch token, e.g. '6. B2', '4. F3', '5. G4'.")
+            self.metrics_label.setText(
+                "No pitch folders were found. The BANK STRUCTURE tab still shows the full indexed hierarchy."
+            )
 
     def select_current_layer(self):
         item = self.layer_list.currentItem()
@@ -474,12 +730,21 @@ class PitchStudioWindow(QMainWindow):
             controls[0].blockSignals(False)
             controls[1].blockSignals(False)
             controls[2].blockSignals(False)
+        self.highpass_spin.blockSignals(True)
+        self.highpass_slope_combo.blockSignals(True)
+        self.highpass_spin.setValue(float(profile.get("highpass_hz", 0.0)))
+        self.highpass_slope_combo.setCurrentIndex({2: 0, 4: 1, 6: 2}.get(int(profile.get("highpass_slope", 2)), 0))
+        self.highpass_spin.blockSignals(False)
+        self.highpass_slope_combo.blockSignals(False)
+        self.update_processing_state()
 
     def save_current_profile(self, *_):
         layer = self.current_layer()
         if not layer:
             return
         profile = default_profile(layer["pitch"])
+        profile["highpass_hz"] = float(self.highpass_spin.value())
+        profile["highpass_slope"] = (2, 4, 6)[self.highpass_slope_combo.currentIndex()]
         profile["bands"] = []
         for row, controls in enumerate(self.band_controls):
             label = self.eq_table.item(row, 0).text()
@@ -489,6 +754,60 @@ class PitchStudioWindow(QMainWindow):
                 "gain_db": gain, "q": q_value,
             })
         self.profiles[layer["name"]] = profile
+        self.update_processing_state()
+
+    @staticmethod
+    def _profile_is_active(profile: dict | None) -> bool:
+        if not profile:
+            return False
+        return (
+            float(profile.get("highpass_hz", 0.0) or 0.0) > 0.0
+            or any(abs(float(band.get("gain_db", 0.0) or 0.0)) > 1e-6 for band in profile.get("bands", []))
+        )
+
+    def update_processing_state(self, *_):
+        layer = self.current_layer()
+        profile = self.profiles.get(layer["name"]) if layer else default_profile()
+        if not profile:
+            profile = default_profile()
+        gains = [float(band.get("gain_db", 0.0) or 0.0) for band in profile.get("bands", [])]
+        highpass = float(profile.get("highpass_hz", 0.0) or 0.0)
+        wet = self.wet_slider.value() / 100.0 if hasattr(self, "wet_slider") else 1.0
+        mask_active = self.oto_checkbox.isChecked() if hasattr(self, "oto_checkbox") else False
+        active = self._profile_is_active(profile) and wet > 0.0
+        self.envelope_plot.set_profile(profile, wet=wet)
+        if active:
+            nonzero = [f'{gain:+.1f} dB @ {band["frequency_hz"]:.0f} Hz' for gain, band in zip(gains, profile.get("bands", [])) if abs(gain) > 1e-6]
+            parts = nonzero[:3]
+            if highpass > 0:
+                slope = int(profile.get("highpass_slope", 2)) * 6
+                parts.append(f"HPF {highpass:.0f} Hz / {slope} dB/oct")
+            description = ", ".join(parts) if parts else "High-pass filter active"
+            self.profile_state_label.setText(f"ACTIVE FILTER PROFILE  ·  {description}")
+            self.profile_state_label.setStyleSheet("color: #376b53; font-weight: 700;")
+        else:
+            reason = "Wet blend is 0%" if wet <= 0 else "all EQ gains are 0 dB and high-pass is OFF"
+            self.profile_state_label.setText(f"NEUTRAL — {reason}. The processed preview should null against the original.")
+            self.profile_state_label.setStyleSheet("color: #b45135; font-weight: 700;")
+        mask_text = (
+            "OTO mask ON — only matched stretchable body regions are eligible; unmatched files are skipped."
+            if mask_active else
+            "OTO mask OFF — the filter is applied to the full selected WAV."
+        )
+        state_text = (
+            f"{'FILTER ACTIVE' if active else 'NO FILTER CHANGE'}  ·  Wet {self.wet_slider.value()}%  ·  {mask_text}"
+        )
+        if not active:
+            state_text += "  EQ is neutral until you edit a gain, set a high-pass frequency, or use Suggest envelope match."
+        self.processing_state_label.setText(state_text)
+
+    def reset_profile(self):
+        layer = self.current_layer()
+        if not layer:
+            return
+        self.profiles[layer["name"]] = default_profile(layer["pitch"])
+        self._load_profile(layer["name"])
+        self.status_label.setText(f'{layer["pitch"]}: reset to neutral; no filters are active.')
 
     def _load_samples(self, layer: dict):
         self.sample_combo.clear()
@@ -553,6 +872,7 @@ class PitchStudioWindow(QMainWindow):
             f'{analysis["failed_count"]} failed'
         )
         self.envelope_plot.set_data(analysis["spectral_envelope"])
+        self.update_processing_state()
         if self.current_layer() and self.sample_combo.currentIndex() >= 0:
             self._suggest_target_note(self.current_layer(), Path(self.sample_combo.currentData()))
 
@@ -691,6 +1011,7 @@ class PitchStudioWindow(QMainWindow):
             return
         path = Path(self.sample_combo.currentData())
         try:
+            original_audio, original_sr, _ = read_wav(path)
             if processed:
                 self.save_current_profile()
                 audio, sample_rate, _ = preview_sample(
@@ -699,8 +1020,25 @@ class PitchStudioWindow(QMainWindow):
                     protect_oto=self.oto_checkbox.isChecked(),
                     source_root=Path(layer["path"]),
                 )
+                if sample_rate != original_sr or audio.shape != original_audio.shape:
+                    raise ValueError("Processed preview changed sample rate or channel/frame shape.")
+                delta = np.asarray(audio, dtype=np.float64) - np.asarray(original_audio, dtype=np.float64)
+                peak_delta = float(np.max(np.abs(delta))) if delta.size else 0.0
+                changed_fraction = float(np.mean(np.abs(delta) > 1e-7)) if delta.size else 0.0
+                rms_delta = float(np.sqrt(np.mean(np.square(delta)))) if delta.size else 0.0
+                if peak_delta <= 1e-7:
+                    self.preview_delta_label.setText(
+                        "NO SAMPLE DIFFERENCE — current settings are neutral, wet is 0%, or the OTO mask contains no changed region."
+                    )
+                else:
+                    self.preview_delta_label.setText(
+                        f"Measured preview delta: peak {peak_delta:.6f}  ·  "
+                        f"changed samples {changed_fraction * 100:.1f}%  ·  "
+                        f"delta RMS {20 * np.log10(max(rms_delta, 1e-12)):.1f} dBFS"
+                    )
             else:
-                audio, sample_rate, _ = read_wav(path)
+                audio, sample_rate = original_audio, original_sr
+                self.preview_delta_label.setText("Playing original source WAV. Press Play processed preview to measure the DSP delta.")
             if np.max(np.abs(audio)) > 1.0:
                 raise ValueError("Preview would clip. Reduce EQ gain or wet blend.")
             target = Path(self.preview_directory.name) / ("processed.wav" if processed else "original.wav")
@@ -755,6 +1093,8 @@ class PitchStudioWindow(QMainWindow):
             self.save_current_profile()
             profile = dict(self.profiles[layer["name"]])
             wet = self.wet_slider.value() / 100.0
+            if wet <= 0 or not self._profile_is_active(profile):
+                raise ValueError("The current profile is neutral (or Wet is 0%). Change an EQ gain/high-pass setting or use Suggest envelope match before running an A/B test.")
             protect_oto = self.oto_checkbox.isChecked()
             executable = Path(executable_text).expanduser().resolve()
             target_note = self.target_note_spin.value()
@@ -834,6 +1174,12 @@ class PitchStudioWindow(QMainWindow):
             profiles[layer["name"]] = self.profiles.get(layer["name"], default_profile(layer["pitch"]))
         wet = self.wet_slider.value() / 100.0
         protect = self.oto_checkbox.isChecked()
+        if wet <= 0 or not any(self._profile_is_active(profiles[name]) for name in profiles):
+            QMessageBox.information(
+                self, "Neutral profile",
+                "All selected pitch profiles are neutral (0 dB EQ, high-pass OFF), or Wet is 0%. No WAV samples would change. Edit the filters or use Suggest envelope match first."
+            )
+            return
         total = max(1, sum(item["wav_count"] for item in selected))
 
         def task(progress):
