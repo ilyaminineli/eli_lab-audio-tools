@@ -104,7 +104,7 @@ The studio can render one selected WAV/OTO alias through a local `moresampler.ex
 4. Set the requested phone duration and, optionally, Moresampler flags.
 5. Click **Render original + restored through Moresampler**.
 
-Both variants use the same classic UTAU resampler arguments: note name, velocity, flags, OTO offset, duration, consonant, cutoff, volume, modulation, tempo and a constant-pitch curve. The test stages each input in a separate temporary folder and creates a per-folder `moreconfig.txt`; it does not add temporary analysis/cache files to the source voicebank. The per-test configuration enables resampler compatibility, uses the source sample rate, and sets Moresampler's F0-analysis bounds to 0.6×–1.7× the measured sample F0.
+Both variants use the same classic UTAU resampler arguments: note name, velocity, flags, OTO offset, duration, consonant, cutoff, volume, modulation, tempo and a constant-pitch curve. The test runs a temporary copy of `moresampler.exe` and its adjacent DLLs, with an isolated global `moreconfig.txt`; your installed executable folder and existing configuration are not edited. Global output settings enable resampler compatibility and match the source sample rate. Each temporary pitch folder gets a separate voicebank `moreconfig.txt` that preserves existing analysis/synthesis options and sets the F0-analysis bounds to 0.6×–1.7× the measured sample F0.
 
 Outputs are written beneath `moresampler_ab/<pitch>/<sample>/<note>_<duration>ms_<timestamp>/`:
 - `original_moresampler.wav`
