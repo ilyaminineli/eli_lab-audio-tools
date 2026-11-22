@@ -84,10 +84,16 @@ def compute_spectrogram_comparison(
         1e-12,
     )
     reference_db = 20.0 * np.log10(ref_amplitude)
-    a_db = 20.0 * np.log10(np.maximum(magnitude_a, 1e-12)) - reference_db
-    b_db = 20.0 * np.log10(np.maximum(magnitude_b, 1e-12)) - reference_db
-    a_db = np.clip(a_db, floor_db, 0.0).astype(np.float32)
-    b_db = np.clip(b_db, floor_db, 0.0).astype(np.float32)
+    if ref_amplitude <= 1e-10:
+        # Digital silence should render at the floor, not as a full-bright
+        # spectrogram merely because the shared reference is also zero.
+        a_db = np.full(magnitude_a.shape, floor_db, dtype=np.float32)
+        b_db = np.full(magnitude_b.shape, floor_db, dtype=np.float32)
+    else:
+        a_db = 20.0 * np.log10(np.maximum(magnitude_a, 1e-12)) - reference_db
+        b_db = 20.0 * np.log10(np.maximum(magnitude_b, 1e-12)) - reference_db
+        a_db = np.clip(a_db, floor_db, 0.0).astype(np.float32)
+        b_db = np.clip(b_db, floor_db, 0.0).astype(np.float32)
 
     difference = b_db - a_db
     energy_mask = np.maximum(a_db, b_db) > (floor_db + 10.0)
