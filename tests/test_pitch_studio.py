@@ -35,7 +35,7 @@ def test_discover_only_pitch_layer_folders(tmp_path):
 
 def test_analyze_pitch_folder_reports_pitch_and_spectral_data(tmp_path):
     folder = tmp_path / "6. B2"
-    _write_test_tone(folder / "a_a.wav")
+    _write_test_tone(folder / "a_a.wav", frequency=220.0)
 
     report = analyze_pitch_folder(folder)
 
@@ -43,7 +43,7 @@ def test_analyze_pitch_folder_reports_pitch_and_spectral_data(tmp_path):
     assert report["pitch"] == "B2"
     assert report["analysed_count"] == 1
     assert report["summary"]["f0_median_hz"] is not None
-    assert report["summary"]["relative_band_energy_median"]["500_2000_hz"] > 0
+    assert report["summary"]["relative_band_energy_median"]["150_500_hz"] > 0.5
 
 
 def test_reference_match_is_bounded_and_moves_toward_reference():
