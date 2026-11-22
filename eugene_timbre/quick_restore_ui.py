@@ -257,7 +257,7 @@ class QuickRestoreWindow(QMainWindow):
         title = QLabel("EUGENE:RE  /  VOICEBANK PREPARATION")
         title.setObjectName("title")
         subtitle = QLabel(
-            "One automatic full-sample pass → waveform and audio comparison → replacement-ready bank copy."
+            "One automatic full-sample pass → sonogram and audio comparison → replacement-ready bank copy."
         )
         subtitle.setObjectName("muted")
         layout.addWidget(title)
@@ -550,7 +550,7 @@ class QuickRestoreWindow(QMainWindow):
             f"Expected measurable changes: {summary['changed']}\n"
             f"Files with no detected correction: {summary['unchanged_after_analysis']}\n\n"
             f"Output: {output}\n\n"
-            "No OTO mask restricts the sample duration. Cleanup stages are applied when detected; tonal EQ is family-aware. "
+            "The sonogram compares frequency content over time. Cleanup stages are applied when detected; tonal EQ is family-aware. "
             "The original bank will not be modified.",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No,
