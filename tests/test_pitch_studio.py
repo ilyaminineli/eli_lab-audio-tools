@@ -29,7 +29,7 @@ def test_discover_only_pitch_layer_folders(tmp_path):
 
     found = discover_pitch_layers(tmp_path)
 
-    assert [item["pitch"] for item in found] == ["B2", "F3", "G4"]
+    assert [item["pitch"] for item in found] == ["F3", "G4", "B2"]
     assert all("CONSONANT" not in item["name"] for item in found)
 
 
