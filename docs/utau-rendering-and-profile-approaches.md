@@ -20,7 +20,7 @@ References:
 
 ## 2. Where Moresampler fits
 
-Moresampler is unusual because it can operate as a resampler, a wavtool, and an automatic voicebank configurator. OpenUtau's compatibility notes describe configuring it either as a resampler or as both resampler and wavtool.
+Moresampler is unusual because it can operate as a resampler or as both a resampler and wavtool; it also has an experimental OTO-generation mode. OpenUtau's compatibility notes describe configuring it either as a resampler or as both resampler and wavtool.
 
 It analyses input WAVs into its own model/cache data (notably LLSM, with pitch information such as MRQ/desc.mrq in documented versions), then synthesizes the requested phone. Therefore a clean source WAV is not the only consideration: analysis settings, pitch estimation, duration extension, OTO segmentation and the selected renderer flags all affect the result.
 
@@ -53,7 +53,7 @@ These values change the synthesis model rather than filtering the saved WAV:
 | `Mt` | Tension / vocal-fold tenseness | More projected or tighter tone |
 | `Mb` | Breathiness | Intimate / airy tone |
 | `Mo` | Openness | More open vowel colour |
-| `Md` | Dryness | Small change to breath-noise modulation; not a reverb control |
+| `Md` | Dryness | A drier renderer-side tone; not a reverb control |
 | `ME` | Formant emphasis | A little more formant prominence |
 | `MC` | Coarseness | Rougher texture |
 | `MG` | Growl | Growled character |
