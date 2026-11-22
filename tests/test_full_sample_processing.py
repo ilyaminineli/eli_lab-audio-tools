@@ -226,3 +226,15 @@ def test_identical_spectrogram_inputs_have_zero_difference():
     data = compute_spectrogram_comparison(audio, audio.copy(), sr)
 
     assert np.allclose(data["difference_db"], 0.0)
+
+
+
+def test_silent_audio_sonogram_uses_floor_and_zero_difference():
+    from eugene_timbre.quick_restore import compute_spectrogram_comparison
+
+    silence = np.zeros(44100 // 2, dtype=np.float32)
+    data = compute_spectrogram_comparison(silence, silence.copy(), 44100)
+
+    assert np.all(data["original_db"] == data["floor_db"])
+    assert np.all(data["processed_db"] == data["floor_db"])
+    assert np.allclose(data["difference_db"], 0.0)
