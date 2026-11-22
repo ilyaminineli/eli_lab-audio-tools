@@ -18,7 +18,6 @@ import numpy as np
 from .analysis import analyze_audio
 from .dsp import PeakingBand, TimbreProfile, apply_profile, apply_profile_masked, describe_profile
 from .io import read_wav, write_wav
-from .oto_analysis import build_oto_body_mask if False else None
 from .oto_analysis import find_nearest_oto, match_entries, parse_oto
 from .processing_chain import build_oto_body_mask
 from .timbre_analysis import TimbreAnalysisConfig, analyze_timbre
