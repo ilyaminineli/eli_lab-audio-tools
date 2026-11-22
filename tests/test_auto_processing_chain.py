@@ -274,11 +274,12 @@ def test_quick_restore_preview_uses_same_oto_aware_route_as_export(tmp_path: Pat
 
     preview = prepare_preview(root, "6. B2/v.wav", wet=0.5)
 
-    assert preview["status"] == "preview_ready"
+    assert preview["processing"]["full_sample_coverage_percent"] == 100.0
     assert preview["same_audio"] is False
-    assert preview["profile"]["name"] == "B2-gentle-body-presence"
-    assert preview["mask"]["mask_coverage_percent"] > 5
+    assert preview["processing"]["family"]["pitch"] == "B2"
     assert np.max(np.abs(preview["processed"] - preview["original"])) > 1e-5
+    # OTO entries no longer restrict the preview to a small body mask.
+    assert np.any(np.abs(preview["processed"][:int(0.08 * sr)] - preview["original"][:int(0.08 * sr)]) > 1e-7)
 
 
 def test_quick_restore_neutral_pitch_layer_preview_is_transparent(tmp_path: Path):
@@ -296,8 +297,10 @@ def test_quick_restore_neutral_pitch_layer_preview_is_transparent(tmp_path: Path
 
     preview = prepare_preview(root, "5. G4/g4.wav")
 
-    assert preview["same_audio"] is True
-    assert preview["status"] == "bypassed"
+    assert preview["processing"]["full_sample_coverage_percent"] == 100.0
+    assert preview["processing"]["family"]["pitch"] == "G4"
+    assert "spectral_eq" in preview["processing"]["stages"]
+    assert preview["processed"].shape == preview["original"].shape
 
 
 def test_quick_restore_ui_module_compiles_and_is_the_default_cli_studio():
@@ -309,6 +312,9 @@ def test_quick_restore_ui_module_compiles_and_is_the_default_cli_studio():
     assert "DEFAULT_INPUT" in ui_text
     assert "DEFAULT_OUTPUT" in ui_text
     assert "from .quick_restore import DEFAULT_WET, prepare_preview" in ui_text
+    assert "class WaveformComparisonWidget" in ui_text
+    assert "DIFFERENCE" in ui_text
+    assert "process_full_sample_bank" in ui_text
     assert "class WaveformComparisonWidget" in ui_text
     assert "DIFFERENCE" in ui_text
     assert "process_full_sample_bank" in ui_text
